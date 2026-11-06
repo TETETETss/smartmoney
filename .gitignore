@@ -1,0 +1,13 @@
+# build.py outputs. CI deploys dist/index.html and does not commit these.
+# raw.json is tens of MB.
+raw.json
+data.json
+debug.json
+index.html
+build.log
+dist/
+
+__pycache__/
+*.py[cod]
+.wrangler/
+node_modules/
