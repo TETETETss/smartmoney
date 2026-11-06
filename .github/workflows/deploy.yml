@@ -34,11 +34,37 @@ jobs:
 
       - name: Check Cloudflare credentials
         run: |
-          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
-            echo "Missing CLOUDFLARE_API_TOKEN or CLOUDFLARE_ACCOUNT_ID GitHub Actions secret."
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "Missing CLOUDFLARE_API_TOKEN GitHub Actions secret."
             exit 1
           fi
-          echo "Cloudflare credentials are present."
+          # The repo secret is present but empty. Wrangler can use the single
+          # account on the token; do not pass an empty ACCOUNT_ID through.
+          if [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "CLOUDFLARE_ACCOUNT_ID secret is empty. Resolving the account from the API token."
+            unset CLOUDFLARE_ACCOUNT_ID
+            body=$(curl -sS https://api.cloudflare.com/client/v4/accounts \
+              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              -H "Content-Type: application/json")
+            BODY="$body" python - <<'PY'
+          import json, os, sys
+          d = json.loads(os.environ["BODY"])
+          if not d.get("success"):
+              print("Cloudflare API GET /accounts failed:")
+              print(json.dumps(d.get("errors") or d, indent=2))
+              sys.exit(1)
+          accounts = d.get("result") or []
+          print(f"Token can access {len(accounts)} account(s).")
+          if len(accounts) != 1:
+              print("Set CLOUDFLARE_ACCOUNT_ID to the account that should own the Pages project.")
+              sys.exit(1)
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as f:
+              f.write(f"CLOUDFLARE_ACCOUNT_ID={accounts[0]['id']}\n")
+          print("Using the only account on this token.")
+          PY
+          else
+            echo "Using CLOUDFLARE_ACCOUNT_ID secret."
+          fi
 
       - name: Build site
         run: |
