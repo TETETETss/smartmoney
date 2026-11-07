@@ -2,8 +2,8 @@ name: Build and deploy
 
 on:
   schedule:
-    # GitHub runs this in UTC. About every 20 minutes; the scheduler can lag.
-    - cron: "*/20 * * * *"
+    # UTC. GitHub may start a scheduled run a few minutes late.
+    - cron: "*/10 * * * *"
   workflow_dispatch:
   push:
     branches: [main]
@@ -20,9 +20,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
-      # smartmoney.pages.dev is flagged by Cloudflare as phishing, so the
-      # project (and its *.pages.dev hostname) is bramspm-smartmoney.
-      PROJECT_NAME: bramspm-smartmoney
+      # Project name is smartmoney. smartmoney.pages.dev is already taken, so
+      # the production hostname may be a different *.pages.dev subdomain.
+      PROJECT_NAME: smartmoney
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
@@ -38,39 +38,70 @@ jobs:
             echo "Missing CLOUDFLARE_API_TOKEN GitHub Actions secret."
             exit 1
           fi
-          # The repo secret is present but empty. Wrangler can use the single
-          # account on the token; do not pass an empty ACCOUNT_ID through.
-          if [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+          CLOUDFLARE_ACCOUNT_ID=$(printf '%s' "$CLOUDFLARE_ACCOUNT_ID" | tr -d '[:space:]')
+          if [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "Using CLOUDFLARE_ACCOUNT_ID secret."
+            echo "CLOUDFLARE_ACCOUNT_ID=$CLOUDFLARE_ACCOUNT_ID" >> "$GITHUB_ENV"
+          else
             echo "CLOUDFLARE_ACCOUNT_ID secret is empty. Resolving the account from the API token."
             unset CLOUDFLARE_ACCOUNT_ID
             body=$(curl -sS https://api.cloudflare.com/client/v4/accounts \
               -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
               -H "Content-Type: application/json")
-            BODY="$body" python - <<'PY'
+            verify=$(curl -sS https://api.cloudflare.com/client/v4/user/tokens/verify \
+              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              -H "Content-Type: application/json")
+            BODY="$body" VERIFY="$verify" python - <<'PY'
           import json, os, sys
-          d = json.loads(os.environ["BODY"])
+          try:
+              v = json.loads(os.environ.get("VERIFY") or "{}")
+          except json.JSONDecodeError:
+              v = {}
+          vr = v.get("result") or {}
+          print("Token verify success:", bool(v.get("success")), "status:", vr.get("status") or v.get("errors"))
+          try:
+              d = json.loads(os.environ["BODY"])
+          except json.JSONDecodeError:
+              print("Cloudflare GET /accounts did not return JSON.")
+              sys.exit(1)
           if not d.get("success"):
               print("Cloudflare API GET /accounts failed:")
-              print(json.dumps(d.get("errors") or d, indent=2))
+              print(json.dumps(d.get("errors") or d, indent=2)[:2000])
               sys.exit(1)
           accounts = d.get("result") or []
           print(f"Token can access {len(accounts)} account(s).")
           if len(accounts) != 1:
-              print("Set CLOUDFLARE_ACCOUNT_ID to the account that should own the Pages project.")
+              print("Set the CLOUDFLARE_ACCOUNT_ID secret to the account that should own the Pages project.")
+              print("GET /accounts returned no single account. A Pages-only token often cannot list accounts.")
               sys.exit(1)
           with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as f:
               f.write(f"CLOUDFLARE_ACCOUNT_ID={accounts[0]['id']}\n")
           print("Using the only account on this token.")
           PY
-          else
-            echo "Using CLOUDFLARE_ACCOUNT_ID secret."
           fi
 
       - name: Build site
         run: |
+          set -o pipefail
           python -u build.py | tee build.log
           grep -E 'charts: [1-9][0-9]* price histories, [1-9][0-9]* trades' build.log
           grep -E 'Done: Macro [0-9]+ traders, [1-9][0-9]* markets shown -> index.html' build.log
+          grep -E 'live trades: [1-9][0-9]* rows from [1-9][0-9]* wallets' build.log
+          python - <<'PY'
+          import json, pathlib, re, sys
+          html = pathlib.Path("index.html").read_text(encoding="utf-8")
+          m = re.search(r"/\*__LIVE_START__\*/(\[.*\])/\*__LIVE_END__\*/", html)
+          if not m:
+              sys.exit("Live Trades payload missing from index.html")
+          rows = json.loads(m.group(1))
+          if not rows:
+              sys.exit("Live Trades payload is empty")
+          bad = [r for r in rows if not r.get("t") or not str(r.get("url", "")).startswith("https://polymarket.com/event/")]
+          if bad:
+              sys.exit(f"{len(bad)} live rows missing a real market title or Polymarket link")
+          r = rows[0]
+          print(f"embed ok: {len(rows)} rows; newest {r.get('n')} {r.get('side')} {r.get('out')} ${r.get('usd')} {r.get('chip')} {r.get('split')} {r.get('arrow')}")
+          PY
 
       - name: Stage dist
         run: |
@@ -92,7 +123,7 @@ jobs:
           set -e
           printf '%s\n' "$out"
           if [ "$code" -ne 0 ]; then
-            if printf '%s\n' "$out" | grep -Eiq 'already exists'; then
+            if printf '%s\n' "$out" | grep -Eiq 'already exists|already taken by this account|project already exists'; then
               echo "Project already exists; continuing."
             else
               echo "Failed to create Pages project (exit ${code})."
@@ -106,5 +137,40 @@ jobs:
             --project-name="$PROJECT_NAME" \
             --branch=main \
             --commit-dirty=true \
-            --commit-hash="${GITHUB_SHA}"
-          echo "Production URL: https://${PROJECT_NAME}.pages.dev"
+            --commit-hash="${GITHUB_SHA}" | tee deploy.log
+          python - <<'PY'
+          import json, os, re, urllib.request
+          log = open("deploy.log", encoding="utf-8", errors="replace").read()
+          urls = re.findall(r"https://[a-z0-9.-]+\.pages\.dev", log)
+          acct = os.environ["CLOUDFLARE_ACCOUNT_ID"]
+          name = os.environ["PROJECT_NAME"]
+          token = os.environ["CLOUDFLARE_API_TOKEN"]
+          req = urllib.request.Request(
+              f"https://api.cloudflare.com/client/v4/accounts/{acct}/pages/projects/{name}",
+              headers={"Authorization": f"Bearer {token}", "Accept": "application/json"})
+          prod = ""
+          try:
+              with urllib.request.urlopen(req, timeout=30) as r:
+                  d = json.loads(r.read().decode())
+              project = d.get("result") or {}
+              sub = project.get("subdomain") or ""
+              domains = [x.get("name") if isinstance(x, dict) else x for x in (project.get("domains") or [])]
+              canon = ((project.get("canonical_deployment") or {}).get("url")) or ""
+              print("Pages subdomain:", sub)
+              print("Pages domains:", ", ".join(str(x) for x in domains if x) or "(none)")
+              if canon:
+                  print("Canonical deployment:", canon)
+              if sub:
+                  prod = f"https://{sub}" if str(sub).startswith("http") else f"https://{sub}.pages.dev" if not str(sub).endswith(".pages.dev") else f"https://{sub}"
+          except Exception as e:
+              print("Could not read the Pages project:", e)
+          if not prod and urls:
+              prod = urls[-1]
+          print("Production URL:", prod or "(unknown)")
+          for u in urls:
+              print("Deploy log URL:", u)
+          summary = os.environ.get("GITHUB_STEP_SUMMARY")
+          if summary and prod:
+              with open(summary, "a", encoding="utf-8") as f:
+                  f.write(f"Live site: {prod}\n")
+          PY

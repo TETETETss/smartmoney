@@ -1,134 +1,130 @@
 [
- {
-  "address": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
-  "name": "ImJustKen"
- },
- {
-  "address": "0xed107a85a4585a381e48c7f7ca4144909e7dd2e5",
-  "name": "elmcap2"
- },
- {
-  "address": "0x44c1dfe43260c94ed4f1d00de2e1f80fb113ebc1",
-  "name": "aenews2"
- },
- {
-  "address": "0xf2f6af4f27ec2dcf4072095ab804016e14cd5817",
-  "name": "gopfan2"
- },
- {
-  "address": "0x7c3db723f1d4d8cb9c550095203b686cb11e5c6b",
-  "name": "Car"
- },
- {
-  "address": "0x6bab41a0dc40d6dd4c1a915b8c01969479fd1292",
-  "name": "Dropper"
- },
- {
-  "address": "0x8a4c788f043023b8b28a762216d037e9f148532b",
-  "name": "occasionalAwareness"
- },
- {
-  "address": "0x12d6cccfc7470a3f4bafc53599a4779cbf2cf2a8",
-  "name": "classified"
- },
- {
-  "address": "0x614dc8d3542c12103d2c6a3553fd761e391d1546",
-  "name": "mr.ozi"
- },
- {
-  "address": "0xe899b5ea69afb161da7a35597b6fe70398860899",
-  "name": "SlavaUkraini"
- },
- {
-  "address": "0x63d43bbb87f85af03b8f2f9e2fad7b54334fa2f1",
-  "name": "wokerjoesleeper"
- },
- {
-  "address": "0x6d9fc316c3b8377060a44b852ba664adbfd59790",
-  "name": "MEPP"
- },
- {
-  "address": "0x8f42ae0a01c0383c7ca8bd060b86a645ee74b88f",
-  "name": "cashy"
- },
- {
-  "address": "0xc8b9a30184244d427169cf62485dde6041b2b836",
-  "name": "SnowLover7"
- },
- {
-  "address": "0xdd225a03cd7ed89e3931906c67c75ab31cf89ef1",
-  "name": "Euan"
- },
- {
-  "address": "0x2e0b70d482e6b389e81dea528be57d825dd48070",
-  "name": "Trump2028"
- },
- {
-  "address": "0x35bbbad2415fe5e39b12da9a316cdc80b022009b",
-  "name": "MisTKy"
- },
- {
-  "address": "0x40cfb29411d29f4fa0908f2a121297042cccd21d",
-  "name": "whig"
- },
- {
-  "address": "0xd5ccdf772f795547e299de57f47966e24de8dea4",
-  "name": "tsybka"
- },
- {
-  "address": "0xd44e974a3edb232aa4aedbdcc59792b76a5f67e2",
-  "name": "KrackenSruster"
- },
- {
-  "address": "0xf1f9a438f2697381b4ac8eb283d6f4dd772d1245",
-  "name": "tunatyler"
- },
- {
-  "address": "0x60a92c8620846d81f5ea17b0564e0d4b7c545a71",
-  "name": "paddaa"
- },
- {
-  "address": "0xc4086b708cd3a50880b7069add1a1a80000f4675",
-  "name": "JJo"
- },
- {
-  "address": "0x08458f7e9d2858027de579e4c3ca305475496b6f",
-  "name": "GollumGekko"
- },
- {
-  "address": "0xe52c0a1327a12edc7bd54ea6f37ce00a4ca96924",
-  "name": "aff3"
- },
- {
-  "address": "0x43440ab002eaac9fede6f9d21bea96d84228f90d",
-  "name": "M888"
- },
- {
-  "address": "0x1f0a343513aa6060488fabe96960e6d1e177f7aa",
-  "name": "archaic"
- },
- {
-  "address": "0x1c144e30f405a25f991cbd8baa15d40599090869",
-  "name": "bernardbulletin"
- },
- {
-  "address": "0x1ee9a5fc09665909c0cce297c581703bfbb9197f",
-  "name": "vinii"
- },
- {
-  "address": "0xa4b366ad22fc0d06f1e934ff468e8922431a87b8",
-  "name": "HolyMoses7"
- },
- {
-  "address": "0x3dca854f147d9b9ecc56d37800f36b347ce23c13",
-  "name": "Ryxon21"
- },
- {
-  "address": "0x401ee31e9ebf9ab9f6315cd95faca5f950436fc9",
-  "name": "Lolakis"
- },
- {
-  "address": "0xeca0c0888e34df59589c67fbe53dc7f298b5e8f8",
-  "name": "StarMaster"
- }
+  {
+    "address": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "name": "ImJustKen"
+  },
+  {
+    "address": "0xed107a85a4585a381e48c7f7ca4144909e7dd2e5",
+    "name": "elmcap2"
+  },
+  {
+    "address": "0x44c1dfe43260c94ed4f1d00de2e1f80fb113ebc1",
+    "name": "aenews2"
+  },
+  {
+    "address": "0xf2f6af4f27ec2dcf4072095ab804016e14cd5817",
+    "name": "gopfan2"
+  },
+  {
+    "address": "0x7c3db723f1d4d8cb9c550095203b686cb11e5c6b",
+    "name": "Car"
+  },
+  {
+    "address": "0x6bab41a0dc40d6dd4c1a915b8c01969479fd1292",
+    "name": "Dropper"
+  },
+  {
+    "address": "0x8a4c788f043023b8b28a762216d037e9f148532b",
+    "name": "occasionalAwareness"
+  },
+  {
+    "address": "0x12d6cccfc7470a3f4bafc53599a4779cbf2cf2a8",
+    "name": "classified"
+  },
+  {
+    "address": "0x614dc8d3542c12103d2c6a3553fd761e391d1546",
+    "name": "mr.ozi"
+  },
+  {
+    "address": "0xe899b5ea69afb161da7a35597b6fe70398860899",
+    "name": "SlavaUkraini"
+  },
+  {
+    "address": "0x63d43bbb87f85af03b8f2f9e2fad7b54334fa2f1",
+    "name": "wokerjoesleeper"
+  },
+  {
+    "address": "0x6d9fc316c3b8377060a44b852ba664adbfd59790",
+    "name": "MEPP"
+  },
+  {
+    "address": "0x8f42ae0a01c0383c7ca8bd060b86a645ee74b88f",
+    "name": "cashy"
+  },
+  {
+    "address": "0xc8b9a30184244d427169cf62485dde6041b2b836",
+    "name": "SnowLover7"
+  },
+  {
+    "address": "0xdd225a03cd7ed89e3931906c67c75ab31cf89ef1",
+    "name": "Euan"
+  },
+  {
+    "address": "0x2e0b70d482e6b389e81dea528be57d825dd48070",
+    "name": "Trump2028"
+  },
+  {
+    "address": "0x35bbbad2415fe5e39b12da9a316cdc80b022009b",
+    "name": "MisTKy"
+  },
+  {
+    "address": "0x40cfb29411d29f4fa0908f2a121297042cccd21d",
+    "name": "whig"
+  },
+  {
+    "address": "0xd5ccdf772f795547e299de57f47966e24de8dea4",
+    "name": "tsybka"
+  },
+  {
+    "address": "0xd44e974a3edb232aa4aedbdcc59792b76a5f67e2",
+    "name": "KrackenSruster"
+  },
+  {
+    "address": "0xf1f9a438f2697381b4ac8eb283d6f4dd772d1245",
+    "name": "tunatyler"
+  },
+  {
+    "address": "0x60a92c8620846d81f5ea17b0564e0d4b7c545a71",
+    "name": "paddaa"
+  },
+  {
+    "address": "0xc4086b708cd3a50880b7069add1a1a80000f4675",
+    "name": "JJo"
+  },
+  {
+    "address": "0x08458f7e9d2858027de579e4c3ca305475496b6f",
+    "name": "GollumGekko"
+  },
+  {
+    "address": "0xe52c0a1327a12edc7bd54ea6f37ce00a4ca96924",
+    "name": "aff3"
+  },
+  {
+    "address": "0x43440ab002eaac9fede6f9d21bea96d84228f90d",
+    "name": "M888"
+  },
+  {
+    "address": "0x1f0a343513aa6060488fabe96960e6d1e177f7aa",
+    "name": "archaic"
+  },
+  {
+    "address": "0x1c144e30f405a25f991cbd8baa15d40599090869",
+    "name": "bernardbulletin"
+  },
+  {
+    "address": "0x1ee9a5fc09665909c0cce297c581703bfbb9197f",
+    "name": "vinii"
+  },
+  {
+    "address": "0xa4b366ad22fc0d06f1e934ff468e8922431a87b8",
+    "name": "HolyMoses7"
+  },
+  {
+    "address": "0x3dca854f147d9b9ecc56d37800f36b347ce23c13",
+    "name": "Ryxon21"
+  },
+  {
+    "address": "0xeca0c0888e34df59589c67fbe53dc7f298b5e8f8",
+    "name": "StarMaster"
+  }
 ]
