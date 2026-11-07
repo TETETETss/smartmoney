@@ -45,38 +45,42 @@ jobs:
           else
             echo "CLOUDFLARE_ACCOUNT_ID secret is empty. Resolving the account from the API token."
             unset CLOUDFLARE_ACCOUNT_ID
-            body=$(curl -sS https://api.cloudflare.com/client/v4/accounts \
-              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-              -H "Content-Type: application/json")
-            verify=$(curl -sS https://api.cloudflare.com/client/v4/user/tokens/verify \
-              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-              -H "Content-Type: application/json")
-            BODY="$body" VERIFY="$verify" python - <<'PY'
+            auth=(-H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" -H "Content-Type: application/json")
+            curl -sS "https://api.cloudflare.com/client/v4/accounts?per_page=50" "${auth[@]}" -o /tmp/cf-accounts.json
+            curl -sS "https://api.cloudflare.com/client/v4/memberships?per_page=50" "${auth[@]}" -o /tmp/cf-memberships.json
+            curl -sS "https://api.cloudflare.com/client/v4/user/tokens/verify" "${auth[@]}" -o /tmp/cf-verify.json
+            python - <<'PY'
           import json, os, sys
-          try:
-              v = json.loads(os.environ.get("VERIFY") or "{}")
-          except json.JSONDecodeError:
-              v = {}
-          vr = v.get("result") or {}
-          print("Token verify success:", bool(v.get("success")), "status:", vr.get("status") or v.get("errors"))
-          try:
-              d = json.loads(os.environ["BODY"])
-          except json.JSONDecodeError:
-              print("Cloudflare GET /accounts did not return JSON.")
-              sys.exit(1)
-          if not d.get("success"):
-              print("Cloudflare API GET /accounts failed:")
-              print(json.dumps(d.get("errors") or d, indent=2)[:2000])
-              sys.exit(1)
-          accounts = d.get("result") or []
-          print(f"Token can access {len(accounts)} account(s).")
-          if len(accounts) != 1:
-              print("Set the CLOUDFLARE_ACCOUNT_ID secret to the account that should own the Pages project.")
-              print("GET /accounts returned no single account. A Pages-only token often cannot list accounts.")
+          def load(path):
+              try:
+                  return json.load(open(path, encoding="utf-8"))
+              except Exception as e:
+                  print(path, "unreadable", e)
+                  return {}
+          v = load("/tmp/cf-verify.json")
+          vr = v.get("result") if isinstance(v.get("result"), dict) else {}
+          print("Token verify success:", bool(v.get("success")), "status:", (vr or {}).get("status"), "errors:", v.get("errors"))
+          found = []
+          accounts = load("/tmp/cf-accounts.json")
+          print("GET /accounts success:", accounts.get("success"), "result_info:", accounts.get("result_info"), "errors:", accounts.get("errors"))
+          for a in accounts.get("result") or []:
+              if isinstance(a, dict) and a.get("id"):
+                  found.append(a["id"])
+          mem = load("/tmp/cf-memberships.json")
+          print("GET /memberships success:", mem.get("success"), "errors:", mem.get("errors"), "count:", len(mem.get("result") or []))
+          for m in mem.get("result") or []:
+              acct = (m or {}).get("account") or {}
+              if acct.get("id"):
+                  found.append(acct["id"])
+                  print("Membership account name:", acct.get("name"))
+          found = list(dict.fromkeys(found))
+          print(f"Discovered {len(found)} account id(s).")
+          if len(found) != 1:
+              print("Set CLOUDFLARE_ACCOUNT_ID. This token cannot see exactly one account.")
               sys.exit(1)
           with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as f:
-              f.write(f"CLOUDFLARE_ACCOUNT_ID={accounts[0]['id']}\n")
-          print("Using the only account on this token.")
+              f.write(f"CLOUDFLARE_ACCOUNT_ID={found[0]}\n")
+          print("Using the only account visible to this token.")
           PY
           fi
 
