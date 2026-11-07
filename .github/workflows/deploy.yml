@@ -45,41 +45,67 @@ jobs:
           else
             echo "CLOUDFLARE_ACCOUNT_ID secret is empty. Resolving the account from the API token."
             unset CLOUDFLARE_ACCOUNT_ID
-            auth=(-H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" -H "Content-Type: application/json")
+            auth=(-H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" -H "Accept: application/json")
             curl -sS "https://api.cloudflare.com/client/v4/accounts?per_page=50" "${auth[@]}" -o /tmp/cf-accounts.json
             curl -sS "https://api.cloudflare.com/client/v4/memberships?per_page=50" "${auth[@]}" -o /tmp/cf-memberships.json
-            curl -sS "https://api.cloudflare.com/client/v4/user/tokens/verify" "${auth[@]}" -o /tmp/cf-verify.json
+            curl -sS -D /tmp/cf-verify.hdr "https://api.cloudflare.com/client/v4/user/tokens/verify" "${auth[@]}" -o /tmp/cf-verify.json
             python - <<'PY'
-          import json, os, sys
+          import json, os, re, urllib.request
+          token = os.environ["CLOUDFLARE_API_TOKEN"]
           def load(path):
               try:
                   return json.load(open(path, encoding="utf-8"))
               except Exception as e:
                   print(path, "unreadable", e)
                   return {}
+          def grab(obj, found):
+              if isinstance(obj, dict):
+                  for k, v in obj.items():
+                      m = re.search(r"com\.cloudflare\.api\.account\.([a-f0-9]{32})", str(k))
+                      if m: found.append(m.group(1))
+                      if k in ("account_id", "accountId") and re.fullmatch(r"[a-f0-9]{32}", str(v or "")):
+                          found.append(v)
+                      acct = v.get("account") if isinstance(v, dict) else None
+                      if isinstance(acct, dict) and re.fullmatch(r"[a-f0-9]{32}", str(acct.get("id") or "")):
+                          found.append(acct["id"])
+                      if k == "id" and isinstance(obj.get("name"), str) and re.fullmatch(r"[a-f0-9]{32}", str(v or "")):
+                          found.append(v)
+                      grab(v, found)
+              elif isinstance(obj, list):
+                  for v in obj: grab(v, found)
           v = load("/tmp/cf-verify.json")
           vr = v.get("result") if isinstance(v.get("result"), dict) else {}
-          print("Token verify success:", bool(v.get("success")), "status:", (vr or {}).get("status"), "errors:", v.get("errors"))
+          print("Token verify success:", bool(v.get("success")), "status:", (vr or {}).get("status"), "keys:", sorted((vr or {}).keys()), "errors:", v.get("errors"))
           found = []
           accounts = load("/tmp/cf-accounts.json")
           print("GET /accounts success:", accounts.get("success"), "result_info:", accounts.get("result_info"), "errors:", accounts.get("errors"))
-          for a in accounts.get("result") or []:
-              if isinstance(a, dict) and a.get("id"):
-                  found.append(a["id"])
+          grab(accounts.get("result"), found)
           mem = load("/tmp/cf-memberships.json")
-          print("GET /memberships success:", mem.get("success"), "errors:", mem.get("errors"), "count:", len(mem.get("result") or []))
-          for m in mem.get("result") or []:
-              acct = (m or {}).get("account") or {}
-              if acct.get("id"):
-                  found.append(acct["id"])
-                  print("Membership account name:", acct.get("name"))
+          print("GET /memberships success:", mem.get("success"), "errors:", mem.get("errors"))
+          grab(mem.get("result"), found)
+          hdr = open("/tmp/cf-verify.hdr", encoding="utf-8", errors="replace").read()
+          for line in hdr.splitlines():
+              if re.search(r"account|cf-", line, re.I) and "report-to" not in line.lower():
+                  print("verify header:", line[:180])
+                  found += re.findall(r"\b[a-f0-9]{32}\b", line)
+          tid = (vr or {}).get("id")
+          if tid and re.fullmatch(r"[a-f0-9-]{8,}", str(tid)):
+              req = urllib.request.Request(
+                  f"https://api.cloudflare.com/client/v4/user/tokens/{tid}",
+                  headers={"Authorization": f"Bearer {token}", "Accept": "application/json"})
+              try:
+                  with urllib.request.urlopen(req, timeout=30) as r:
+                      detail = json.loads(r.read().decode())
+                  print("GET /user/tokens/{id} success:", detail.get("success"), "errors:", detail.get("errors"))
+                  grab(detail.get("result"), found)
+              except Exception as e:
+                  body = e.read().decode("utf-8", "replace")[:300] if hasattr(e, "read") else ""
+                  print("GET /user/tokens/{id} failed:", e, body)
           found = list(dict.fromkeys(found))
           print(f"Discovered {len(found)} account id(s).")
           if len(found) != 1:
-              print("Set CLOUDFLARE_ACCOUNT_ID. This token cannot see exactly one account.")
-              sys.exit(1)
-          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as f:
-              f.write(f"CLOUDFLARE_ACCOUNT_ID={found[0]}\n")
+              raise SystemExit("Set CLOUDFLARE_ACCOUNT_ID. This token cannot see exactly one account.")
+          open(os.environ["GITHUB_ENV"], "a", encoding="utf-8").write(f"CLOUDFLARE_ACCOUNT_ID={found[0]}\n")
           print("Using the only account visible to this token.")
           PY
           fi
