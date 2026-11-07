@@ -44,6 +44,7 @@ jobs:
             echo "CLOUDFLARE_ACCOUNT_ID=$CLOUDFLARE_ACCOUNT_ID" >> "$GITHUB_ENV"
           else
             echo "CLOUDFLARE_ACCOUNT_ID secret is empty. Resolving the account from the API token."
+            export PYTHONUNBUFFERED=1
             unset CLOUDFLARE_ACCOUNT_ID
             auth=(-H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" -H "Accept: application/json")
             curl -sS "https://api.cloudflare.com/client/v4/accounts?per_page=50" "${auth[@]}" -o /tmp/cf-accounts.json
@@ -104,7 +105,11 @@ jobs:
           found = list(dict.fromkeys(found))
           print(f"Discovered {len(found)} account id(s).")
           if len(found) != 1:
-              raise SystemExit("Set CLOUDFLARE_ACCOUNT_ID. This token cannot see exactly one account.")
+              raise SystemExit(
+                  "CLOUDFLARE_API_TOKEN is active, but CLOUDFLARE_ACCOUNT_ID is empty and this "
+                  "Pages token cannot list accounts. Set the secret to the 32-character account id "
+                  "(the same account that owns the pmscan Pages project, if this token is for that account)."
+              )
           open(os.environ["GITHUB_ENV"], "a", encoding="utf-8").write(f"CLOUDFLARE_ACCOUNT_ID={found[0]}\n")
           print("Using the only account visible to this token.")
           PY
