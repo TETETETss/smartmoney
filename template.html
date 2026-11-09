@@ -270,7 +270,7 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
 #v-live .ltbar span{color:#777;font-size:12px;margin-left:auto}
 #v-live .ltscroll{overflow-x:auto}
 #v-live table{width:100%;border-collapse:collapse;table-layout:fixed;min-width:930px;font-size:13px}
-#v-live th{text-align:left;font-weight:400;color:#777;font-size:11px;text-transform:uppercase;letter-spacing:.6px;padding:16px 22px;border-bottom:1px solid #1f1f24}
+#v-live th{text-align:left;font-weight:400;color:#777;font-size:11px;text-transform:uppercase;letter-spacing:.6px;padding:16px 22px;border-bottom:1px solid #1f1f24}#v-live th#ltamt{cursor:pointer}#v-live th#ltamt:hover{color:#ddd}
 #v-live td{padding:20px 22px;border-bottom:1px solid #1f1f24;vertical-align:middle;font-size:13px}
 #v-live th:nth-child(1){width:37%}#v-live th:nth-child(2){width:22%}#v-live th:nth-child(3){width:20%}#v-live th:nth-child(4){width:14%}#v-live th:nth-child(5){width:7%}
 #v-live tr.trade-row{background:#0f0f12}#v-live tr.trade-row:hover{background:#16161b}
@@ -336,7 +336,7 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
    <div class="hero"><div><div class="muted" style="font-size:12px;margin-bottom:8px" id="liveline">__NLIVE__ RECENT TRADES · MACRO + FAST WALLETS</div><h2>Live Trades</h2></div></div>
    <div class="ltshell">
     <div class="ltbar"><input id="liveq" type="search" aria-label="Search markets or traders" placeholder="Search markets or traders…" autocomplete="off" spellcheck="false" oninput="liveRender()"><span id="livecount"></span></div>
-    <div class="ltscroll"><table id="lttbl"><thead><tr><th>Market</th><th>Trader</th><th>Side</th><th>Amount</th><th>Time</th></tr></thead><tbody id="ltbody"></tbody></table></div>
+    <div class="ltscroll"><table id="lttbl"><thead><tr><th>Market</th><th>Trader</th><th>Side</th><th id="ltamt" title="Sort by amount">Amount<span id="ltamtarr"></span></th><th>Time</th></tr></thead><tbody id="ltbody"></tbody></table></div>
     <div class="ltfoot"><span>Held bar = shares currently held in that market. Empty = fully exited.</span><span id="liveasof"></span></div>
    </div>
   </div>
@@ -383,7 +383,7 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
 </div>
 <script>
 ['contextmenu','copy','cut','dragstart','selectstart'].forEach(ev=>document.addEventListener(ev,e=>{if(ev=='selectstart'&&e.target.closest&&e.target.closest('input,textarea'))return;e.preventDefault()}));
-document.addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(e.key=='F12'||((e.ctrlKey||e.metaKey)&&['c','a','s','u','p','x'].includes(k))||((e.ctrlKey||e.metaKey)&&e.shiftKey&&['i','j','c'].includes(k))){e.preventDefault();e.stopPropagation()}},true);
+document.addEventListener('keydown',e=>{const t=e.target;if(t&&(t.isContentEditable||(t.closest&&t.closest('input,textarea'))))return;const k=e.key.toLowerCase();if(e.key=='F12'||((e.ctrlKey||e.metaKey)&&['c','a','s','u','p','x'].includes(k))||((e.ctrlKey||e.metaKey)&&e.shiftKey&&['i','j','c'].includes(k))){e.preventDefault();e.stopPropagation()}},true);
 
 const CHS={main:__CHARTS__,fast:__FAST_CHARTS__};let CH=CHS.main;
 const DS={main:__DATA__,fast:__FAST_DATA__},NT={main:__NTRADERS__,fast:__NFAST__};let GROUP='main',D=DS.main;
@@ -524,9 +524,12 @@ const shn=n=>(+n||0).toLocaleString('en-US',{maximumFractionDigits:2});
 const shortSh=n=>n>=1e6?(n/1e6).toFixed(1)+'M':n>=1000?(n/1000).toFixed(1)+'K':shn(n);
 const cents=p=>{const v=Math.round((+p||0)*1000)/10;return (Math.abs(v-Math.round(v))<0.05?String(Math.round(v)):v.toFixed(1))+'¢'};
 const ago=ts=>{let s=Math.max(0,Math.floor(Date.now()/1000-(+ts||0)));if(s<45)return s+'s';if(s<3600)return Math.round(s/60)+'m';if(s<86400)return Math.round(s/3600)+'h';return Math.round(s/86400)+'d'};
-function liveRender(){const q=(document.getElementById('liveq').value||'').trim().toLowerCase();const data=LIVE.filter(r=>!q||(r.n+' '+r.t+' '+r.out).toLowerCase().includes(q));
+function updatedLabel(ts){const m=Math.max(0,Math.floor((Date.now()/1000-(+ts||0))/60));if(m<1)return 'Updated just now';if(m<60)return 'Updated '+m+' min ago';const h=Math.floor(m/60);if(h<48)return 'Updated '+h+' hour'+(h===1?'':'s')+' ago';const d=Math.floor(h/24);return 'Updated '+d+' day'+(d===1?'':'s')+' ago'}
+let liveAmt=0;
+function liveRender(){const q=(document.getElementById('liveq').value||'').trim().toLowerCase();let data=LIVE.filter(r=>!q||(r.n+' '+r.t+' '+r.out).toLowerCase().includes(q));if(liveAmt)data.sort((a,b)=>liveAmt*(b.usd-a.usd)||b.ts-a.ts);
  document.getElementById('livecount').textContent=data.length+(data.length===1?' trade':' trades');
- const asof=document.getElementById('liveasof');if(asof)asof.textContent=BUILT?'Updated '+ago(BUILT)+' ago':'';
+ const asof=document.getElementById('liveasof');if(asof)asof.textContent=BUILT?updatedLabel(BUILT):'';
+ const arr=document.getElementById('ltamtarr');if(arr)arr.textContent=liveAmt===1?' ↓':liveAmt===-1?' ↑':'';
  document.getElementById('ltbody').innerHTML=data.map(r=>{const sell=r.side==='SELL';const initials=(r.n||'?').replace(/[^a-z0-9]/gi,'').slice(0,2).toUpperCase()||'?';
   const held=r.held>0?shortSh(r.held)+' sh held':'0 sh held · Fully exited';const peak=Math.max(r.peak||0,r.held||0,1);const width=r.held>0?Math.min(r.held/peak,1)*100:0;
   const tag=(r.chip||'')+(r.split?' '+r.split:'')+(r.arrow?' '+r.arrow:'');
@@ -536,7 +539,8 @@ function liveRender(){const q=(document.getElementById('liveq').value||'').trim(
   const fillrow=liveOpen.has(r.id)&&r.fills&&r.fills.length?`<tr class="fillrow"><td colspan="5"><div class="fill-list">${r.fills.map((f,i)=>`<span>Fill ${i+1} · <b>${dollars(f.usd)}</b><br>${shn(f.shares)} shares @ ${cents(f.price)} · <span data-ts="${f.ts}">${ago(f.ts)}</span></span>`).join('')}</div></td></tr>`:'';
   return `<tr class="trade-row"><td><div class="market">${icon}<a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">${esc(r.t)}</a></div></td><td><div class="trader-top">${av}<span class="name">${esc(r.n)}</span></div><div class="holding" title="${shn(r.held)} shares currently held"><div class="track" role="meter" aria-label="Current shares held" aria-valuemin="0" aria-valuemax="${peak}" aria-valuenow="${r.held||0}"><i style="width:${width}%"></i></div><div class="held ${r.held>0?'':'exited'}">${held}</div></div></td><td><div class="side ${sell?'sell':''}">${sell?'Sell':'Buy'} ${esc(r.out)}<span class="price">${cents(r.price)}</span></div>${tag?`<span class="consensus ${r.chip==='Against'?'against':''}">${esc(tag)}</span>`:''}${fills}</td><td><div class="amount">${dollars(r.usd)}</div><div class="shares">${shn(r.shares)} shares</div></td><td class="time" data-ts="${r.ts}">${ago(r.ts)}</td></tr>${fillrow}`}).join('')||'<tr><td colspan="5" class="empty">No tracked-wallet trades match.</td></tr>'}
 document.getElementById('lttbl').addEventListener('click',e=>{const b=e.target.closest('[data-fill]');if(!b)return;const id=+b.dataset.fill;liveOpen.has(id)?liveOpen.delete(id):liveOpen.add(id);liveRender()});
-setInterval(()=>{document.querySelectorAll('#v-live [data-ts]').forEach(el=>{el.textContent=ago(+el.dataset.ts)});const asof=document.getElementById('liveasof');if(asof&&BUILT)asof.textContent='Updated '+ago(BUILT)+' ago'},30000);
+document.getElementById('ltamt').addEventListener('click',()=>{liveAmt=liveAmt===1?-1:1;liveRender()});
+setInterval(()=>{document.querySelectorAll('#v-live [data-ts]').forEach(el=>{el.textContent=ago(+el.dataset.ts)});const asof=document.getElementById('liveasof');if(asof&&BUILT)asof.textContent=updatedLabel(BUILT)},30000);
 let cntM={};
 const fm=v=>v==null?'—':(v>=0?'+':'−')+'$'+K(Math.abs(v));
 function spark(s){if(!s||s.length<2)return '<div class="muted" style="font-size:12px;padding:30px 0">No chart data</div>';const W=300,H=70,mn=Math.min(...s,0),mx=Math.max(...s),rg=mx-mn||1;const pts=s.map((v,i)=>[(i/(s.length-1)*W).toFixed(1),(H-4-(v-mn)/rg*(H-8)).toFixed(1)]);const d='M'+pts.join('L');

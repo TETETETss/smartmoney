@@ -8,15 +8,15 @@ on:
   push:
     branches: [main]
 
-concurrency:
-  group: smartmoney-pages
-  cancel-in-progress: false
-
 permissions:
   contents: read
+  actions: write
 
 jobs:
   build-and-deploy:
+    concurrency:
+      group: smartmoney-pages
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
@@ -209,3 +209,19 @@ jobs:
               with open(summary, "a", encoding="utf-8") as f:
                   f.write(f"Live site: {prod}\n")
           PY
+
+  schedule-next:
+    needs: build-and-deploy
+    if: success()
+    runs-on: ubuntu-latest
+    concurrency:
+      group: smartmoney-refresh
+      cancel-in-progress: true
+    steps:
+      - name: Queue the next refresh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "Scheduled runs were landing hours apart. Wait, then start the next deploy."
+          sleep 540
+          gh workflow run deploy.yml --ref main
