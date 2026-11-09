@@ -224,4 +224,4 @@ jobs:
         run: |
           echo "Scheduled runs were landing hours apart. Wait, then start the next deploy."
           sleep 540
-          gh workflow run deploy.yml --ref main
+          gh api --method POST "repos/${{ github.repository }}/actions/workflows/deploy.yml/dispatches" -f ref=main
