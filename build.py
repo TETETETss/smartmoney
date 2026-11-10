@@ -308,23 +308,33 @@ def _activity_pages(addr):
         if min(norm_ts(x) or cutoff for x in r) < cutoff: break
     return [x for x in rows if str(F(x, 'side', default='')).upper() in ('BUY', 'SELL') and norm_ts(x) >= cutoff]
 
+def _num(v):
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return None
+
 def pos_index():
-    """addr -> condition -> outcome -> shares currently held. Redeemed and flat positions are skipped."""
-    idx = {}
+    """Shares and dollar value currently held: addr -> condition -> outcome.
+    Value prefers current_value from data-api v2, otherwise current price × size."""
+    idx, vals = {}, {}
     for addr, P in RAW.items():
         for p in P or []:
             if F(p, 'redeemable') in (True, 'True', 'true', 1): continue
-            try:
-                sh = float(F(p, 'current_size', 'size', default=0) or 0)
-            except (TypeError, ValueError):
-                continue
-            if sh <= 0.01: continue
+            sh = _num(F(p, 'current_size', 'size', default=0))
+            if sh is None or sh <= 0.01: continue
             cid = F(p, 'condition_id', 'conditionId')
             if not cid: continue
             out = F(p, 'outcome') or ('Yes' if str(F(p, 'outcome_index', 'outcomeIndex')) == '0' else 'No')
+            val = _num(F(p, 'current_value', 'currentValue'))
+            if val is None:
+                px = _num(F(p, 'current_price', 'cur_price', 'curPrice')) or 0.0
+                val = sh * px
             slot = idx.setdefault(addr, {}).setdefault(cid, {})
             slot[out] = slot.get(out, 0.0) + sh
-    return idx
+            vslot = vals.setdefault(addr, {}).setdefault(cid, {})
+            vslot[out] = vslot.get(out, 0.0) + val
+    return idx, vals
 
 def _holders(state):
     """state: addr -> outcome -> shares. One wallet on both outcomes is a hedge and is left out."""
@@ -404,7 +414,7 @@ def live_feed(addrs, names):
                 'slug': F(x, 'slug', 'market_slug') or '', 'ev': F(x, 'event_slug', 'eventSlug') or '', 'img': F(x, 'icon', 'image') or '',
                 'side': side, 'out': outcome, 'shares': shares, 'price': price, 'usd': usd, 'ts': ts})
     print(f'  activity rows: {raw_n}, priced trades >= ${MIN_TRADE_USD:g}: {len(trades)}')
-    idx = pos_index()
+    idx, vals = pos_index()
     by_cid = {}
     for t in trades: by_cid.setdefault(t['cid'], []).append(t)
     cons, arrows = {}, {}
@@ -443,7 +453,8 @@ def live_feed(addrs, names):
         usd, shares = sum(f['usd'] for f in fills), sum(f['shares'] for f in fills)
         price = usd / shares if shares else head['price']
         held = float((idx.get(g['a'], {}).get(g['cid'], {}) or {}).get(g['out'], 0.0) or 0.0)
-        if held <= 0.01: held = 0.0
+        hval = float((vals.get(g['a'], {}).get(g['cid'], {}) or {}).get(g['out'], 0.0) or 0.0)
+        if held <= 0.01: held, hval = 0.0, 0.0
         peak = _held_peak(held, ev_key.get((g['a'], g['cid'], g['out']), []))
         now, holders = cons.get(g['cid'], (_summary({}), {}))
         chip, split = _chip(g['side'], g['out'], now, g['a'], holders)
@@ -458,7 +469,7 @@ def live_feed(addrs, names):
                 break
         rows.append({'n': head['n'], 'avatar': head['avatar'] or '', 't': title, 'url': market_url(slug, ev), 'img': img or '', 'cid': g['cid'],
             'side': g['side'], 'out': g['out'], 'price': round(price, 4), 'usd': round(usd, 2), 'shares': round(shares, 2),
-            'ts': head['ts'], 'held': round(held, 2), 'peak': round(max(peak, held), 2), 'chip': chip, 'split': split,
+            'ts': head['ts'], 'held': round(held, 2), 'hval': round(hval, 2), 'peak': round(max(peak, held), 2), 'chip': chip, 'split': split,
             'arrow': arrows.get(g['cid'], ''),
             'fills': [{'ts': f['ts'], 'usd': round(f['usd'], 2), 'shares': round(f['shares'], 2), 'price': round(f['price'], 4)} for f in fills] if len(fills) > 1 else []})
     rows.sort(key=lambda r: -r['ts'])
