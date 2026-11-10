@@ -456,7 +456,7 @@ def live_feed(addrs, names):
                 ev = ev or F(p, 'event_slug', 'eventSlug') or ''
                 img = img or F(p, 'icon', 'image') or ''
                 break
-        rows.append({'n': head['n'], 'avatar': head['avatar'] or '', 't': title, 'url': market_url(slug, ev), 'img': img or '',
+        rows.append({'n': head['n'], 'avatar': head['avatar'] or '', 't': title, 'url': market_url(slug, ev), 'img': img or '', 'cid': g['cid'],
             'side': g['side'], 'out': g['out'], 'price': round(price, 4), 'usd': round(usd, 2), 'shares': round(shares, 2),
             'ts': head['ts'], 'held': round(held, 2), 'peak': round(max(peak, held), 2), 'chip': chip, 'split': split,
             'arrow': arrows.get(g['cid'], ''),
@@ -494,7 +494,7 @@ def main():
         seen.add(w['address']); addrs.append(w['address'])
     prefetch_positions(addrs)
     LIVE = live_feed(addrs, names)
-    for m in D + DF: m.pop('cid', None); m.pop('tok', None)
+    for m in D + DF: m.pop('tok', None)
     json.dump(RAW, open(os.path.join(HERE, 'raw.json'), 'w', encoding='utf-8'))
     if not ok:
         sys.exit('No data came back from Polymarket (network blocked?). index.html was NOT changed.')
