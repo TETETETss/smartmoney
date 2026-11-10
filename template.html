@@ -403,7 +403,7 @@ let HID=new Set(),SHOWH=false;try{HID=new Set(JSON.parse(localStorage.getItem('s
 function saveH(){try{localStorage.setItem('sm_hidden',JSON.stringify([...HID]))}catch(e){}}
 function hideM(i,on){const u=D[i].url;on?HID.add(u):HID.delete(u);saveH();render()}
 function chipsR(){const nh=D.filter(m=>HID.has(m.url)).length;chips.innerHTML=cats.map(x=>`<button class="chip ${x==F?'on':''}" onclick="F='${x}';render()">${x}</button>`).join('')+(nh&&!SV?`<button class="chip hidc ${SHOWH?'on':''}" onclick="SHOWH=!SHOWH;render()">${SHOWH?'Hide hidden':'Show hidden'} (${nh})</button>`:'')}
-Object.values(DS).forEach(A=>A.forEach(m=>{const yes=m.top=='Yes',now=yes?m.ask:1-m.bid,h=m.tr.filter(t=>!t.ex&&t.side==m.top);m.cav=h.length?h.reduce((a,t)=>a+t.avg,0)/h.length:0;m.gap=Math.abs(now-m.cav);m.hc=m.tr.filter(t=>!t.ex).length;m.nw=Math.max(0,...m.tr.map(t=>t.fe||0))}));
+DS.forEach(m=>{const yes=m.top=='Yes',now=yes?m.ask:1-m.bid,h=m.tr.filter(t=>!t.ex&&t.side==m.top);m.cav=h.length?h.reduce((a,t)=>a+t.avg,0)/h.length:0;m.gap=Math.abs(now-m.cav);m.hc=m.tr.filter(t=>!t.ex).length;m.nw=Math.max(0,...m.tr.map(t=>t.fe||0))});
 function masonry(){const cards=[...grid.querySelectorAll('.card')];const w=grid.clientWidth||innerWidth;const n=Math.max(1,Math.floor((w+14)/(300+14)));
  grid.innerHTML='';const cols=[...Array(n)].map(()=>{const c=document.createElement('div');c.className='mcol';grid.appendChild(c);return c});
  cards.forEach(cd=>{const s=cols.reduce((a,b)=>b.offsetHeight<a.offsetHeight?b:a);s.appendChild(cd)})}
