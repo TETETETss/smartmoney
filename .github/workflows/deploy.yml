@@ -120,7 +120,7 @@ jobs:
           set -o pipefail
           python -u build.py | tee build.log
           grep -E 'charts: [1-9][0-9]* price histories, [1-9][0-9]* trades' build.log
-          grep -E 'Done: Macro [0-9]+ traders, [1-9][0-9]* markets shown -> index.html' build.log
+          grep -E 'Done: [0-9]+ traders, [1-9][0-9]* markets shown -> index.html' build.log
           grep -E 'live trades: [1-9][0-9]* rows from [1-9][0-9]* wallets' build.log
           python - <<'PY'
           import json, pathlib, re, sys

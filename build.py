@@ -6,7 +6,6 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 MIN_VALUE = float(os.environ.get('MIN_VALUE', 10))      # ignore positions worth less than this ($)
 MAX_PRICE = 0.98     # hide markets where the leading side already trades above 98c
 MIN_TRADERS = int(os.environ.get('MIN_TRADERS', 2))
-MACRO_MIN_VALUE = float(os.environ.get('MACRO_MIN_VALUE', 500))   # macro traders bet bigger: ignore positions under this ($)
 SOLO_MIN = float(os.environ.get('SOLO_MIN', 0))   # 0 = only markets held by MIN_TRADERS+ traders; set e.g. 250 to also show big single-trader bets
 
 import urllib.error
@@ -118,7 +117,9 @@ def load_wallets(fname):
     for w in json.load(open(path, encoding='utf-8')):
         a = w['address'].lower()
         if a in seen: continue
-        seen.add(a); W.append({'address': a, 'name': w.get('name')})
+        item = {'address': a, 'name': w.get('name')}
+        if w.get('min') is not None: item['min'] = float(w['min'])
+        seen.add(a); W.append(item)
     return W
 
 
@@ -484,40 +485,26 @@ def live_feed(addrs, names):
     return rows
 
 def main():
-    # one combined "Macro" group: wallets.json traders keep their small $ minimum, wallets_macro.json traders use $500
-    W1, W2 = load_wallets('wallets.json'), load_wallets('wallets_macro.json')
-    for w in W1: w['min'] = MIN_VALUE
-    for w in W2: w['min'] = MACRO_MIN_VALUE
-    seen, W = set(), []
-    for w in W1 + W2:
-        if w['address'] in seen: continue
-        seen.add(w['address']); W.append(w)
-    D, T, ok = build_group(W, MACRO_MIN_VALUE, 'Macro')
+    # One tracked list. Each wallet keeps its own position minimum (macro $500, fast $10).
+    W = load_wallets('wallets.json')
+    D, T, ok = build_group(W, MIN_VALUE, 'Markets')
     CH = charts(D, W, T) if ok and os.environ.get('NO_CHARTS') != '1' else {}
-    WF = load_wallets('wallets_fast.json')
-    DF, TF, fast_ok = build_group(WF, MIN_VALUE, 'Fast Wallet')
-    CHF = charts(DF, WF, TF) if fast_ok and os.environ.get('NO_CHARTS') != '1' else {}
-    names, addrs = {}, []
-    seen = set()
-    for w in W + WF:
-        if w.get('name'): names.setdefault(w['address'], w['name'])
-        if w['address'] in seen: continue
-        seen.add(w['address']); addrs.append(w['address'])
+    names = {w['address']: w['name'] for w in W if w.get('name')}
+    addrs = [w['address'] for w in W]
     prefetch_positions(addrs)
     LIVE = live_feed(addrs, names)
-    for m in D + DF: m.pop('tok', None)
+    for m in D: m.pop('tok', None)
     json.dump(RAW, open(os.path.join(HERE, 'raw.json'), 'w', encoding='utf-8'))
     if not ok:
         sys.exit('No data came back from Polymarket (network blocked?). index.html was NOT changed.')
     if not LIVE:
         sys.exit('No recent trades came back from the Polymarket data API. index.html was NOT changed.')
-    json.dump({'D': D, 'TR': T, 'CH': CH, 'DF': DF, 'TRF': TF, 'CHF': CHF, 'LIVE': LIVE}, open(os.path.join(HERE, 'data.json'), 'w', encoding='utf-8'))
+    json.dump({'D': D, 'TR': T, 'CH': CH, 'LIVE': LIVE}, open(os.path.join(HERE, 'data.json'), 'w', encoding='utf-8'))
     html = open(os.path.join(HERE, 'template.html'), encoding='utf-8').read()
     html = html.replace('__CHARTS__', js_json(CH)).replace('__DATA__', js_json(D)).replace('__TRADERS__', js_json(T)).replace('__NTRADERS__', str(len(W)))
-    html = html.replace('__FAST_DATA__', js_json(DF)).replace('__FAST_TRADERS__', js_json(TF)).replace('__FAST_CHARTS__', js_json(CHF)).replace('__NFAST__', str(len(WF)))
     html = html.replace('__LIVE__', js_json(LIVE)).replace('__NLIVE__', str(len(LIVE))).replace('__BUILT__', str(int(time.time())))
     open(os.path.join(HERE, 'index.html'), 'w', encoding='utf-8').write(html)
-    print(f'\nDone: Macro {len(W)} traders, {len(D)} markets shown -> index.html')
+    print(f'\nDone: {len(W)} traders, {len(D)} markets shown -> index.html')
 
 if __name__ == '__main__':
     main()
