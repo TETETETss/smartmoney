@@ -502,22 +502,60 @@ def _yes_price(cid):
             if str(F(p, 'outcome') or '').lower() == 'no': no_px = px
     return None if no_px is None else 1 - no_px
 
-def inflows(addrs, names):
-    """Net new money in the last 24h. yes/no are buys minus sells; net keeps only the positive side."""
-    print(f'\n== top inflows: {len(addrs)} wallets, last {INFLOW_HOURS}h ==')
+def _flow_meta(b, x, addr, names, ts):
+    b['names'][addr] = names.get(addr) or F(x, 'name') or F(x, 'pseudonym') or (addr[:6] + '…' + addr[-4:])
+    av = F(x, 'profile_image', 'profileImage') or ''
+    if av: b['avatar'][addr] = av
+    if ts >= b['ts']:
+        b['ts'] = ts
+        title = F(x, 'title', 'market_title', 'question') or ''
+        if title: b['t'] = title
+        img = F(x, 'icon', 'image') or ''
+        if img: b['img'] = img
+        url = market_url(F(x, 'slug', 'market_slug') or '', F(x, 'event_slug', 'eventSlug') or '')
+        if url.startswith('https://polymarket.com/event/'): b['url'] = url
+
+def _flow_markets(books, held, exited):
+    mk = []
+    for cid, b in books.items():
+        net = max(b['yes'], 0) + max(b['no'], 0)
+        if net < INFLOW_MIN or not b['t'] or not str(b['url']).startswith('https://polymarket.com/event/'): continue
+        tr = []
+        for (addr, out), val in b['tr'].items():
+            if val <= 0: continue
+            row = {'n': b['names'].get(addr, addr[:6]), 'avatar': b['avatar'].get(addr, ''), 'out': out, 'usd': round(val)}
+            if exited:
+                sh = float(((held.get(addr) or {}).get(cid) or {}).get(out) or 0)
+                row['exited'] = sh <= 0.01
+            tr.append(row)
+        tr.sort(key=lambda r: -r['usd'])
+        px = _yes_price(cid)
+        mk.append({'t': b['t'], 'url': b['url'], 'img': b['img'] or '', 'yes': round(b['yes']), 'no': round(b['no']),
+                   'px': None if px is None else round(px, 4), 'tr': tr})
+    mk.sort(key=lambda m: -(max(m['yes'], 0) + max(m['no'], 0)))
+    return mk
+
+def money_flow(addrs, names):
+    """Last 24h. Inflow yes/no are buys minus sells. Outflow yes/no are dollars sold, skipping 95c+ sells and redemptions."""
+    print(f'\n== money flow: {len(addrs)} wallets, last {INFLOW_HOURS}h ==')
     cutoff = time.time() - INFLOW_HOURS * 3600
     with cf.ThreadPoolExecutor(8) as ex:
         fetched = list(ex.map(lambda a: _activity_pages(a, INFLOW_HOURS, INFLOW_PAGES), addrs))
-    books = {}
+    held, _vals = pos_index()
+    inn, out = {}, {}
+    def book(store, cid):
+        return store.setdefault(cid, {'yes': 0.0, 'no': 0.0, 'tr': {}, 'names': {}, 'avatar': {}, 't': '', 'url': '', 'img': '', 'ts': 0})
     for addr, rows in zip(addrs, fetched):
         for x in rows:
             ts = norm_ts(x)
             if ts < cutoff: continue
+            kind = str(F(x, 'type', default='TRADE')).upper()
+            if kind and kind != 'TRADE': continue
             side = str(F(x, 'side', default='')).upper()
             if side not in ('BUY', 'SELL'): continue
             ol = str(F(x, 'outcome') or '').strip().lower()
-            if ol == 'yes': out = 'Yes'
-            elif ol == 'no': out = 'No'
+            if ol == 'yes': outcome = 'Yes'
+            elif ol == 'no': outcome = 'No'
             else: continue
             usd = _num(F(x, 'usdc_size', 'usdcSize'))
             if usd is None:
@@ -525,34 +563,23 @@ def inflows(addrs, names):
             if usd <= 0: continue
             cid = F(x, 'condition_id', 'conditionId') or ''
             if not cid: continue
-            b = books.setdefault(cid, {'yes': 0.0, 'no': 0.0, 'tr': {}, 'names': {}, 'avatar': {}, 't': '', 'url': '', 'img': '', 'ts': 0})
-            signed = usd if side == 'BUY' else -usd
-            b['yes' if out == 'Yes' else 'no'] += signed
-            b['tr'][(addr, out)] = b['tr'].get((addr, out), 0.0) + signed
-            b['names'][addr] = names.get(addr) or F(x, 'name') or F(x, 'pseudonym') or (addr[:6] + '…' + addr[-4:])
-            av = F(x, 'profile_image', 'profileImage') or ''
-            if av: b['avatar'][addr] = av
-            if ts >= b['ts']:
-                b['ts'] = ts
-                title = F(x, 'title', 'market_title', 'question') or ''
-                if title: b['t'] = title
-                img = F(x, 'icon', 'image') or ''
-                if img: b['img'] = img
-                url = market_url(F(x, 'slug', 'market_slug') or '', F(x, 'event_slug', 'eventSlug') or '')
-                if url.startswith('https://polymarket.com/event/'): b['url'] = url
-    mk = []
-    for cid, b in books.items():
-        net = max(b['yes'], 0) + max(b['no'], 0)
-        if net < INFLOW_MIN or not b['t'] or not str(b['url']).startswith('https://polymarket.com/event/'): continue
-        tr = [{'n': b['names'].get(a, a[:6]), 'avatar': b['avatar'].get(a, ''), 'out': o, 'usd': round(v)}
-              for (a, o), v in b['tr'].items() if v > 0]
-        tr.sort(key=lambda r: -r['usd'])
-        px = _yes_price(cid)
-        mk.append({'t': b['t'], 'url': b['url'], 'img': b['img'] or '', 'yes': round(b['yes']), 'no': round(b['no']),
-                   'px': None if px is None else round(px, 4), 'tr': tr})
-    mk.sort(key=lambda m: -(max(m['yes'], 0) + max(m['no'], 0)))
-    print(f'top inflows: {len(mk)} markets >= ${INFLOW_MIN:.0f}')
-    return {'built': int(time.time()), 'mk': mk}
+            key = 'yes' if outcome == 'Yes' else 'no'
+            bi = book(inn, cid)
+            bi[key] += usd if side == 'BUY' else -usd
+            bi['tr'][(addr, outcome)] = bi['tr'].get((addr, outcome), 0.0) + (usd if side == 'BUY' else -usd)
+            _flow_meta(bi, x, addr, names, ts)
+            px = _num(F(x, 'price')) or 0
+            if side == 'SELL' and px < 0.95:
+                bo = book(out, cid)
+                bo[key] += usd
+                bo['tr'][(addr, outcome)] = bo['tr'].get((addr, outcome), 0.0) + usd
+                _flow_meta(bo, x, addr, names, ts)
+    built = int(time.time())
+    inflow = {'built': built, 'mk': _flow_markets(inn, held, False)}
+    outflow = {'built': built, 'mk': _flow_markets(out, held, True)}
+    print(f'top inflows: {len(inflow["mk"])} markets >= ${INFLOW_MIN:.0f}')
+    print(f'top outflows: {len(outflow["mk"])} markets >= ${INFLOW_MIN:.0f}')
+    return inflow, outflow
 
 def main():
     # One tracked list. Each wallet keeps its own position minimum (macro $500, fast $10).
@@ -563,18 +590,18 @@ def main():
     addrs = [w['address'] for w in W]
     prefetch_positions(addrs)
     LIVE = live_feed(addrs, names)
-    INFLOW = inflows(addrs, names)
+    INFLOW, OUTFLOW = money_flow(addrs, names)
     for m in D: m.pop('tok', None)
     json.dump(RAW, open(os.path.join(HERE, 'raw.json'), 'w', encoding='utf-8'))
     if not ok:
         sys.exit('No data came back from Polymarket (network blocked?). index.html was NOT changed.')
     if not LIVE:
         sys.exit('No recent trades came back from the Polymarket data API. index.html was NOT changed.')
-    json.dump({'D': D, 'TR': T, 'CH': CH, 'LIVE': LIVE, 'INFLOW': INFLOW}, open(os.path.join(HERE, 'data.json'), 'w', encoding='utf-8'))
+    json.dump({'D': D, 'TR': T, 'CH': CH, 'LIVE': LIVE, 'INFLOW': INFLOW, 'OUTFLOW': OUTFLOW}, open(os.path.join(HERE, 'data.json'), 'w', encoding='utf-8'))
     html = open(os.path.join(HERE, 'template.html'), encoding='utf-8').read()
     html = html.replace('__CHARTS__', js_json(CH)).replace('__DATA__', js_json(D)).replace('__TRADERS__', js_json(T)).replace('__NTRADERS__', str(len(W)))
     html = html.replace('__LIVE__', js_json(LIVE)).replace('__NLIVE__', str(len(LIVE))).replace('__BUILT__', str(int(time.time())))
-    html = html.replace('__INFLOW__', js_json(INFLOW))
+    html = html.replace('__INFLOW__', js_json(INFLOW)).replace('__OUTFLOW__', js_json(OUTFLOW))
     open(os.path.join(HERE, 'index.html'), 'w', encoding='utf-8').write(html)
     print(f'\nDone: {len(W)} traders, {len(D)} markets shown -> index.html')
 

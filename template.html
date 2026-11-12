@@ -306,32 +306,42 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
 #v-live .ltfoot{display:flex;justify-content:space-between;gap:20px;padding:18px 22px;border-top:1px solid #1f1f24;color:#777;font-size:11px;background:#0b0b0d}
 #v-live .empty{text-align:center;padding:48px 20px;color:#959baa}
 @media(max-width:900px){#v-live .ltshell{margin:8px 12px 0}#v-live .ltbar,#v-live th,#v-live td{padding-left:14px;padding-right:14px}#v-live .ltfoot{flex-direction:column;gap:8px}#v-live .market a{font-size:14px}}
-.if-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:0 36px 60px}
-.if-card{position:relative}
-.if-top{display:flex;gap:12px;align-items:flex-start}
-.if-rk{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:12px;color:#777;width:24px;flex:none;padding-top:2px}
-.if-ttl{flex:1;font-size:16px;font-weight:600;line-height:1.3;transition:text-shadow .2s}
+.if-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:0 36px 60px;align-items:stretch}
+.if-card{gap:0;padding:0;overflow:hidden}
+.if-card:hover{box-shadow:none}
+.if-sec{padding:18px 22px}
+.if-sec+.if-sec{border-top:1px solid #222}
+.if-lbl{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#777}
+.if-head{display:flex;gap:14px;align-items:center}
+.if-head .mimg{width:52px;height:52px;align-self:center;margin:0;border-radius:10px;object-fit:cover;display:block}
+.if-hb{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.if-eye{display:flex;align-items:center;gap:8px}
+.if-hot{font-size:9px;font-weight:600;padding:3px 8px;border-radius:99px;background:#fff;color:#000;letter-spacing:.6px}
+.if-ttl{font-size:16px;font-weight:600;line-height:1.35;transition:text-shadow .2s}
 .if-ttl:hover{text-shadow:0 0 8px rgba(255,255,255,.7)}
-.if-amt{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-.if-amt b{font-size:34px;font-weight:500;letter-spacing:-1px;line-height:1}
-.if-amt small{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:11px;letter-spacing:.8px;color:#777;text-transform:uppercase}
-.if-bar{display:flex;height:4px;border-radius:2px;overflow:hidden;background:#262626}
-.if-bar i{display:block;height:100%}.if-bar .y{background:#4ade80}.if-bar .n{background:#ff5a5a}
-.if-card .sp b{font-size:15px;font-weight:500}
-.if-tr{display:flex;flex-direction:column;border-top:1px solid #262626}
-.if-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #1d1d1d;font-size:13px}
+.if-money{display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:end}
+.if-split{display:flex;flex-direction:column;gap:8px;min-width:0}
+.if-sl{display:flex;justify-content:space-between;font-size:12px;font-variant-numeric:tabular-nums}
+.if-sl span{color:#aaa}.if-sl b{font-weight:600;color:#fff}
+.if-sl .y b{color:#86c99c}.if-sl .n b{color:#d79a9a}
+.if-bar{display:flex;height:6px;border-radius:3px;overflow:hidden;background:#262626;gap:2px}
+.if-bar i{display:block;height:100%;border-radius:3px}.if-bar .y{background:#4ade80}.if-bar .n{background:#5a5a5a}
+.if-net{text-align:left;padding-right:28px;border-right:1px solid #222}
+.if-net b{display:block;font-size:40px;font-weight:500;letter-spacing:-1.2px;line-height:1;margin-top:6px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.if-trh{display:flex;justify-content:space-between;margin-bottom:6px}
+.if-row{display:grid;grid-template-columns:22px 1fr auto 64px;align-items:center;gap:10px;padding:7px 0;font-size:13px;border-bottom:1px solid #1c1c1c}
 .if-row:last-child{border-bottom:0}
-.if-av{width:22px;height:22px;border-radius:50%;object-fit:cover;flex:none;background:#2a2a2a;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#bbb}
-.if-row .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.if-av{width:22px;height:22px;border-radius:50%;object-fit:cover;background:#2a2a2a;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#bbb}
+.if-row .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .if-row .nm:hover{color:#e8e8e8;text-shadow:0 0 8px rgba(255,255,255,.7)}
-.if-row .usd{font-variant-numeric:tabular-nums;font-weight:500}
-.if-more{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:11px;color:#777;padding-top:8px;letter-spacing:.6px}
-.if-card.hot{border-color:#ffffff59;box-shadow:0 0 28px rgba(255,255,255,.10)}
-.if-hot{font-size:10px;font-weight:600;padding:4px 9px;border-radius:99px;background:#fff;color:#000;letter-spacing:.4px;white-space:nowrap}
-.if-empty{grid-column:1/-1;padding:40px;text-align:center;color:#777;border:1px dashed #333;border-radius:20px;font-size:13px}
-.if-now{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:11px;letter-spacing:.6px;color:#8a8a8a}
+.if-row .usd{text-align:right;font-weight:500;font-variant-numeric:tabular-nums}
+.if-foot{margin-top:auto;display:flex;justify-content:space-between;align-items:center;padding:12px 22px;border-top:1px solid #222;background:rgba(255,255,255,.015)}
+.if-open{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#ccc;border:1px solid #333;border-radius:99px;padding:6px 12px;transition:all .2s}
+.if-open:hover{background:#fff;color:#000;border-color:#fff}
+.if-card.hot{border-color:#ffffff59}
+.if-empty{grid-column:1/-1;margin:0;padding:40px;text-align:center;color:#777;border:1px dashed #333;border-radius:20px;font-size:13px}
 @media(max-width:1100px){.if-list{grid-template-columns:1fr}}
-@media(max-width:900px){.if-list{padding:16px 12px 40px}.if-amt b{font-size:28px}}
+@media(max-width:900px){.if-list{padding:16px 12px 40px}.if-sec{padding:16px}.if-foot{padding:12px 16px}.if-net b{font-size:32px}.if-money{gap:16px}}
 .sbar{overflow-y:auto}
 </style></head><body class="indash">
 <canvas id="orb"></canvas>
@@ -343,7 +353,7 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
   <nav>
    <a class="nv on" data-v="markets" onclick="view('markets')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.8 5.6 3.8 9s-1.2 6.4-3.8 9c-2.6-2.6-3.8-5.6-3.8-9S9.4 5.6 12 3z"/></svg></em>Markets</a>
    <a class="nv" data-v="live" onclick="view('live')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2.5-6 4 12L16 12h5"/></svg></em>Live Trades</a>
-   <a class="nv" data-v="inflows" onclick="view('inflows')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v14M6 11l6 6 6-6"/><path d="M4 21h16"/></svg></em>Top Inflows</a>
+   <a class="nv" data-v="inflows" onclick="view('inflows')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v14M6 11l6 6 6-6"/><path d="M4 21h16"/></svg></em>Money Flow</a>
    <a class="nv" data-v="saved" onclick="view('saved')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></em>Bookmarked<span class="savn" id="savn"></span></a>
    <a class="nv" data-v="traders" onclick="view('traders')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.2 4.2-6.5 8-6.5s7 2.3 8 6.5"/></svg></em>Traders</a>
    <a class="nv" data-v="lookup" onclick="view('lookup')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></em>Wallet lookup</a>
@@ -371,10 +381,11 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
   </div>
   <div class="v" id="v-inflows" style="display:none">
    <div class="hero"><div>
-    <div class="muted" style="font-size:12px;margin-bottom:8px" id="ifline">LAST 24H · TRACKED WALLETS</div>
-    <h2>Top Inflows</h2>
-    <div class="sortnote">Markets where smart traders put in $2K+ of new money today</div>
-   </div></div>
+    <div class="muted" style="font-size:12px;margin-bottom:12px" id="ifline">LAST 24H · TRACKED WALLETS</div>
+    <h2>Money Flow</h2>
+    <div class="sortnote" id="ifnote">Markets where smart traders put in $2K+ of new money today</div>
+   </div>
+   <div class="chips"><button class="chip on" data-m="in" onclick="ifMode('in')">Inflows</button><button class="chip" data-m="out" onclick="ifMode('out')">Outflows</button></div></div>
    <div class="if-list" id="iflist"></div>
   </div>
   <div class="v" id="v-traders" style="display:none">
@@ -555,21 +566,23 @@ async function lookup(){
 const TRS=__TRADERS__;let TR=TRS;
 function view(v){const r=(v=='saved'||v=='markets')?'markets':v;if(r=='markets'){SV=v=='saved';F='All';FOC=null}if(v=='traders')trR();document.querySelectorAll('main>.v').forEach(x=>x.style.display=x.id=='v-'+r?'block':'none');if(r=='markets')render();if(r=='live')liveRender();if(r=='inflows')ifRender();document.querySelectorAll('.nv').forEach(x=>x.classList.toggle('on',x.dataset.v==v));document.body.classList.remove('navopen');scrollTo(0,0)}
 const LIVE=/*__LIVE_START__*/__LIVE__/*__LIVE_END__*/;const BUILT=__BUILT__;const liveOpen=new Set();
-const INFLOW=__INFLOW__;
+const INFLOW=__INFLOW__;const OUTFLOW=__OUTFLOW__;let IFM='in';
+function ifMode(m){IFM=m;document.querySelectorAll('#v-inflows .chip').forEach(c=>c.classList.toggle('on',c.dataset.m==m));ifRender()}
 function ifRender(){const MIN_IN=2000;const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const $=n=>'$'+(n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e4?Math.round(n/1e3)+'K':n>=1e3?(n/1e3).toFixed(1)+'K':Math.round(n));
- const mk=(INFLOW.mk||[]).map(m=>{const y=Math.max(0,m.yes),n=Math.max(0,m.no);return Object.assign({},m,{y,n,net:y+n})}).filter(m=>m.net>=MIN_IN).sort((a,b)=>b.net-a.net);
+ const OUTM=IFM=='out', SRC=OUTM?OUTFLOW:INFLOW;
+ const mk=(SRC.mk||[]).map(m=>{const y=Math.max(0,+m.yes||0),n=Math.max(0,+m.no||0);return Object.assign({},m,{y,n,net:y+n})}).filter(m=>m.net>=MIN_IN).sort((a,b)=>b.net-a.net);
  const el=document.getElementById('iflist');if(!el)return;
- const ago=Math.max(0,Math.round((Date.now()/1000-(INFLOW.built||0))/60));
- const line=document.getElementById('ifline');if(line)line.textContent=mk.length+' MARKETS · $2K+ IN · LAST 24H · UPDATED '+(ago<60?ago+' MIN':Math.round(ago/60)+'H')+' AGO';
- if(!mk.length){el.innerHTML='<div class="if-empty">No market has $2K+ of smart-money inflow in the last 24h yet.</div>';return}
- el.innerHTML=mk.map((m,i)=>{const yp=Math.round(m.y/m.net*100),lead=m.y>=m.n?'YES':'NO';
-  const px=m.px==null?'':`<span class="if-now">NOW YES ${Math.round(m.px*100)}¢</span>`;
+ const ago=Math.max(0,Math.round((Date.now()/1000-(SRC.built||0))/60));
+ const note=document.getElementById('ifnote');if(note)note.textContent=OUTM?'Markets where smart traders sold $2K+ today (sells at 95¢+ and redemptions excluded)':'Markets where smart traders put in $2K+ of new money today';
+ const line=document.getElementById('ifline');if(line)line.textContent=mk.length+' MARKETS · $2K+ '+(OUTM?'OUT':'IN')+' · LAST 24H · UPDATED '+(ago<60?ago+' MIN':Math.round(ago/60)+'H')+' AGO';
+ if(!mk.length){el.innerHTML='<div class="if-empty">No market has $2K+ of smart-money '+(OUTM?'outflow':'inflow')+' in the last 24h yet.</div>';return}
+ el.innerHTML=mk.map((m,i)=>{const yp=m.net?Math.round(m.y/m.net*100):0,lead=m.y>=m.n?'YES':'NO',nt=m.tr.length,ex=m.tr.filter(t=>t.exited).length;
   const rows=m.tr.slice(0,4).map(t=>{const av=t.avatar?`<img class="if-av" src="${esc(t.avatar)}" alt="" loading="lazy" referrerpolicy="no-referrer">`:`<span class="if-av">${esc((t.n||'?')[0].toUpperCase())}</span>`;
-   return `<div class="if-row">${av}<a class="nm" href="https://polymarket.com/@${encodeURIComponent(t.n)}" target="_blank" rel="noopener">${esc(t.n)}</a><span class="side ${t.out=='Yes'?'sy':'sn'}">${esc(t.out).toUpperCase()}</span><span class="usd">${$(t.usd)}</span></div>`}).join('');
-  const more=m.tr.length>4?`<div class="if-more">+${m.tr.length-4} more traders</div>`:'';
+   const badge=OUTM?((t.exited?'EXITED ':'TRIMMED ')+String(t.out||'').toUpperCase()):String(t.out||'').toUpperCase();
+   return `<div class="if-row">${av}<a class="nm" href="https://polymarket.com/@${encodeURIComponent(t.n)}" target="_blank" rel="noopener">${esc(t.n)}</a><span class="side ${t.out=='Yes'?'sy':'sn'}">${esc(badge)}</span><span class="usd">${$(t.usd)}</span></div>`}).join('');
   const img=m.img?`<img class="mimg" src="${esc(m.img)}" alt="" loading="lazy" referrerpolicy="no-referrer">`:`<span class="mimg"></span>`;
-  return `<div class="card if-card${i==0?' hot':''}"><div class="if-top"><span class="if-rk">${String(i+1).padStart(2,'0')}</span>${img}<a class="if-ttl" href="${esc(m.url)}" target="_blank" rel="noopener">${esc(m.t)}</a>${i==0?'<span class="if-hot">HOTTEST</span>':''}</div><div class="if-amt"><b>${$(m.net)}</b><small>net in · ${m.tr.length} trader${m.tr.length>1?'s':''} · mostly ${lead}</small></div><div class="if-bar"><i class="y" style="width:${yp}%"></i><i class="n" style="width:${100-yp}%"></i></div><div class="split"><div class="sp spy"><span class="spl">YES IN</span><b>${$(m.y)}</b><small>${yp}%</small></div><div class="sp spn"><span class="spl">NO IN</span><b>${$(m.n)}</b><small>${100-yp}%</small></div></div><div class="if-tr">${rows}${more}</div>${px}</div>`}).join('')}
+  return `<div class="card if-card${i==0?' hot':''}"><div class="if-sec if-head">${img}<div class="if-hb"><div class="if-eye"><span class="if-lbl">#${String(i+1).padStart(2,'0')}</span>${i==0?`<span class="if-hot">${OUTM?'BIGGEST EXIT':'HOTTEST'}</span>`:''}</div><a class="if-ttl" href="${esc(m.url)}" target="_blank" rel="noopener">${esc(m.t)}</a></div></div><div class="if-sec if-money"><div class="if-net"><span class="if-lbl">${OUTM?'Sold · 24h':'Net in · 24h'}</span><b>${$(m.net)}</b></div><div class="if-split"><span class="if-lbl">${OUTM?'Mostly sold '+lead:'Mostly '+lead}</span><div class="if-sl"><span class="y">YES <b>${$(m.y)}</b> · ${yp}%</span><span class="n">NO <b>${$(m.n)}</b> · ${100-yp}%</span></div><div class="if-bar">${yp>0?`<i class="y" style="width:${yp}%"></i>`:''}${yp<100?'<i class="n" style="flex:1"></i>':''}</div></div></div><div class="if-sec"><div class="if-trh"><span class="if-lbl">Smart traders</span><span class="if-lbl">${OUTM?ex+' exited · '+(nt-ex)+' trimmed':nt+' total'}</span></div>${rows}</div><div class="if-foot"><span class="if-lbl">${m.px==null?'':'Now YES '+Math.round(m.px*100)+'¢'}${nt>4?' · +'+(nt-4)+' more':''}</span><a class="if-open" href="${esc(m.url)}" target="_blank" rel="noopener">Open market ↗</a></div></div>`}).join('')}
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const dollars=n=>'$'+(+n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 const money=n=>{const v=+n||0,c=Math.round(Math.abs(v)*100),sign=v<0?'-':'';if(c%100===0)return sign+'$'+Math.round(Math.abs(v)).toLocaleString('en-US');return sign+'$'+Math.abs(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})};
