@@ -4,7 +4,6 @@ import json, time, urllib.request, urllib.parse, re, os, sys, threading
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 MIN_VALUE = float(os.environ.get('MIN_VALUE', 10))      # ignore positions worth less than this ($)
-MAX_PRICE = 0.98     # hide markets where the leading side already trades above 98c
 MIN_TRADERS = int(os.environ.get('MIN_TRADERS', 2))
 SOLO_MIN = float(os.environ.get('SOLO_MIN', 0))   # 0 = only markets held by MIN_TRADERS+ traders; set e.g. 250 to also show big single-trader bets
 
@@ -219,7 +218,9 @@ def build_group(W, min_value, label):
             if F(p,'conditionId','condition_id','asset','token_id') in both: continue
             price = float(F(p,'curPrice','cur_price','current_price','price',default=0) or 0); val = float(F(p,'currentValue','current_value','value',default=0) or 0)
             is_mention = cat_of(F(p,'title','market_title','question',default='')) == 'Mention'
-            if F(p,'redeemable') in (True, 'True', 'true') or (val < w.get('min', min_value) and not is_mention) or val <= 0 or price <= 0 or price >= 1: continue
+            # Redeemable positions are already settled. A price of $1 is still a live hold until then,
+            # so a market trading at 99¢ or $1 stays on the Markets list.
+            if F(p,'redeemable') in (True, 'True', 'true') or (val < w.get('min', min_value) and not is_mention) or val <= 0 or price <= 0 or price > 1: continue
             out = F(p,'outcome'); idx = F(p,'outcomeIndex','outcome_index')
             side = out if out in ('Yes', 'No') else ('Yes' if str(idx) == '0' else 'No')
             yes = price if side == 'Yes' else 1 - price
@@ -244,8 +245,6 @@ def build_group(W, min_value, label):
         tr = list(m['tr'].values())
         if len(tr) < MIN_TRADERS and not (solo_ok and sum(t['val'] for t in tr) >= SOLO_MIN): continue   # every market needs 2+ traders (mention markets: no $ minimum)
         cy = sum(t['side'] == 'Yes' for t in tr); top = 'Yes' if cy >= len(tr) - cy else 'No'
-        lead = m['yes'] if top == 'Yes' else 1 - m['yes']
-        if lead > MAX_PRICE: continue
         url = 'https://polymarket.com/event/' + (f"{m['ev']}/{m['slug']}" if m['ev'] and m['ev'] != m['slug'] else (m['slug'] or ''))
         title = m['t']
         o1, o2 = m['out2']
@@ -490,6 +489,21 @@ INFLOW_HOURS = 24
 INFLOW_PAGES = int(os.environ.get('INFLOW_PAGES', 8))
 INFLOW_MIN = float(os.environ.get('INFLOW_MIN', 2000))
 
+def _redeemable(p):
+    return F(p, 'redeemable') in (True, 'True', 'true', 1)
+
+def _resolved(cid):
+    """Every share we still see has been marked redeemable. A 99¢ market that is not redeemable is still open."""
+    saw = False
+    for P in RAW.values():
+        for p in P or []:
+            if F(p, 'condition_id', 'conditionId') != cid: continue
+            sh = _num(F(p, 'current_size', 'size')) or 0
+            if sh <= 0.01: continue
+            saw = True
+            if not _redeemable(p): return False
+    return saw
+
 def _yes_price(cid):
     """Current YES price from open positions, else 1 minus the NO price."""
     no_px = None
@@ -523,6 +537,7 @@ def _flow_markets(books, held, is_out):
     for cid, b in books.items():
         net = max(b['yes'], 0) + max(b['no'], 0)
         if net < INFLOW_MIN or not b['t'] or not str(b['url']).startswith('https://polymarket.com/event/'): continue
+        if _resolved(cid): continue
         tr = []
         for (addr, out), slot in b['tr'].items():
             val = slot['usd']
