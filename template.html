@@ -320,27 +320,22 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
 .if-ttl{font-size:16px;font-weight:600;line-height:1.35;transition:text-shadow .2s}
 .if-ttl:hover{text-shadow:0 0 8px rgba(255,255,255,.7)}
 .if-money{display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center}
+.if-sh{display:flex;justify-content:space-between;gap:12px;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:11px;letter-spacing:.4px;font-variant-numeric:tabular-nums}
+.if-sh .y{color:#86c99c}.if-sh .n{color:#d79a9a;text-align:right}
+.if-row .who{min-width:0;display:flex;flex-direction:column;gap:2px}
+.if-row .sub{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:11px;color:#777;letter-spacing:.3px;white-space:nowrap}
 .if-split{display:flex;flex-direction:column;gap:8px;min-width:0}
-.if-sl{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;font-size:12px;font-variant-numeric:tabular-nums}
+.if-sl{display:flex;justify-content:space-between;font-size:12px;font-variant-numeric:tabular-nums}
 .if-sl span{color:#aaa}.if-sl b{font-weight:600;color:#fff}
-.if-sl .y,.if-sl .n{display:flex;flex-direction:column;gap:2px;min-width:0}
-.if-sl .n{align-items:flex-end;text-align:right}
 .if-sl .y b{color:#86c99c}.if-sl .n b{color:#d79a9a}
-.if-meta,.if-sl .if-meta{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:10px;letter-spacing:.2px;color:#777;line-height:1.25;font-weight:400}
 .if-bar{display:flex;height:6px;border-radius:3px;overflow:hidden;background:#262626;gap:2px}
 .if-bar i{display:block;height:100%;border-radius:3px}.if-bar .y{background:#4ade80}.if-bar .n{background:#5a5a5a}
 .if-net{text-align:left;padding-right:28px;border-right:1px solid #222}
 .if-net b{display:block;font-size:40px;font-weight:500;letter-spacing:-1.2px;line-height:1;margin-top:6px;font-variant-numeric:tabular-nums;white-space:nowrap}
 .if-trh{display:flex;justify-content:space-between;margin-bottom:6px}
-.if-row{display:grid;grid-template-columns:22px minmax(0,1fr) auto auto;align-items:center;column-gap:8px;row-gap:1px;padding:7px 0;font-size:13px;border-bottom:1px solid #1c1c1c}
-.if-row>.if-av{grid-column:1;grid-row:1}
-.if-row>.nm{grid-column:2;grid-row:1}
-.if-row>.if-meta{grid-column:2;grid-row:2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.if-row>.side{grid-column:3;grid-row:1;white-space:nowrap}
-.if-row>.usd{grid-column:4;grid-row:1;align-self:center}
-.if-row:has(.if-meta)>.if-av,.if-row:has(.if-meta)>.side,.if-row:has(.if-meta)>.usd{grid-row:1 / span 2}
+.if-row{display:grid;grid-template-columns:28px 1fr auto 64px;align-items:center;gap:12px;padding:9px 0;font-size:13px;border-bottom:1px solid #1c1c1c}
 .if-row:last-child{border-bottom:0}
-.if-av{width:22px;height:22px;border-radius:50%;object-fit:cover;background:#2a2a2a;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#bbb}
+.if-av{width:28px;height:28px;border-radius:50%;object-fit:cover;background:#2a2a2a;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#bbb}
 .if-row .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .if-row .nm:hover{color:#e8e8e8;text-shadow:0 0 8px rgba(255,255,255,.7)}
 .if-row .usd{text-align:right;font-weight:500;font-variant-numeric:tabular-nums}
@@ -579,8 +574,7 @@ const INFLOW=__INFLOW__;const OUTFLOW=__OUTFLOW__;let IFM='in';
 function ifMode(m){IFM=m;document.querySelectorAll('#v-inflows .chip').forEach(c=>c.classList.toggle('on',c.dataset.m==m));ifRender()}
 function ifRender(){const MIN_IN=2000;const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const $=n=>'$'+(n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e4?Math.round(n/1e3)+'K':n>=1e3?(n/1e3).toFixed(1)+'K':Math.round(n));
- const shs=n=>{n=+n||0;const fmt=v=>{const s=v.toFixed(1);return s.endsWith('.0')?s.slice(0,-2):s};if(n>=1e6)return fmt(n/1e6)+'M';if(n>=1000)return fmt(n/1000)+'K';const r=Math.round(n*10)/10;return r.toLocaleString('en-US')};
- const flowMeta=(sh,avg)=>sh>0&&avg!=null?shs(sh)+' sh · avg '+Math.round(avg*100)+'¢':'';
+ const shs=n=>n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(1).replace(/\.0$/,'')+'K':Math.round(n)+'';
  const OUTM=IFM=='out', SRC=OUTM?OUTFLOW:INFLOW;
  const mk=(SRC.mk||[]).map(m=>{const y=Math.max(0,+m.yes||0),n=Math.max(0,+m.no||0);return Object.assign({},m,{y,n,net:y+n})}).filter(m=>m.net>=MIN_IN).sort((a,b)=>b.net-a.net);
  const el=document.getElementById('iflist');if(!el)return;
@@ -591,10 +585,9 @@ function ifRender(){const MIN_IN=2000;const esc=s=>String(s==null?'':s).replace(
  el.innerHTML=mk.map((m,i)=>{const yp=m.net?Math.round(m.y/m.net*100):0,lead=m.y>=m.n?'YES':'NO',nt=m.tr.length,ex=m.tr.filter(t=>t.exited).length;
   const rows=m.tr.slice(0,4).map(t=>{const av=t.avatar?`<img class="if-av" src="${esc(t.avatar)}" alt="" loading="lazy" referrerpolicy="no-referrer">`:`<span class="if-av">${esc((t.n||'?')[0].toUpperCase())}</span>`;
    const badge=OUTM?((t.exited?'EXITED ':'TRIMMED ')+String(t.out||'').toUpperCase()):String(t.out||'').toUpperCase();
-   const meta=flowMeta(t.sh,t.avg);
-   return `<div class="if-row">${av}<a class="nm" href="https://polymarket.com/@${encodeURIComponent(t.n)}" target="_blank" rel="noopener">${esc(t.n)}</a>${meta?`<span class="if-meta">${esc(meta)}</span>`:''}<span class="side ${t.out=='Yes'?'sy':'sn'}">${esc(badge)}</span><span class="usd">${$(t.usd)}</span></div>`}).join('');
+   return `<div class="if-row">${av}<span class="who"><a class="nm" href="https://polymarket.com/@${encodeURIComponent(t.n)}" target="_blank" rel="noopener">${esc(t.n)}</a>${t.sh?`<span class="sub">${shs(t.sh)} shares · avg ${Math.round(t.avg*100)}¢</span>`:''}</span><span class="side ${t.out=='Yes'?'sy':'sn'}">${esc(badge)}</span><span class="usd">${$(t.usd)}</span></div>`}).join('');
   const img=m.img?`<img class="mimg" src="${esc(m.img)}" alt="" loading="lazy" referrerpolicy="no-referrer">`:`<span class="mimg"></span>`;
-  return `<div class="card if-card${i==0?' hot':''}"><div class="if-sec if-head">${img}<div class="if-hb"><div class="if-eye"><span class="if-lbl">#${String(i+1).padStart(2,'0')}</span>${i==0?`<span class="if-hot">${OUTM?'BIGGEST EXIT':'HOTTEST'}</span>`:''}</div><a class="if-ttl" href="${esc(m.url)}" target="_blank" rel="noopener">${esc(m.t)}</a></div></div><div class="if-sec if-money"><div class="if-net"><span class="if-lbl">${OUTM?'Sold · 24h':'Net in · 24h'}</span><b>${$(m.net)}</b></div><div class="if-split"><span class="if-lbl">${OUTM?'Mostly sold '+lead:'Mostly '+lead}</span><div class="if-sl"><span class="y"><span>YES <b>${$(m.y)}</b> · ${yp}%</span>${flowMeta(m.ysh,m.yavg)?`<span class="if-meta">${esc(flowMeta(m.ysh,m.yavg))}</span>`:''}</span><span class="n"><span>NO <b>${$(m.n)}</b> · ${100-yp}%</span>${flowMeta(m.nsh,m.navg)?`<span class="if-meta">${esc(flowMeta(m.nsh,m.navg))}</span>`:''}</span></div><div class="if-bar">${yp>0?`<i class="y" style="width:${yp}%"></i>`:''}${yp<100?'<i class="n" style="flex:1"></i>':''}</div></div></div><div class="if-sec"><div class="if-trh"><span class="if-lbl">Smart traders</span><span class="if-lbl">${OUTM?ex+' exited · '+(nt-ex)+' trimmed':nt+' total'}</span></div>${rows}</div><div class="if-foot"><span class="if-lbl">${m.px==null?'':'Now YES '+Math.round(m.px*100)+'¢'}${nt>4?' · +'+(nt-4)+' more':''}</span><a class="if-open" href="${esc(m.url)}" target="_blank" rel="noopener">Open market ↗</a></div></div>`}).join('')}
+  return `<div class="card if-card${i==0?' hot':''}"><div class="if-sec if-head">${img}<div class="if-hb"><div class="if-eye"><span class="if-lbl">#${String(i+1).padStart(2,'0')}</span>${i==0?`<span class="if-hot">${OUTM?'BIGGEST EXIT':'HOTTEST'}</span>`:''}</div><a class="if-ttl" href="${esc(m.url)}" target="_blank" rel="noopener">${esc(m.t)}</a></div></div><div class="if-sec if-money"><div class="if-net"><span class="if-lbl">${OUTM?'Sold · 24h':'Net in · 24h'}</span><b>${$(m.net)}</b></div><div class="if-split"><span class="if-lbl">${OUTM?'Mostly sold '+lead:'Mostly '+lead}</span><div class="if-sl"><span class="y">YES <b>${$(m.y)}</b> · ${yp}%</span><span class="n">NO <b>${$(m.n)}</b> · ${100-yp}%</span></div><div class="if-bar">${yp>0?`<i class="y" style="width:${yp}%"></i>`:''}${yp<100?'<i class="n" style="flex:1"></i>':''}</div><div class="if-sh"><span class="y">YES ${shs(m.ysh||0)} shares · avg ${m.ysh?Math.round(m.yavg*100)+'¢':'—'}</span><span class="n">NO ${shs(m.nsh||0)} shares · avg ${m.nsh?Math.round(m.navg*100)+'¢':'—'}</span></div></div></div><div class="if-sec"><div class="if-trh"><span class="if-lbl">Smart traders</span><span class="if-lbl">${OUTM?ex+' exited · '+(nt-ex)+' trimmed':nt+' total'}</span></div>${rows}</div><div class="if-foot"><span class="if-lbl">${m.px==null?'':'Now YES '+Math.round(m.px*100)+'¢'}${nt>4?' · +'+(nt-4)+' more':''}</span><a class="if-open" href="${esc(m.url)}" target="_blank" rel="noopener">Open market ↗</a></div></div>`}).join('')}
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const dollars=n=>'$'+(+n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 const money=n=>{const v=+n||0,c=Math.round(Math.abs(v)*100),sign=v<0?'-':'';if(c%100===0)return sign+'$'+Math.round(Math.abs(v)).toLocaleString('en-US');return sign+'$'+Math.abs(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})};
