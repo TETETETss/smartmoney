@@ -282,11 +282,13 @@ def market_url(slug, event_slug):
 def js_json(obj):
     return json.dumps(obj, separators=(',', ':')).replace('<', '\\u003c')
 
-def _activity_pages(addr):
+def _activity_pages(addr, hours=None, pages=None):
     """Recent TRADE rows from data-api v2 activity, falling back to v2 trades. v1 is retired (HTTP 410)."""
-    cutoff = time.time() - LIVE_HOURS * 3600
+    hours = LIVE_HOURS if hours is None else hours
+    pages = LIVE_PAGES if pages is None else pages
+    cutoff = time.time() - hours * 3600
     rows, cur = [], None
-    for _ in range(max(1, LIVE_PAGES)):
+    for _ in range(max(1, pages)):
         q = {'user': addr, 'limit': 100, 'type': 'TRADE'}
         if cur: q['cursor'] = cur
         d = get(V2 + 'activity?' + urllib.parse.urlencode(q), quiet=True)
@@ -298,7 +300,7 @@ def _activity_pages(addr):
     trades = [x for x in rows if str(F(x, 'type', default='TRADE')).upper() == 'TRADE' and str(F(x, 'side', default='')).upper() in ('BUY', 'SELL') and norm_ts(x) >= cutoff]
     if trades or rows: return trades
     rows, cur = [], None
-    for _ in range(max(1, LIVE_PAGES)):
+    for _ in range(max(1, pages)):
         q = {'user': addr, 'limit': 100, 'taker_only': 'false'}
         if cur: q['cursor'] = cur
         d = get(V2 + 'trades?' + urllib.parse.urlencode(q), quiet=True)
@@ -484,6 +486,74 @@ def live_feed(addrs, names):
         print(f'  newest: {s["n"]} {s["side"]} {s["out"]} ${s["usd"]} · {s["chip"]} {s["split"]} {s["arrow"]} · {s["t"][:70]}')
     return rows
 
+INFLOW_HOURS = 24
+INFLOW_PAGES = int(os.environ.get('INFLOW_PAGES', 8))
+INFLOW_MIN = float(os.environ.get('INFLOW_MIN', 2000))
+
+def _yes_price(cid):
+    """Current YES price from open positions, else 1 minus the NO price."""
+    no_px = None
+    for P in RAW.values():
+        for p in P or []:
+            if F(p, 'condition_id', 'conditionId') != cid: continue
+            px = _num(F(p, 'current_price', 'cur_price', 'curPrice'))
+            if px is None: continue
+            if str(F(p, 'outcome') or '').lower() == 'yes': return px
+            if str(F(p, 'outcome') or '').lower() == 'no': no_px = px
+    return None if no_px is None else 1 - no_px
+
+def inflows(addrs, names):
+    """Net new money in the last 24h. yes/no are buys minus sells; net keeps only the positive side."""
+    print(f'\n== top inflows: {len(addrs)} wallets, last {INFLOW_HOURS}h ==')
+    cutoff = time.time() - INFLOW_HOURS * 3600
+    with cf.ThreadPoolExecutor(8) as ex:
+        fetched = list(ex.map(lambda a: _activity_pages(a, INFLOW_HOURS, INFLOW_PAGES), addrs))
+    books = {}
+    for addr, rows in zip(addrs, fetched):
+        for x in rows:
+            ts = norm_ts(x)
+            if ts < cutoff: continue
+            side = str(F(x, 'side', default='')).upper()
+            if side not in ('BUY', 'SELL'): continue
+            ol = str(F(x, 'outcome') or '').strip().lower()
+            if ol == 'yes': out = 'Yes'
+            elif ol == 'no': out = 'No'
+            else: continue
+            usd = _num(F(x, 'usdc_size', 'usdcSize'))
+            if usd is None:
+                usd = (_num(F(x, 'size')) or 0) * (_num(F(x, 'price')) or 0)
+            if usd <= 0: continue
+            cid = F(x, 'condition_id', 'conditionId') or ''
+            if not cid: continue
+            b = books.setdefault(cid, {'yes': 0.0, 'no': 0.0, 'tr': {}, 'names': {}, 'avatar': {}, 't': '', 'url': '', 'img': '', 'ts': 0})
+            signed = usd if side == 'BUY' else -usd
+            b['yes' if out == 'Yes' else 'no'] += signed
+            b['tr'][(addr, out)] = b['tr'].get((addr, out), 0.0) + signed
+            b['names'][addr] = names.get(addr) or F(x, 'name') or F(x, 'pseudonym') or (addr[:6] + '…' + addr[-4:])
+            av = F(x, 'profile_image', 'profileImage') or ''
+            if av: b['avatar'][addr] = av
+            if ts >= b['ts']:
+                b['ts'] = ts
+                title = F(x, 'title', 'market_title', 'question') or ''
+                if title: b['t'] = title
+                img = F(x, 'icon', 'image') or ''
+                if img: b['img'] = img
+                url = market_url(F(x, 'slug', 'market_slug') or '', F(x, 'event_slug', 'eventSlug') or '')
+                if url.startswith('https://polymarket.com/event/'): b['url'] = url
+    mk = []
+    for cid, b in books.items():
+        net = max(b['yes'], 0) + max(b['no'], 0)
+        if net < INFLOW_MIN or not b['t'] or not str(b['url']).startswith('https://polymarket.com/event/'): continue
+        tr = [{'n': b['names'].get(a, a[:6]), 'avatar': b['avatar'].get(a, ''), 'out': o, 'usd': round(v)}
+              for (a, o), v in b['tr'].items() if v > 0]
+        tr.sort(key=lambda r: -r['usd'])
+        px = _yes_price(cid)
+        mk.append({'t': b['t'], 'url': b['url'], 'img': b['img'] or '', 'yes': round(b['yes']), 'no': round(b['no']),
+                   'px': None if px is None else round(px, 4), 'tr': tr})
+    mk.sort(key=lambda m: -(max(m['yes'], 0) + max(m['no'], 0)))
+    print(f'top inflows: {len(mk)} markets >= ${INFLOW_MIN:.0f}')
+    return {'built': int(time.time()), 'mk': mk}
+
 def main():
     # One tracked list. Each wallet keeps its own position minimum (macro $500, fast $10).
     W = load_wallets('wallets.json')
@@ -493,16 +563,18 @@ def main():
     addrs = [w['address'] for w in W]
     prefetch_positions(addrs)
     LIVE = live_feed(addrs, names)
+    INFLOW = inflows(addrs, names)
     for m in D: m.pop('tok', None)
     json.dump(RAW, open(os.path.join(HERE, 'raw.json'), 'w', encoding='utf-8'))
     if not ok:
         sys.exit('No data came back from Polymarket (network blocked?). index.html was NOT changed.')
     if not LIVE:
         sys.exit('No recent trades came back from the Polymarket data API. index.html was NOT changed.')
-    json.dump({'D': D, 'TR': T, 'CH': CH, 'LIVE': LIVE}, open(os.path.join(HERE, 'data.json'), 'w', encoding='utf-8'))
+    json.dump({'D': D, 'TR': T, 'CH': CH, 'LIVE': LIVE, 'INFLOW': INFLOW}, open(os.path.join(HERE, 'data.json'), 'w', encoding='utf-8'))
     html = open(os.path.join(HERE, 'template.html'), encoding='utf-8').read()
     html = html.replace('__CHARTS__', js_json(CH)).replace('__DATA__', js_json(D)).replace('__TRADERS__', js_json(T)).replace('__NTRADERS__', str(len(W)))
     html = html.replace('__LIVE__', js_json(LIVE)).replace('__NLIVE__', str(len(LIVE))).replace('__BUILT__', str(int(time.time())))
+    html = html.replace('__INFLOW__', js_json(INFLOW))
     open(os.path.join(HERE, 'index.html'), 'w', encoding='utf-8').write(html)
     print(f'\nDone: {len(W)} traders, {len(D)} markets shown -> index.html')
 

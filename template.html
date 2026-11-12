@@ -306,6 +306,32 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
 #v-live .ltfoot{display:flex;justify-content:space-between;gap:20px;padding:18px 22px;border-top:1px solid #1f1f24;color:#777;font-size:11px;background:#0b0b0d}
 #v-live .empty{text-align:center;padding:48px 20px;color:#959baa}
 @media(max-width:900px){#v-live .ltshell{margin:8px 12px 0}#v-live .ltbar,#v-live th,#v-live td{padding-left:14px;padding-right:14px}#v-live .ltfoot{flex-direction:column;gap:8px}#v-live .market a{font-size:14px}}
+.if-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:0 36px 60px}
+.if-card{position:relative}
+.if-top{display:flex;gap:12px;align-items:flex-start}
+.if-rk{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:12px;color:#777;width:24px;flex:none;padding-top:2px}
+.if-ttl{flex:1;font-size:16px;font-weight:600;line-height:1.3;transition:text-shadow .2s}
+.if-ttl:hover{text-shadow:0 0 8px rgba(255,255,255,.7)}
+.if-amt{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.if-amt b{font-size:34px;font-weight:500;letter-spacing:-1px;line-height:1}
+.if-amt small{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:11px;letter-spacing:.8px;color:#777;text-transform:uppercase}
+.if-bar{display:flex;height:4px;border-radius:2px;overflow:hidden;background:#262626}
+.if-bar i{display:block;height:100%}.if-bar .y{background:#4ade80}.if-bar .n{background:#ff5a5a}
+.if-card .sp b{font-size:15px;font-weight:500}
+.if-tr{display:flex;flex-direction:column;border-top:1px solid #262626}
+.if-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #1d1d1d;font-size:13px}
+.if-row:last-child{border-bottom:0}
+.if-av{width:22px;height:22px;border-radius:50%;object-fit:cover;flex:none;background:#2a2a2a;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#bbb}
+.if-row .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.if-row .nm:hover{color:#e8e8e8;text-shadow:0 0 8px rgba(255,255,255,.7)}
+.if-row .usd{font-variant-numeric:tabular-nums;font-weight:500}
+.if-more{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:11px;color:#777;padding-top:8px;letter-spacing:.6px}
+.if-card.hot{border-color:#ffffff59;box-shadow:0 0 28px rgba(255,255,255,.10)}
+.if-hot{font-size:10px;font-weight:600;padding:4px 9px;border-radius:99px;background:#fff;color:#000;letter-spacing:.4px;white-space:nowrap}
+.if-empty{grid-column:1/-1;padding:40px;text-align:center;color:#777;border:1px dashed #333;border-radius:20px;font-size:13px}
+.if-now{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:11px;letter-spacing:.6px;color:#8a8a8a}
+@media(max-width:1100px){.if-list{grid-template-columns:1fr}}
+@media(max-width:900px){.if-list{padding:16px 12px 40px}.if-amt b{font-size:28px}}
 .sbar{overflow-y:auto}
 </style></head><body class="indash">
 <canvas id="orb"></canvas>
@@ -317,6 +343,7 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
   <nav>
    <a class="nv on" data-v="markets" onclick="view('markets')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.8 5.6 3.8 9s-1.2 6.4-3.8 9c-2.6-2.6-3.8-5.6-3.8-9S9.4 5.6 12 3z"/></svg></em>Markets</a>
    <a class="nv" data-v="live" onclick="view('live')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2.5-6 4 12L16 12h5"/></svg></em>Live Trades</a>
+   <a class="nv" data-v="inflows" onclick="view('inflows')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v14M6 11l6 6 6-6"/><path d="M4 21h16"/></svg></em>Top Inflows</a>
    <a class="nv" data-v="saved" onclick="view('saved')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></em>Bookmarked<span class="savn" id="savn"></span></a>
    <a class="nv" data-v="traders" onclick="view('traders')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.2 4.2-6.5 8-6.5s7 2.3 8 6.5"/></svg></em>Traders</a>
    <a class="nv" data-v="lookup" onclick="view('lookup')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></em>Wallet lookup</a>
@@ -341,6 +368,14 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
     <div class="ltscroll"><table id="lttbl"><thead><tr><th>Market</th><th>Trader</th><th>Side</th><th id="ltamt" title="Sort by amount">Amount<span id="ltamtarr"></span></th><th>Time</th></tr></thead><tbody id="ltbody"></tbody></table></div>
     <div class="ltfoot"><span>Held bar = shares currently held in that market. Empty = fully exited.</span><span id="liveasof"></span></div>
    </div>
+  </div>
+  <div class="v" id="v-inflows" style="display:none">
+   <div class="hero"><div>
+    <div class="muted" style="font-size:12px;margin-bottom:8px" id="ifline">LAST 24H · TRACKED WALLETS</div>
+    <h2>Top Inflows</h2>
+    <div class="sortnote">Markets where smart traders put in $2K+ of new money today</div>
+   </div></div>
+   <div class="if-list" id="iflist"></div>
   </div>
   <div class="v" id="v-traders" style="display:none">
    <div class="hero"><div><div class="muted" style="font-size:12px;margin-bottom:8px" id="tline">__NTRADERS__ HAND-PICKED TRADERS · SORTED BY ALL-TIME PNL</div><h2>Traders</h2></div></div>
@@ -518,8 +553,23 @@ async function lookup(){
  }catch(e){lkout.innerHTML=`<div class="lke">Could not load this wallet (${String(e.message||e)}). If every lookup fails, Polymarket may be blocked on your connection: check your DNS setting or VPN, then try again.</div>`}
 }
 const TRS=__TRADERS__;let TR=TRS;
-function view(v){const r=(v=='saved'||v=='markets')?'markets':v;if(r=='markets'){SV=v=='saved';F='All';FOC=null}if(v=='traders')trR();document.querySelectorAll('main>.v').forEach(x=>x.style.display=x.id=='v-'+r?'block':'none');if(r=='markets')render();if(r=='live')liveRender();document.querySelectorAll('.nv').forEach(x=>x.classList.toggle('on',x.dataset.v==v));document.body.classList.remove('navopen');scrollTo(0,0)}
+function view(v){const r=(v=='saved'||v=='markets')?'markets':v;if(r=='markets'){SV=v=='saved';F='All';FOC=null}if(v=='traders')trR();document.querySelectorAll('main>.v').forEach(x=>x.style.display=x.id=='v-'+r?'block':'none');if(r=='markets')render();if(r=='live')liveRender();if(r=='inflows')ifRender();document.querySelectorAll('.nv').forEach(x=>x.classList.toggle('on',x.dataset.v==v));document.body.classList.remove('navopen');scrollTo(0,0)}
 const LIVE=/*__LIVE_START__*/__LIVE__/*__LIVE_END__*/;const BUILT=__BUILT__;const liveOpen=new Set();
+const INFLOW=__INFLOW__;
+function ifRender(){const MIN_IN=2000;const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const $=n=>'$'+(n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e4?Math.round(n/1e3)+'K':n>=1e3?(n/1e3).toFixed(1)+'K':Math.round(n));
+ const mk=(INFLOW.mk||[]).map(m=>{const y=Math.max(0,m.yes),n=Math.max(0,m.no);return Object.assign({},m,{y,n,net:y+n})}).filter(m=>m.net>=MIN_IN).sort((a,b)=>b.net-a.net);
+ const el=document.getElementById('iflist');if(!el)return;
+ const ago=Math.max(0,Math.round((Date.now()/1000-(INFLOW.built||0))/60));
+ const line=document.getElementById('ifline');if(line)line.textContent=mk.length+' MARKETS · $2K+ IN · LAST 24H · UPDATED '+(ago<60?ago+' MIN':Math.round(ago/60)+'H')+' AGO';
+ if(!mk.length){el.innerHTML='<div class="if-empty">No market has $2K+ of smart-money inflow in the last 24h yet.</div>';return}
+ el.innerHTML=mk.map((m,i)=>{const yp=Math.round(m.y/m.net*100),lead=m.y>=m.n?'YES':'NO';
+  const px=m.px==null?'':`<span class="if-now">NOW YES ${Math.round(m.px*100)}¢</span>`;
+  const rows=m.tr.slice(0,4).map(t=>{const av=t.avatar?`<img class="if-av" src="${esc(t.avatar)}" alt="" loading="lazy" referrerpolicy="no-referrer">`:`<span class="if-av">${esc((t.n||'?')[0].toUpperCase())}</span>`;
+   return `<div class="if-row">${av}<a class="nm" href="https://polymarket.com/@${encodeURIComponent(t.n)}" target="_blank" rel="noopener">${esc(t.n)}</a><span class="side ${t.out=='Yes'?'sy':'sn'}">${esc(t.out).toUpperCase()}</span><span class="usd">${$(t.usd)}</span></div>`}).join('');
+  const more=m.tr.length>4?`<div class="if-more">+${m.tr.length-4} more traders</div>`:'';
+  const img=m.img?`<img class="mimg" src="${esc(m.img)}" alt="" loading="lazy" referrerpolicy="no-referrer">`:`<span class="mimg"></span>`;
+  return `<div class="card if-card${i==0?' hot':''}"><div class="if-top"><span class="if-rk">${String(i+1).padStart(2,'0')}</span>${img}<a class="if-ttl" href="${esc(m.url)}" target="_blank" rel="noopener">${esc(m.t)}</a>${i==0?'<span class="if-hot">HOTTEST</span>':''}</div><div class="if-amt"><b>${$(m.net)}</b><small>net in · ${m.tr.length} trader${m.tr.length>1?'s':''} · mostly ${lead}</small></div><div class="if-bar"><i class="y" style="width:${yp}%"></i><i class="n" style="width:${100-yp}%"></i></div><div class="split"><div class="sp spy"><span class="spl">YES IN</span><b>${$(m.y)}</b><small>${yp}%</small></div><div class="sp spn"><span class="spl">NO IN</span><b>${$(m.n)}</b><small>${100-yp}%</small></div></div><div class="if-tr">${rows}${more}</div>${px}</div>`}).join('')}
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const dollars=n=>'$'+(+n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 const money=n=>{const v=+n||0,c=Math.round(Math.abs(v)*100),sign=v<0?'-':'';if(c%100===0)return sign+'$'+Math.round(Math.abs(v)).toLocaleString('en-US');return sign+'$'+Math.abs(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})};
