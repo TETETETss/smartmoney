@@ -515,22 +515,41 @@ def _flow_meta(b, x, addr, names, ts):
         url = market_url(F(x, 'slug', 'market_slug') or '', F(x, 'event_slug', 'eventSlug') or '')
         if url.startswith('https://polymarket.com/event/'): b['url'] = url
 
-def _flow_markets(books, held, exited):
+def _avg(usd, sh):
+    return None if not sh else round(usd / sh, 4)
+
+def _flow_markets(books, held, is_out):
     mk = []
     for cid, b in books.items():
         net = max(b['yes'], 0) + max(b['no'], 0)
         if net < INFLOW_MIN or not b['t'] or not str(b['url']).startswith('https://polymarket.com/event/'): continue
         tr = []
-        for (addr, out), val in b['tr'].items():
+        for (addr, out), slot in b['tr'].items():
+            val = slot['usd']
             if val <= 0: continue
-            row = {'n': b['names'].get(addr, addr[:6]), 'avatar': b['avatar'].get(addr, ''), 'out': out, 'usd': round(val)}
-            if exited:
-                sh = float(((held.get(addr) or {}).get(cid) or {}).get(out) or 0)
-                row['exited'] = sh <= 0.01
+            if is_out:
+                sh, avg = slot['sh'], _avg(slot['usd'], slot['sh'])
+            else:
+                sh = slot['buy_sh'] - slot['sell_sh']
+                avg = _avg(slot['buy_usd'], slot['buy_sh'])
+            row = {'n': b['names'].get(addr, addr[:6]), 'avatar': b['avatar'].get(addr, ''), 'out': out,
+                   'usd': round(val), 'sh': round(sh, 2) if sh and sh > 0 else 0, 'avg': avg}
+            if is_out:
+                left = float(((held.get(addr) or {}).get(cid) or {}).get(out) or 0)
+                row['exited'] = left <= 0.01
             tr.append(row)
         tr.sort(key=lambda r: -r['usd'])
         px = _yes_price(cid)
+        if is_out:
+            ysh, yavg = b.get('yes_sh') or 0, _avg(max(b['yes'], 0), b.get('yes_sh') or 0)
+            nsh, navg = b.get('no_sh') or 0, _avg(max(b['no'], 0), b.get('no_sh') or 0)
+        else:
+            ysh = (b.get('yes_buy_sh') or 0) - (b.get('yes_sell_sh') or 0)
+            nsh = (b.get('no_buy_sh') or 0) - (b.get('no_sell_sh') or 0)
+            yavg, navg = _avg(b.get('yes_buy_usd') or 0, b.get('yes_buy_sh') or 0), _avg(b.get('no_buy_usd') or 0, b.get('no_buy_sh') or 0)
         mk.append({'t': b['t'], 'url': b['url'], 'img': b['img'] or '', 'yes': round(b['yes']), 'no': round(b['no']),
+                   'ysh': round(ysh, 2) if ysh and ysh > 0 else 0, 'yavg': yavg,
+                   'nsh': round(nsh, 2) if nsh and nsh > 0 else 0, 'navg': navg,
                    'px': None if px is None else round(px, 4), 'tr': tr})
     mk.sort(key=lambda m: -(max(m['yes'], 0) + max(m['no'], 0)))
     return mk
@@ -544,7 +563,10 @@ def money_flow(addrs, names):
     held, _vals = pos_index()
     inn, out = {}, {}
     def book(store, cid):
-        return store.setdefault(cid, {'yes': 0.0, 'no': 0.0, 'tr': {}, 'names': {}, 'avatar': {}, 't': '', 'url': '', 'img': '', 'ts': 0})
+        return store.setdefault(cid, {'yes': 0.0, 'no': 0.0, 'tr': {}, 'names': {}, 'avatar': {}, 't': '', 'url': '', 'img': '', 'ts': 0,
+            'yes_buy_usd': 0.0, 'yes_buy_sh': 0.0, 'yes_sell_sh': 0.0, 'no_buy_usd': 0.0, 'no_buy_sh': 0.0, 'no_sell_sh': 0.0, 'yes_sh': 0.0, 'no_sh': 0.0})
+    def slot_in(b, addr, outcome):
+        return b['tr'].setdefault((addr, outcome), {'usd': 0.0, 'buy_usd': 0.0, 'buy_sh': 0.0, 'sell_sh': 0.0, 'sh': 0.0})
     for addr, rows in zip(addrs, fetched):
         for x in rows:
             ts = norm_ts(x)
@@ -557,22 +579,37 @@ def money_flow(addrs, names):
             if ol == 'yes': outcome = 'Yes'
             elif ol == 'no': outcome = 'No'
             else: continue
+            sh = _num(F(x, 'size')) or 0
+            px = _num(F(x, 'price')) or 0
             usd = _num(F(x, 'usdc_size', 'usdcSize'))
-            if usd is None:
-                usd = (_num(F(x, 'size')) or 0) * (_num(F(x, 'price')) or 0)
+            if usd is None: usd = sh * px
             if usd <= 0: continue
+            if sh <= 0 and px > 0: sh = usd / px
             cid = F(x, 'condition_id', 'conditionId') or ''
             if not cid: continue
             key = 'yes' if outcome == 'Yes' else 'no'
             bi = book(inn, cid)
-            bi[key] += usd if side == 'BUY' else -usd
-            bi['tr'][(addr, outcome)] = bi['tr'].get((addr, outcome), 0.0) + (usd if side == 'BUY' else -usd)
+            sl = slot_in(bi, addr, outcome)
+            if side == 'BUY':
+                bi[key] += usd
+                sl['usd'] += usd
+                sl['buy_usd'] += usd
+                sl['buy_sh'] += sh
+                bi[key + '_buy_usd'] += usd
+                bi[key + '_buy_sh'] += sh
+            else:
+                bi[key] -= usd
+                sl['usd'] -= usd
+                sl['sell_sh'] += sh
+                bi[key + '_sell_sh'] += sh
             _flow_meta(bi, x, addr, names, ts)
-            px = _num(F(x, 'price')) or 0
             if side == 'SELL' and px < 0.95:
                 bo = book(out, cid)
+                so = slot_in(bo, addr, outcome)
                 bo[key] += usd
-                bo['tr'][(addr, outcome)] = bo['tr'].get((addr, outcome), 0.0) + usd
+                so['usd'] += usd
+                so['sh'] += sh
+                bo[key + '_sh'] += sh
                 _flow_meta(bo, x, addr, names, ts)
     built = int(time.time())
     inflow = {'built': built, 'mk': _flow_markets(inn, held, False)}
