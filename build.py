@@ -88,10 +88,26 @@ def F(p, *names, default=None):
         if n in p and p[n] is not None: return p[n]
     return default
 
+def public_profile(addr):
+    return get('https://gamma-api.polymarket.com/public-profile?address=' + addr, quiet=True) or {}
+
 def name_of(addr, given):
     if given: return given
-    p = get('https://gamma-api.polymarket.com/public-profile?address=' + addr, quiet=True) or {}
+    p = public_profile(addr)
     return p.get('name') or p.get('pseudonym') or addr[:6] + '…' + addr[-4:]
+
+def wallet_avatars(W):
+    """Name -> Polymarket profile image. Missing pictures fall back to a letter in the page."""
+    print(f'\n== avatars: {len(W)} wallets ==')
+    with cf.ThreadPoolExecutor(8) as ex:
+        profs = list(ex.map(lambda w: public_profile(w['address']), W))
+    av = {}
+    for w, p in zip(W, profs):
+        img = (p.get('profileImage') or p.get('profile_image') or '').strip()
+        name = w.get('name') or p.get('name') or p.get('pseudonym')
+        if name and img: av[name] = img
+    print(f'avatars: {len(av)} of {len(W)}')
+    return av
 
 CATS = [('Mention', r'\b(say|says|said|mention|mentions|mentioned|tweet|post)\b.*["\u201c]|\bmention'),
         ('Pop culture', r'(movie|film|oscar|academy award|emmy|grammy|golden globe|james bond|halftime|super bowl|big game|album|song|spotify|netflix|box office|top grossing|actor|actress|best picture|searched|time person of the year|pregnant|marvel|avengers|spider-man| as [a-z]+ [a-z]+\?$|taylor swift|drake|kardashian|celebrity)'),
@@ -653,7 +669,7 @@ def main():
     html = open(os.path.join(HERE, 'template.html'), encoding='utf-8').read()
     html = html.replace('__CHARTS__', js_json(CH)).replace('__DATA__', js_json(D)).replace('__TRADERS__', js_json(T)).replace('__NTRADERS__', str(len(W)))
     html = html.replace('__LIVE__', js_json(LIVE)).replace('__NLIVE__', str(len(LIVE))).replace('__BUILT__', str(int(time.time())))
-    html = html.replace('__INFLOW__', js_json(INFLOW)).replace('__OUTFLOW__', js_json(OUTFLOW))
+    html = html.replace('__INFLOW__', js_json(INFLOW)).replace('__OUTFLOW__', js_json(OUTFLOW)).replace('__AVATARS__', js_json(wallet_avatars(W)))
     open(os.path.join(HERE, 'index.html'), 'w', encoding='utf-8').write(html)
     print(f'\nDone: {len(W)} traders, {len(D)} markets shown -> index.html')
 
