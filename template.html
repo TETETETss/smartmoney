@@ -367,6 +367,113 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
 @media(max-width:1100px){.if-list{grid-template-columns:1fr}}
 @media(max-width:900px){.if-list{padding:16px 12px 40px}.if-sec{padding:16px}.if-foot{padding:12px 16px}.if-net b{font-size:32px}.if-money{gap:16px}}
 .sbar{overflow-y:auto}
+
+.wa-go{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;margin-left:6px;padding:0;border:1px solid #333;border-radius:50%;background:transparent;color:#888;cursor:pointer;vertical-align:-3px;flex:none}
+.wa-go:hover{color:#fff;border-color:#aaa}
+#v-wallet{--bg:transparent;--panel:#121212;--panel2:#0c0c0c;--line:#262626;--cell:#161616;--txt:#fff;--mut:#8a8a8a;--dim:#666;--g:#4ade80;--r:#f87171;--acc:#fff;--y:#e8e8e8;color:var(--txt);font-size:14px}
+#v-wallet a{color:inherit;text-decoration:none}
+#v-wallet button{font-family:inherit;cursor:pointer}
+#v-wallet .wa-wrap{padding:0 36px 60px}
+#v-wallet .g{color:var(--g)} #v-wallet .r{color:var(--r)} #v-wallet .mut{color:var(--mut)} #v-wallet .dim{color:var(--dim)}
+#v-wallet .mono{font-variant-numeric:tabular-nums}
+#v-wallet .search{display:flex;gap:8px;max-width:720px;margin:0 0 18px}
+#v-wallet .search input{flex:1;background:#0e0e0e;border:1px solid #333;border-radius:12px;padding:12px 14px;color:#fff;font:inherit;outline:none}
+#v-wallet .search input:focus{border-color:#e8e8e8}
+#v-wallet .btn{background:#fff;color:#000;font-weight:600;border-radius:12px;padding:12px 18px;border:0}
+#v-wallet .btn:disabled{opacity:.5}
+#v-wallet .head{background:#121212;border:1px solid #262626;border-radius:16px;padding:18px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+#v-wallet .avatar{width:56px;height:56px;border-radius:50%;background:#2a2a2a center/cover;flex-shrink:0}
+#v-wallet .who h1{font-size:20px;font-weight:700;display:flex;align-items:center;gap:8px}
+#v-wallet .who .addr{color:#8a8a8a;font-size:12px;margin-top:4px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+#v-wallet .who .addr button{color:#8a8a8a;font-size:12px;background:none;border:0;padding:0}
+#v-wallet .who .addr button:hover,#v-wallet .who .addr a:hover{color:#fff}
+#v-wallet .kpis{display:flex;gap:10px;margin-left:auto;flex-wrap:wrap}
+#v-wallet .kpi{background:#0c0c0c;border:1px solid #222;border-radius:12px;padding:10px 16px;min-width:110px}
+#v-wallet .kpi .l{font-size:11px;color:#8a8a8a;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+#v-wallet .kpi .v{font-size:18px;font-weight:700;margin-top:4px}
+#v-wallet .tabs{display:flex;gap:6px;margin:22px 0 18px;border-bottom:1px solid #262626;flex-wrap:wrap}
+#v-wallet .tab{padding:10px 16px;font-size:14px;color:#8a8a8a;font-weight:600;border:1px solid transparent;border-bottom:none;border-radius:10px 10px 0 0;background:none;position:relative;top:1px}
+#v-wallet .tab.on{color:#fff;border-color:#333;background:#000}
+#v-wallet .tab.on::after{content:"";position:absolute;left:18%;right:18%;bottom:6px;height:2px;border-radius:2px;background:#4ade80}
+#v-wallet .tab .pill{background:#222;font-size:12px;padding:2px 8px;border-radius:10px;margin-left:6px;color:#fff}
+#v-wallet .grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+#v-wallet .card{background:#121212;border:1px solid #262626;border-radius:16px;overflow:hidden;padding:0;gap:0;box-shadow:none}
+#v-wallet .card:hover{border-color:#3a3a3a;box-shadow:none}
+#v-wallet .card-h{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;background:#0c0c0c}
+#v-wallet .card-h h3{font-size:16px;font-weight:700}
+#v-wallet .card-b{padding:6px 16px 14px}
+#v-wallet .scroll{max-height:330px;overflow-y:auto}
+#v-wallet .seg{display:flex;background:#1a1a1a;border-radius:10px;padding:3px;border:1px solid #262626}
+#v-wallet .seg button{padding:6px 12px;border-radius:8px;color:#8a8a8a;font-weight:600;font-size:13px;background:none;border:0}
+#v-wallet .seg button.on{background:#fff;color:#000}
+#v-wallet .row{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid #222}
+#v-wallet .row:last-child{border-bottom:none}
+#v-wallet .rank{color:#666;font-size:13px;width:24px;flex-shrink:0}
+#v-wallet .ico{width:28px;height:28px;border-radius:50%;background:#2a2a2a center/cover;flex-shrink:0}
+#v-wallet .ttl{flex:1;min-width:0;font-weight:500}
+#v-wallet .row .ttl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#v-wallet .sub{color:#8a8a8a;font-size:12px;font-weight:400;margin:0}
+#v-wallet .chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 0 64px}
+#v-wallet .chip{border:1px solid #333;border-radius:6px;padding:4px 9px;font-size:12.5px;color:#ccc;background:transparent}
+#v-wallet .amt{font-weight:700;white-space:nowrap}
+#v-wallet .side-b{color:#e8e8e8;font-weight:700;font-size:13px;width:40px}
+#v-wallet .side-s{color:#d79a9a;font-weight:700;font-size:13px;width:40px}
+#v-wallet .sect{display:flex;align-items:center;gap:8px;font-weight:700;letter-spacing:.04em;font-size:14px;padding:16px 4px 4px}
+#v-wallet .cal{padding:18px}
+#v-wallet .cal-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+#v-wallet .navb{width:40px;height:40px;border-radius:10px;background:#1a1a1a;border:1px solid #333;font-size:18px;color:#aaa}
+#v-wallet .navb:disabled{opacity:.35}
+#v-wallet .cal-title{font-size:26px;font-weight:700}
+#v-wallet .cal-total{font-size:22px;font-weight:700}
+#v-wallet .legend{margin-left:auto;display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:#8a8a8a}
+#v-wallet .legend i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:middle}
+#v-wallet .cal-stats{margin:16px 0 6px;color:#8a8a8a;font-size:14px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+#v-wallet .cal-stats b{color:#fff}
+#v-wallet .cgrid{display:grid;grid-template-columns:repeat(7,1fr) 72px;gap:8px;margin-top:16px}
+#v-wallet .cgrid .dh{text-align:center;color:#8a8a8a;font-size:12px;font-weight:600;padding-bottom:4px}
+#v-wallet .cell{background:#161616;border-radius:6px;height:72px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:14px;font-weight:500}
+#v-wallet .cell .p{font-size:13px;font-weight:600}
+#v-wallet .cell.out{opacity:.25}
+#v-wallet .wk{display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+#v-wallet .mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px}
+#v-wallet .mgrid .cell{height:88px}
+#v-wallet .lb-row{display:grid;grid-template-columns:110px 80px 1fr 80px;align-items:center;gap:14px;padding:10px 6px;font-weight:700}
+#v-wallet .lb-row .c{color:#ccc;font-size:13px}
+#v-wallet .bar{height:18px;background:#222;border-radius:9px;position:relative;overflow:hidden}
+#v-wallet .bar span{position:absolute;top:0;bottom:0;border-radius:9px}
+#v-wallet .lb-overall{background:#0c0c0c;padding:16px 22px;display:flex;justify-content:space-between;align-items:center}
+#v-wallet .lb-overall .l{color:#e8e8e8;font-weight:700;font-size:12px;letter-spacing:.05em}
+#v-wallet .lb-overall .n{font-size:22px;font-weight:800;margin-top:2px}
+#v-wallet table{width:100%;border-collapse:collapse;font-size:13px}
+#v-wallet th{text-align:left;color:#8a8a8a;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;padding:12px 10px;border-bottom:1px solid #262626;border-top:0;cursor:pointer;user-select:none;white-space:nowrap;background:transparent}
+#v-wallet th.num,#v-wallet td.num{text-align:right}
+#v-wallet td{padding:11px 10px;border-bottom:1px solid #222;border-top:0;vertical-align:middle}
+#v-wallet tr:hover td{background:#161616}
+#v-wallet .mk{display:flex;align-items:center;gap:10px;min-width:220px}
+#v-wallet .mk .ttl{white-space:normal}
+#v-wallet .toolbar{display:flex;gap:10px;align-items:center;padding:14px 18px;flex-wrap:wrap}
+#v-wallet .toolbar input,#v-wallet .toolbar select{background:#0e0e0e;border:1px solid #333;border-radius:8px;padding:8px 12px;color:#fff;font:inherit;outline:none}
+#v-wallet .more{display:block;margin:14px auto;background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:9px 18px;font-weight:600;color:#fff}
+#v-wallet .badge{font-size:11px;font-weight:700;padding:3px 7px;border-radius:5px;background:#1c1c1c;color:#ccc;text-transform:uppercase;letter-spacing:.04em}
+#v-wallet .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;padding:18px}
+#v-wallet .tile{background:#0c0c0c;border:1px solid #222;border-radius:12px;padding:14px 16px}
+#v-wallet .tile .l{font-size:11px;color:#8a8a8a;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+#v-wallet .tile .v{font-size:20px;font-weight:700;margin-top:6px}
+#v-wallet .tile .s{font-size:12px;color:#8a8a8a;margin-top:3px}
+#v-wallet .chart{padding:8px 18px 18px}
+#v-wallet .chart svg{width:100%;height:260px;display:block}
+#v-wallet .empty{padding:28px;text-align:center;color:#8a8a8a}
+#v-wallet .loading{padding:48px;text-align:center;color:#8a8a8a}
+#v-wallet .spin{display:inline-block;width:18px;height:18px;border:2px solid #333;border-top-color:#4ade80;border-radius:50%;animation:wa-spin .8s linear infinite;vertical-align:middle;margin-right:8px}
+@keyframes wa-spin{to{transform:rotate(360deg)}}
+#v-wallet .wa-empty{padding:48px 8px 20px}
+#v-wallet .wa-empty h2{font-size:28px;font-weight:700;letter-spacing:.2px;text-transform:uppercase;margin-bottom:8px}
+#v-wallet .wa-empty p{color:#8a8a8a;max-width:560px}
+#v-wallet .err{background:#2a1216;border:1px solid #5a3030;color:#ffb3bf;padding:14px 18px;border-radius:12px;margin-bottom:18px}
+#v-wallet .hidden{display:none!important}
+@media(max-width:980px){#v-wallet .grid2{grid-template-columns:1fr}#v-wallet .kpis{margin-left:0}#v-wallet .wa-wrap{padding:0 16px 40px}}
+@media(max-width:760px){#v-wallet .cgrid{grid-template-columns:repeat(7,1fr)}#v-wallet .wk,#v-wallet .cgrid .dh.wkh{display:none}#v-wallet .cell{height:52px;font-size:12px}#v-wallet .cell .p{font-size:10px}}
+
 </style></head><body class="indash">
 <canvas id="orb"></canvas>
 
@@ -381,6 +488,7 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
    <a class="nv" data-v="saved" onclick="view('saved')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></em>Bookmarked<span class="savn" id="savn"></span></a>
    <a class="nv" data-v="traders" onclick="view('traders')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.2 4.2-6.5 8-6.5s7 2.3 8 6.5"/></svg></em>Traders</a>
    <a class="nv" data-v="lookup" onclick="view('lookup')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></em>Wallet lookup</a>
+   <a class="nv" data-v="wallet" onclick="view('wallet')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M16 15h2"/></svg></em>Wallet Analysis</a>
    <a class="nv" data-v="tips" onclick="view('tips')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.6 2.6 0 0 1 5 .8c0 1.7-2.5 2.3-2.5 4"/><circle cx="12" cy="17.2" r=".6" fill="currentColor"/></svg></em>How to use</a>
    <a class="nv" href="https://poly.market/brams" target="_blank" rel="noopener"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6L4.5 19a1.5 1.5 0 0 0 1.3 2h12.4a1.5 1.5 0 0 0 1.3-2L14 9V3"/><path d="M7 15h10"/></svg></em>AI Model Analysis<span class="cs">Coming soon</span></a>
   </nav>
@@ -412,6 +520,23 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
    <div class="chips"><button class="chip on" data-m="in" onclick="ifMode('in')">Inflows</button><button class="chip" data-m="out" onclick="ifMode('out')">Outflows</button></div></div>
    <div class="grid" id="iflist"></div>
   </div>
+
+  <div class="v" id="v-wallet" style="display:none">
+   <div class="hero"><div>
+    <div class="muted" style="font-size:12px;margin-bottom:12px">ANY POLYMARKET WALLET</div>
+    <h2>Wallet Analysis</h2>
+    <div class="sortnote">Daily PnL, category ranks, open positions, trades, and a performance report</div>
+   </div></div>
+   <div class="wa-wrap">
+    <form class="search" id="waf">
+     <input id="waq" type="search" placeholder="Wallet address, Polymarket username, or profile link" autocomplete="off" spellcheck="false">
+     <button class="btn" id="wago" type="submit">Analyze</button>
+    </form>
+    <div id="waerr" class="err hidden"></div>
+    <div id="waapp"><div class="wa-empty"><h2>Analyze any Polymarket wallet</h2><p>Search a tracked trader, any username, or a 0x address. Daily PnL, ranks, positions, activity, history, and a performance report.</p></div></div>
+   </div>
+  </div>
+
   <div class="v" id="v-traders" style="display:none">
    <div class="hero"><div><div class="muted" style="font-size:12px;margin-bottom:8px" id="tline">__NTRADERS__ HAND-PICKED TRADERS · SORTED BY ALL-TIME PNL</div><h2>Traders</h2></div></div>
    <div class="tnote"><h3>Why these traders</h3><ul>
@@ -468,6 +593,7 @@ const K=n=>n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?Math.round(n/1e3)+'K':Math.round
 const usdK=n=>'$'+(n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e4?Math.round(n/1e3)+'K':n>=1e3?(n/1e3).toFixed(1)+'K':Math.round(+n||0));
 const c=p=>Math.round(p*100);
 const AV=__AVATARS__;
+function waBtn(n){return `<button type="button" class="wa-go" title="Wallet analysis" onclick="openWallet('${encodeURIComponent(n||'')}')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>`}
 const avImg=n=>AV[n]?`<img class="tav" src="${AV[n]}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.outerHTML='<span class=&quot;tav&quot;>${String(n||'?')[0].toUpperCase()}</span>'">`:`<span class="tav">${String(n||'?')[0].toUpperCase()}</span>`;
 const nowBox=(sd,p)=>`<div class="sp ${sd=='Yes'?'spy':'spn'} nowb"><span class="spl">${sd.toUpperCase()}</span><div class="v ${sd=='Yes'?'g':'rd'}">${Math.round((+p||0)*100)}¢</div></div>`;
 function noAcc(){}
@@ -537,7 +663,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&FOC){FOC=null;grid.
 function render(){setTimeout(focR);pickD();D.sort(SORTS[SORT][2]);chipsR();headR();grid.innerHTML=D.map((m,i)=>[m,i]).filter(([m])=>(F=='All'||m.cat==F)&&qm(m)&&(SV?!!SAV[m.url]:(!SAV[m.url]&&(SHOWH||!HID.has(m.url))))).map(([m,mi])=>{const hid=HID.has(m.url),sav=!!SAV[m.url];
  const sides={};m.tr.filter(t=>!t.ex).forEach(t=>{const s=sides[t.side]||(sides[t.side]={sh:0,ap:0,k:0});s.sh+=t.sh;s.ap+=t.avg;s.k++});
  const valOf=t=>t.val||t.sh*(t.avg||0),maxV=Math.max(1,...m.tr.filter(t=>!t.ex).map(valOf));
- const row=t=>{const cls=t.side=='Yes'?'sy':t.side=='No'?'sn':'sx',S=t.side?String(t.side).toUpperCase():'—';return `<tr class="${t.ex?'ex':''}"><td class="tn"><div class="tw">${avImg(t.n)}<div><a class="tlk" href="https://polymarket.com/@${t.n}" target="_blank">${t.n}</a>${t.ex?'':`<span class="pbar ${cls}b"><i style="width:${Math.max(3,Math.round(valOf(t)/maxV*100))}%"></i></span>`}</div></div></td><td>${t.side?`<span class="side ${t.ex?'sx':cls}">${S}</span>`:'<span class="side sx">—</span>'}</td><td class="r">${K(t.sh)} shares</td><td class="r">${t.ex?'—':'@'+c(t.avg)}</td><td class="r">${t.ex?'Exited @'+c(t.ex):usdK(valOf(t))}</td></tr>`};
+ const row=t=>{const cls=t.side=='Yes'?'sy':t.side=='No'?'sn':'sx',S=t.side?String(t.side).toUpperCase():'—';return `<tr class="${t.ex?'ex':''}"><td class="tn"><div class="tw">${avImg(t.n)}<div><a class="tlk" href="https://polymarket.com/@${t.n}" target="_blank">${t.n}</a>${waBtn(t.n)}${t.ex?'':`<span class="pbar ${cls}b"><i style="width:${Math.max(3,Math.round(valOf(t)/maxV*100))}%"></i></span>`}</div></div></td><td>${t.side?`<span class="side ${t.ex?'sx':cls}">${S}</span>`:'<span class="side sx">—</span>'}</td><td class="r">${K(t.sh)} shares</td><td class="r">${t.ex?'—':'@'+c(t.avg)}</td><td class="r">${t.ex?'Exited @'+c(t.ex):usdK(valOf(t))}</td></tr>`};
 const grpHtml=['Yes','No',null].map(sd=>{const g=m.tr.filter(t=>(t.side||null)==sd).sort((x,y)=>(!!x.ex-!!y.ex)||(valOf(y)-valOf(x)));if(!g.length)return '';const h=g.filter(t=>!t.ex),sh=h.reduce((q,t)=>q+t.sh,0);
   return `<tr class="grp"><td colspan="5"><span class="side ${sd=='Yes'?'sy':sd=='No'?'sn':'sx'}">${sd?sd.toUpperCase():'OTHER'}</span><span class="gc">${h.length} holding · ${K(sh)} shares</span></td></tr>`+g.map(row).join('')}).join('');
  const rows=grpHtml;
@@ -614,7 +740,7 @@ function ifRender(){const MIN_IN=2000;const esc=s=>String(s==null?'':s).replace(
    const sh=g.reduce((a,t)=>a+(+t.sh||0),0), cls=sd=='Yes'?'sy':'sn', S=sd.toUpperCase();
    return `<tr class="grp"><td colspan="5"><span class="side ${cls}">${S}</span><span class="gc">${g.length} ${OUTM?'selling':'buying'} · ${K(sh)} shares</span></td></tr>`+
     g.map(t=>{const badge=OUTM?((t.exited?'EXITED ':'TRIMMED ')+S):S;
-     return `<tr class="${t.exited?'ex':''}"><td class="tn"><div class="tw">${avImg(t.n)}<div><a class="tlk" href="https://polymarket.com/@${encodeURIComponent(t.n)}" target="_blank" rel="noopener">${esc(t.n)}</a><span class="pbar ${cls}b"><i style="width:${Math.max(3,Math.round((+t.usd||0)/maxV*100))}%"></i></span></div></div></td><td><span class="side ${cls}">${esc(badge)}</span></td><td class="r">${K(t.sh||0)} shares</td><td class="r">${t.avg==null?'—':'@'+c(t.avg)}</td><td class="r">${usdK(t.usd)}</td></tr>`}).join('')};
+     return `<tr class="${t.exited?'ex':''}"><td class="tn"><div class="tw">${avImg(t.n)}<div><a class="tlk" href="https://polymarket.com/@${encodeURIComponent(t.n)}" target="_blank" rel="noopener">${esc(t.n)}</a>${waBtn(t.n)}<span class="pbar ${cls}b"><i style="width:${Math.max(3,Math.round((+t.usd||0)/maxV*100))}%"></i></span></div></div></td><td><span class="side ${cls}">${esc(badge)}</span></td><td class="r">${K(t.sh||0)} shares</td><td class="r">${t.avg==null?'—':'@'+c(t.avg)}</td><td class="r">${usdK(t.usd)}</td></tr>`}).join('')};
   const img=m.img?`<img class="mimg" src="${esc(m.img)}" alt="" loading="lazy" referrerpolicy="no-referrer">`:`<span class="mimg"></span>`;
   return `<div class="card"><div class="ct"><div class="tl">${img}<a class="ttl" href="${esc(m.url)}" target="_blank" rel="noopener">${esc(m.t)}</a><div class="ifx"><b>${usdK(m.net)}</b><span>${OUTM?'Total out · 24h':'Total in · 24h'}</span>${i==0?`<span class="ifhot">${OUTM?'BIGGEST EXIT':'HOTTEST'}</span>`:''}</div></div></div><div class="stats"><div class="st"><label>TRADERS</label><div class="v">${names.size}<span class="unit">Smart Traders</span><small style="flex-basis:100%"><span class="badge ${lead=='Yes'?'yes':'no'}">${onLead.size}/${names.size} ${lead.toUpperCase()}</span></small></div></div><div class="st"><label>AVG ENTRY</label><div class="split">${box('YES','spy',m.y,m.yavg)}${box('NO','spn',m.n,m.navg)}</div></div><div class="st"><label>NOW</label>${now}</div></div><table><tbody><tr><th>Trader</th><th>Side</th><th class="r">Size</th><th class="r">Avg</th><th class="r">Value</th></tr>${grp(lead)}${grp(lead=='Yes'?'No':'Yes')}</tbody></table></div>`}).join('');
  masonry(el)}
@@ -639,7 +765,7 @@ function liveRender(){const q=(document.getElementById('liveq').value||'').trim(
   const av=r.avatar?`<img class="avatar" src="${esc(r.avatar)}" alt="${esc(r.n)} profile picture" width="28" height="28" loading="lazy" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'avatar',textContent:'${initials}'}))">`:`<span class="avatar" role="img" aria-label="${esc(r.n)} initials avatar">${initials}</span>`;
   const fills=(r.fills&&r.fills.length>1)?`<button class="fills" type="button" data-fill="${r.id}" aria-expanded="${liveOpen.has(r.id)}">${liveOpen.has(r.id)?'⌄':'›'} ${r.fills.length} fills</button>`:'';
   const fillrow=liveOpen.has(r.id)&&r.fills&&r.fills.length?`<tr class="fillrow"><td colspan="5"><div class="fill-list">${r.fills.map((f,i)=>`<span>Fill ${i+1} · <b>${dollars(f.usd)}</b><br>${shn(f.shares)} shares @ ${cents(f.price)} · <span data-ts="${f.ts}">${ago(f.ts)}</span></span>`).join('')}</div></td></tr>`:'';
-  return `<tr class="trade-row"><td><div class="market" data-url="${esc(r.url)}" data-cid="${esc(r.cid||'')}"><span class="mhit">${icon}</span><a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">${esc(r.t)}</a></div></td><td><div class="trader-top">${av}<span class="name">${esc(r.n)}</span></div><div class="holding" title="${r.held>0?shn(r.held)+' '+esc(r.out)+' shares, '+holdUsd(r.hval):'Fully exited'}"><div class="track" role="meter" aria-label="Current shares held" aria-valuemin="0" aria-valuemax="${peak}" aria-valuenow="${r.held||0}"><i style="width:${width}%"></i></div><div class="held ${r.held>0?'':'exited'}">${held}</div></div></td><td><div class="side ${sell?'sell':''}">${sell?'Sell':'Buy'} ${esc(r.out)}<span class="price">${cents(r.price)}</span></div>${tag?`<span class="consensus ${r.chip==='Against'?'against':''}">${esc(tag)}</span>`:''}${fills}</td><td><div class="amount">${money(r.usd)}</div><div class="shares">${shn(r.shares)} shares</div></td><td class="time" data-ts="${r.ts}">${ago(r.ts)}</td></tr>${fillrow}`}).join('')||'<tr><td colspan="5" class="empty">No tracked-wallet trades match.</td></tr>'}
+  return `<tr class="trade-row"><td><div class="market" data-url="${esc(r.url)}" data-cid="${esc(r.cid||'')}"><span class="mhit">${icon}</span><a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">${esc(r.t)}</a></div></td><td><div class="trader-top">${av}<span class="name">${esc(r.n)}</span>${waBtn(r.n)}</div><div class="holding" title="${r.held>0?shn(r.held)+' '+esc(r.out)+' shares, '+holdUsd(r.hval):'Fully exited'}"><div class="track" role="meter" aria-label="Current shares held" aria-valuemin="0" aria-valuemax="${peak}" aria-valuenow="${r.held||0}"><i style="width:${width}%"></i></div><div class="held ${r.held>0?'':'exited'}">${held}</div></div></td><td><div class="side ${sell?'sell':''}">${sell?'Sell':'Buy'} ${esc(r.out)}<span class="price">${cents(r.price)}</span></div>${tag?`<span class="consensus ${r.chip==='Against'?'against':''}">${esc(tag)}</span>`:''}${fills}</td><td><div class="amount">${money(r.usd)}</div><div class="shares">${shn(r.shares)} shares</div></td><td class="time" data-ts="${r.ts}">${ago(r.ts)}</td></tr>${fillrow}`}).join('')||'<tr><td colspan="5" class="empty">No tracked-wallet trades match.</td></tr>'}
 function slugOf(url){const p=String(url||'').split('?')[0].replace(/\/+$/,'').split('/');try{return decodeURIComponent(p[p.length-1]||'').toLowerCase()}catch(e){return (p[p.length-1]||'').toLowerCase()}}
 function findLiveMarket(url, cid){const slug=slugOf(url);let loose=null;for(const m of DS){if((cid&&m.cid&&m.cid===cid)||m.url===url)return m;if(!loose&&slug&&slugOf(m.url)===slug)loose=m}return loose}
 function showLiveMarket(url, cid){const m=findLiveMarket(url, cid);if(!m)return false;if(HID.has(m.url))SHOWH=true;const box=document.getElementById('q');if(box)box.value='';Q='';view(SAV[m.url]?'saved':'markets');const card=[...document.querySelectorAll('#grid .card')].find(el=>el.dataset.u===m.url);if(!card)return false;card.classList.add('flash');card.scrollIntoView({behavior:'smooth',block:'center'});clearTimeout(showLiveMarket.t);showLiveMarket.t=setTimeout(()=>card.classList.remove('flash'),1800);return true}
@@ -792,4 +918,600 @@ async function aiAsk(q){
  }finally{AICTL=null;aisend.textContent='Send'}
 }
 (async()=>{try{if(!window.claude?.use)return;AI=await claude.use('sample');if(AI)aib.hidden=false}catch(e){}})();
+
+(function(){
+function wa$(s){return document.querySelector('#v-wallet '+s)}
+async function waProfiles(q){
+  const u=new URL('https://gamma-api.polymarket.com/public-search');
+  u.searchParams.set('q', q); u.searchParams.set('search_profiles','true'); u.searchParams.set('search_tags','false'); u.searchParams.set('limit_per_type','10');
+  const r=await fetch(u);
+  if(!r.ok) throw new Error('Profile search failed (HTTP '+r.status+')');
+  const j=await r.json();
+  return j.profiles||[];
+}
+async function resolveWallet(raw){
+  const direct=parseAddr(raw);
+  if(direct) return direct;
+  let name=String(raw||'').trim();
+  const at=name.match(/polymarket\.com\/@([^/?#]+)/i);
+  if(at){try{name=decodeURIComponent(at[1])}catch(e){name=at[1]}}
+  name=name.replace(/^@/,'').trim();
+  if(!name) throw new Error('Enter a wallet address (0x…) or a Polymarket username.');
+  const tracked=(typeof TRS!=='undefined'?TRS:[]).find(t=>(t.n||'').toLowerCase()===name.toLowerCase()&&t.a);
+  if(tracked) return String(tracked.a).toLowerCase();
+  const profs=await waProfiles(name);
+  const exact=profs.find(p=>(p.name||'').toLowerCase()===name.toLowerCase()&&p.proxyWallet);
+  const hit=exact||profs.find(p=>p.proxyWallet);
+  if(!hit) throw new Error('No Polymarket profile named "'+name+'". Try the 0x address.');
+  return String(hit.proxyWallet).toLowerCase();
+}
+
+const WA_API = 'https://data-api.polymarket.com';
+const CATS = ['politics','geopolitics','culture','finance','tech','crypto','economics','sports','weather','mentions','esports'];
+const S = {}; // state
+
+// ---------- helpers ----------
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num = v => (v == null || isNaN(+v)) ? 0 : +v;
+function money(v, sign = true) {
+  v = num(v); const a = Math.abs(v); const sg = v < 0 ? '-' : (sign && v > 0 ? '+' : '');
+  let s;
+  if (a >= 1e6) s = (a/1e6).toFixed(2) + 'M';
+  else if (a >= 1e4) s = (a/1e3).toFixed(1) + 'K';
+  else if (a >= 1e3) s = (a/1e3).toFixed(2) + 'K';
+  else if (a >= 100) s = a.toFixed(0);
+  else s = a.toFixed(2);
+  return sg + '$' + s;
+}
+const moneyFull = v => (num(v) < 0 ? '-$' : '$') + Math.abs(num(v)).toLocaleString('en-US', {maximumFractionDigits: 0});
+const cls = v => num(v) > 0 ? 'g' : num(v) < 0 ? 'r' : 'mut';
+const cents = p => (num(p) * 100).toFixed(num(p) * 100 >= 99.5 || num(p) * 100 < 1 ? 1 : 1).replace(/\.0$/, '') + '¢';
+const shortRank = n => n == null ? '—' : n >= 1e4 ? (n/1e3).toFixed(1) + 'K' : n.toLocaleString();
+function ago(ts) {
+  const s = Date.now()/1000 - ts;
+  if (s < 3600) return Math.max(1, Math.floor(s/60)) + 'm';
+  if (s < 86400) return Math.floor(s/3600) + 'h';
+  if (s < 86400*30) return Math.floor(s/86400) + 'd';
+  return new Date(ts*1000).toLocaleDateString('en-US', {month:'short', day:'numeric'});
+}
+const mlink = p => `https://polymarket.com/event/${p.event_slug || p.slug}${p.event_slug && p.slug && p.slug !== p.event_slug ? '/' + p.slug : ''}`;
+const icon = u => `<div class="ico" style="background-image:url('${esc(u)}')"></div>`;
+const outc = o => `<span class="${/^no$/i.test(o) ? 'r' : /^yes$/i.test(o) ? 'g' : 'mut'}">${esc(o)}</span>`;
+
+async function api(path, params = {}) {
+  const u = new URL(WA_API + path);
+  Object.entries(params).forEach(([k, v]) => v != null && v !== '' && u.searchParams.set(k, v));
+  const r = await fetch(u);
+  if (!r.ok) throw new Error(`${path} → HTTP ${r.status}`);
+  return r.json();
+}
+async function paged(path, params, max) {
+  let out = [], cursor = null;
+  do {
+    const j = await api(path, {...params, cursor});
+    out = out.concat(j.data || []);
+    cursor = j.pagination?.next_cursor;
+  } while (cursor && out.length < max);
+  return out;
+}
+const safe = p => p.catch(e => { console.warn(e); return null; });
+
+// group titles: "Will X by Nov 30?" + "Will X by Dec 31?" → "Will X by …" + chips
+function groupTitle(titles) {
+  if (titles.length === 1) return {title: titles[0], parts: null};
+  const w = titles.map(t => t.replace(/\?$/, '').split(' '));
+  let i = 0;
+  while (w.every(x => x[i] === w[0][i]) && i < w[0].length) i++;
+  if (i < 2) return {title: titles[0], parts: titles};
+  return {title: w[0].slice(0, i).join(' ') + ' …', parts: w.map(x => x.slice(i).join(' ') || '—')};
+}
+function groupByEvent(rows, valFn) {
+  const m = new Map();
+  rows.forEach(p => {
+    const k = p.event_slug || p.slug || p.condition_id;
+    if (!m.has(k)) m.set(k, []);
+    m.get(k).push(p);
+  });
+  return [...m.values()].map(list => ({list, total: list.reduce((s, p) => s + valFn(p), 0), head: list[0]}));
+}
+
+// ---------- load ----------
+function parseAddr(s) {
+  const m = String(s).match(/0x[a-fA-F0-9]{40}/);
+  return m ? m[0].toLowerCase() : null;
+}
+wa$('#waf').addEventListener('submit', e => {
+  e.preventDefault();
+  const a = parseAddr(wa$('#waq').value);
+  if (!a) return showErr('Enter a valid 0x wallet address (42 characters) or a polymarket.com/profile/0x… link.');
+  history.replaceState(null, '', '?wallet=' + a);
+  load(a);
+});
+function showErr(m) { const e = wa$('#waerr'); e.textContent = m; e.classList.toggle('hidden', !m); }
+
+async function load(addr) {
+  showErr('');
+  wa$('#wago').disabled = true;
+  wa$('#waapp').innerHTML = `<div class="loading"><span class="spin"></span>Loading wallet ${addr.slice(0,6)}…${addr.slice(-4)}</div>`;
+  Object.keys(S).forEach(k => delete S[k]);
+  S.addr = addr; S.tab = 'overview'; S.lbPeriod = 'all'; S.calMode = 'daily'; S.calUnit = '$';
+  try {
+    const [stats, value, open, wins, losses, recentClosed, trades, pnl, lbAll] = await Promise.all([
+      safe(api('/v2/user-stats', {user: addr})),
+      safe(api('/v2/value', {user: addr})),
+      safe(paged('/v2/positions', {user: addr, limit: 500}, 2000)),
+      safe(api('/v2/positions', {user: addr, status: 'CLOSED', sort_by: 'REALIZED_PNL', sort_direction: 'DESC', limit: 300})),
+      safe(api('/v2/positions', {user: addr, status: 'CLOSED', sort_by: 'REALIZED_PNL', sort_direction: 'ASC', limit: 300})),
+      safe(api('/v2/positions', {user: addr, status: 'CLOSED', sort_by: 'TIMESTAMP', sort_direction: 'DESC', limit: 50})),
+      safe(api('/v2/activity', {user: addr, type: 'TRADE', limit: 100})),
+      safe(api('/v2/user-pnl', {user: addr, interval: 'all', fidelity: '1d'}).then(j => j?.data?.points?.length ? j : api('/v2/user-pnl', {user: addr, interval: 'max', fidelity: '1d'}))),
+      safe(api('/v2/leaderboard', {user: addr, time_period: 'all'})),
+    ]);
+    if (!stats && !open && !trades) throw new Error('Could not reach the Polymarket Data API (network or CORS). Try again, or open this page from your deployed site.');
+    S.stats = stats?.data || {};
+    S.value = num(value?.data?.value);
+    S.open = (open || []).filter(p => num(p.current_value) > 0.01 || num(p.current_size) > 0);
+    S.wins = wins?.data || [];
+    S.losses = losses?.data || [];
+    S.recentClosed = recentClosed?.data || [];
+    S.trades = trades?.data || [];
+    S.tradesCursor = trades?.pagination?.next_cursor;
+    S.lbUser = lbAll?.data || {};
+    buildDaily(pnl?.data?.points || []);
+    const profileSrc = S.trades[0] || S.open[0] || {};
+    S.name = S.lbUser.user_name || profileSrc.name || profileSrc.pseudonym || (addr.slice(0,6) + '…' + addr.slice(-4));
+    S.img = S.lbUser.profile_image || profileSrc.profile_image_optimized || profileSrc.profile_image || '';
+    render();
+    loadLeaderboard();
+  } catch (e) {
+    wa$('#waapp').innerHTML = '';
+    showErr(e.message);
+  } finally { wa$('#wago').disabled = false; }
+}
+
+// ---------- PnL series → daily ----------
+function totalOf(p) {
+  if (p.economic_pnl != null) return num(p.economic_pnl);
+  return num(p.realized_pnl) + num(p.unrealized_pnl);
+}
+const comp = {
+  lp: p => num(p.realized_lp_pnl),
+  yield: p => num(p.yield_income),
+  maker: p => num(p.maker_rebate),
+  fees: p => -Math.abs(num(p.fees)),
+};
+function dkey(d) { return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+function buildDaily(points) {
+  points = points.slice().sort((a, b) => a.timestamp - b.timestamp);
+  S.points = points;
+  const last = new Map();
+  points.forEach(p => last.set(dkey(new Date(p.timestamp * 1000)), p));
+  const days = {}; let prev = null;
+  [...last.entries()].forEach(([k, p]) => {
+    const d = {total: totalOf(p) - (prev ? totalOf(prev) : 0)};
+    Object.entries(comp).forEach(([c, f]) => d[c] = f(p) - (prev ? f(prev) : 0));
+    d.trading = d.total - d.lp - d.yield - d.maker - d.fees;
+    days[k] = d; prev = p;
+  });
+  // first point is a baseline, not a day of PnL
+  const firstKey = last.keys().next().value; if (firstKey && points.length > 1) delete days[firstKey];
+  S.days = days;
+  const now = new Date();
+  S.calY = now.getFullYear(); S.calM = now.getMonth();
+  S.firstDay = Object.keys(days)[0];
+}
+
+// ---------- render ----------
+function render() {
+  const st = S.stats;
+  const rawPnl = st.all_time_pnl;
+  const allPnl = rawPnl && typeof rawPnl === 'object' ? (rawPnl.economic_pnl ?? rawPnl.position_pnl) : (rawPnl ?? S.lbUser.pnl);
+  wa$('#waapp').innerHTML = `
+    <div class="head">
+      <div class="avatar" style="background-image:url('${esc(S.img)}')"></div>
+      <div class="who">
+        <h1>${esc(S.name)}${S.lbUser.verified ? ' <span title="verified" style="color:var(--acc)">✔</span>' : ''}</h1>
+        <div class="addr"><span class="mono">${S.addr.slice(0,8)}…${S.addr.slice(-6)}</span>
+          <button onclick="navigator.clipboard.writeText('${S.addr}');this.textContent='copied'">copy</button>
+          <a href="https://polymarket.com/profile/${S.addr}" target="_blank">polymarket ↗</a>
+          ${S.lbUser.x_username ? `<a href="https://x.com/${esc(S.lbUser.x_username)}" target="_blank">@${esc(S.lbUser.x_username)}</a>` : ''}
+          ${st.join_date ? `<span>joined ${new Date(st.join_date*1000).toLocaleDateString('en-US',{month:'short',year:'numeric'})}</span>` : ''}
+        </div>
+      </div>
+      <div class="kpis">
+        <div class="kpi"><div class="l">Portfolio</div><div class="v mono">${moneyFull(S.value)}</div></div>
+        <div class="kpi"><div class="l">All-time PnL</div><div class="v mono ${cls(allPnl)}">${allPnl == null ? '—' : money(allPnl)}</div></div>
+        <div class="kpi"><div class="l">Volume</div><div class="v mono">${S.lbUser.volume != null ? moneyFull(S.lbUser.volume) : '—'}</div></div>
+        <div class="kpi"><div class="l">Markets</div><div class="v mono">${st.trades != null ? num(st.trades).toLocaleString() : '—'}</div></div>
+        <div class="kpi"><div class="l">Biggest win</div><div class="v mono g">${st.biggest_win != null ? money(st.biggest_win) : '—'}</div></div>
+      </div>
+    </div>
+    <div class="tabs">
+      ${[['overview','Overview'],['positions',`Positions <span class="pill">${S.open.length}</span>`],['activity','Activity'],['history','History'],['report','Report']]
+        .map(([k, l]) => `<button class="tab ${S.tab===k?'on':''}" data-tab="${k}">${l}</button>`).join('')}
+    </div>
+    <div id="wabody"></div>`;
+  document.querySelectorAll('.tab').forEach(b => b.onclick = () => { S.tab = b.dataset.tab; render(); });
+  ({overview: renderOverview, positions: renderPositions, activity: renderActivity, history: renderHistory, report: renderReport})[S.tab]();
+}
+
+// ---------- overview ----------
+function renderOverview() {
+  wa$('#wabody').innerHTML = `
+    <div class="card" style="margin-bottom:22px"><div class="cal" id="cal"></div></div>
+    <div class="grid2" style="margin-bottom:22px">
+      <div>
+        <div class="card" style="margin-bottom:22px">
+          <div class="card-h"><h3>Current Positions</h3><span class="sub">${moneyFull(S.open.reduce((s,p)=>s+num(p.current_value),0))} open</span></div>
+          <div class="card-b scroll" id="curpos"></div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h3>Recent Trades</h3><span class="sub">Newest first</span></div>
+          <div class="card-b scroll" id="rtrades"></div>
+        </div>
+      </div>
+      <div class="card"><div class="card-b" id="wl" style="padding-top:0"></div></div>
+    </div>
+    <div class="card" id="lb"></div>`;
+  renderCalendar();
+  // current positions grouped by event
+  const groups = groupByEvent(S.open, p => num(p.current_value)).sort((a, b) => b.total - a.total);
+  wa$('#curpos').innerHTML = groups.length ? groups.map((g, i) => {
+    const gt = groupTitle(g.list.map(p => p.title));
+    const single = g.list.length === 1;
+    const partOf = new Map(g.list.map((p, j) => [p, gt.parts ? gt.parts[j] : p.title]));
+    return `<div class="row" style="flex-wrap:wrap;${single?'':'border-bottom:none;padding-bottom:0'}">
+        <span class="rank">#${i+1}</span>${icon(g.head.icon)}
+        <span class="ttl"><a href="${mlink(g.head)}" target="_blank">${esc(gt.title)}</a></span>
+        ${single ? outc(g.head.outcome) : ''}<span class="amt mono">${money(g.total, false)}</span>
+      </div>
+      ${single ? '' : `<div class="chips" style="padding-bottom:12px;border-bottom:1px solid var(--line);margin-left:0;padding-left:64px">${g.list.sort((a,b)=>num(b.current_value)-num(a.current_value)).map((p, j) =>
+        `<a class="chip" href="${mlink(p)}" target="_blank">${esc(partOf.get(p))} ${outc(p.outcome)} ${money(p.current_value,false)}</a>`).join('')}</div>`}`;
+  }).join('') : '<div class="empty">No open positions</div>';
+  // fix chip labels after sort (recompute map title→part)
+  wa$('#rtrades').innerHTML = tradeRows(S.trades.slice(0, 40));
+  renderWL();
+}
+function tradeRows(list) {
+  if (!list.length) return '<div class="empty">No trades</div>';
+  return list.map(t => `<div class="row">
+      ${icon(t.icon)}
+      <span class="ttl"><a href="${mlink(t)}" target="_blank" title="${esc(t.title)}">${esc(t.title)}</a></span>
+      <span class="${t.side==='SELL'?'side-s':'side-b'}">${esc(t.side)}</span>
+      <span class="mono" style="width:64px;text-align:right">${Math.round(num(t.size)).toLocaleString()}</span>
+      <span style="width:34px">${outc(t.outcome)}</span>
+      <span class="mono mut" style="width:62px;text-align:right">@${cents(t.price)}</span>
+      <span class="dim" style="width:32px;text-align:right;font-size:12px">${ago(t.timestamp)}</span>
+    </div>`).join('');
+}
+function renderWL() {
+  const all = new Map();
+  [...S.wins, ...S.losses, ...S.recentClosed].forEach(p => all.set(p.token_id || (p.condition_id + p.outcome), p));
+  const closed = [...all.values()];
+  const g = groupByEvent(closed, p => num(p.realized_pnl));
+  const wins = g.filter(x => x.total > 0).sort((a, b) => b.total - a.total).slice(0, 15);
+  const losses = g.filter(x => x.total < 0).sort((a, b) => a.total - b.total).slice(0, 15);
+  const recentG = groupByEvent(S.recentClosed, p => num(p.realized_pnl))
+    .map(x => ({...x, t: Math.max(...x.list.map(p => num(p.last_event_at)))})).sort((a, b) => b.t - a.t).slice(0, 15);
+  const block = (list, emptyTxt) => list.length ? list.map((x, i) => {
+    const gt = groupTitle(x.list.map(p => p.title));
+    return `<div class="row"><span class="rank">#${i+1}</span>${icon(x.head.icon)}
+      <span class="ttl"><a href="${mlink(x.head)}" target="_blank" title="${esc(x.list.map(p=>p.title).join('\n'))}">${esc(gt.title)}</a>
+      ${x.list.length > 1 ? `<span class="sub">(${x.list.length} markets)</span>` : ''}</span>
+      <span class="amt mono ${cls(x.total)}">${money(x.total)}</span></div>`;
+  }).join('') : `<div class="empty">${emptyTxt}</div>`;
+  wa$('#wl').innerHTML = `
+    <div class="sect g">📈 BIGGEST WINS</div><div class="scroll" style="max-height:200px">${block(wins, 'No closed wins yet')}</div>
+    <div class="sect r">📉 BIGGEST LOSSES</div><div class="scroll" style="max-height:200px">${block(losses, 'No closed losses')}</div>
+    <div class="sect mut">🕘 RECENT</div><div class="scroll" style="max-height:200px">${block(recentG, 'Nothing closed recently')}</div>`;
+}
+
+// ---------- calendar ----------
+function renderCalendar() {
+  const el = wa$('#cal'); if (!el) return;
+  const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const now = new Date();
+  const hasData = Object.keys(S.days).length > 0;
+  const daily = S.calMode === 'daily';
+  // period data
+  let keys;
+  if (daily) {
+    const pre = `${S.calY}-${String(S.calM+1).padStart(2,'0')}-`;
+    keys = Object.keys(S.days).filter(k => k.startsWith(pre));
+  } else keys = Object.keys(S.days).filter(k => k.startsWith(S.calY + '-'));
+  const sum = f => keys.reduce((s, k) => s + num(S.days[k][f]), 0);
+  const total = sum('total');
+  const base = Math.max(1, S.value + Math.max(0, -total)); // % base: portfolio value
+  const fmt = v => S.calUnit === '%' ? ((v >= 0 ? '+' : '') + (v / base * 100).toFixed(2) + '%') : money(v);
+  // win/loss counted on days (daily) or months (monthly)
+  let units;
+  if (daily) units = keys.map(k => S.days[k].total);
+  else { units = Array(12).fill(null); keys.forEach(k => { const m = +k.slice(5,7) - 1; units[m] = (units[m] || 0) + S.days[k].total; }); units = units.filter(v => v != null); }
+  const nz = units.filter(v => Math.abs(v) >= 0.005);
+  const W = nz.filter(v => v > 0).length, L = nz.length - W;
+  const best = nz.length ? Math.max(...nz) : 0, worst = nz.length ? Math.min(...nz) : 0;
+  const atStart = daily ? (S.firstDay && `${S.calY}-${String(S.calM+1).padStart(2,'0')}` <= S.firstDay.slice(0,7)) : (S.firstDay && S.calY <= +S.firstDay.slice(0,4));
+  const atEnd = daily ? (S.calY === now.getFullYear() && S.calM === now.getMonth()) : S.calY === now.getFullYear();
+  const legend = [['Trading','#f4a53b','trading'],['LP','#4b7bff','lp'],['Yield','#a463f2','yield'],['Maker','#3fbf8a','maker'],['Fees','#f05d6c','fees']]
+    .map(([l, c, f]) => { const v = sum(f); return `<span><i style="background:${c}"></i>${l} <b class="${cls(v)}">${S.calUnit==='%'?fmt(v):money(v)}</b></span>`; }).join('');
+
+  const maxAbs = Math.max(1, ...(daily ? keys.map(k => Math.abs(S.days[k].total)) : units.map(Math.abs)));
+  const shade = v => {
+    if (v == null || Math.abs(v) < 0.005) return '';
+    const t = Math.min(1, Math.abs(v) / maxAbs), a = (0.25 + 0.6 * Math.sqrt(t)).toFixed(2);
+    return `background:${v > 0 ? `rgba(76,175,125,${a})` : `rgba(214,72,98,${a})`}`;
+  };
+  let grid = '';
+  if (daily) {
+    const first = new Date(S.calY, S.calM, 1), dim = new Date(S.calY, S.calM + 1, 0).getDate();
+    const startDow = first.getDay();
+    const cells = []; for (let i = 0; i < startDow; i++) cells.push(null);
+    for (let d = 1; d <= dim; d++) cells.push(d);
+    while (cells.length % 7) cells.push(-1);
+    grid = `<div class="cgrid">${['S','M','T','W','T','F','S'].map(d => `<div class="dh">${d}</div>`).join('')}<div class="dh wkh">WK</div>`;
+    for (let w = 0; w < cells.length / 7; w++) {
+      let wk = 0, any = false;
+      for (let i = 0; i < 7; i++) {
+        const d = cells[w*7+i];
+        if (d == null || d < 0) { grid += `<div class="cell out"></div>`; continue; }
+        const k = `${S.calY}-${String(S.calM+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const v = S.days[k]?.total;
+        if (v != null) { wk += v; any = true; }
+        grid += `<div class="cell" style="${shade(v)}" title="${k}${v!=null?': '+money(v):''}">${d}${v != null && Math.abs(v) >= 0.005 ? `<span class="p ${v>0?'g':'r'}" style="color:${v>0?'#9ff0c0':'#ffb3bf'}">${fmt(v)}</span>` : ''}</div>`;
+      }
+      grid += `<div class="wk ${any ? cls(wk) : 'dim'}">${any ? fmt(wk) : '–'}</div>`;
+    }
+    grid += '</div>';
+  } else {
+    const mv = Array(12).fill(null); keys.forEach(k => { const m = +k.slice(5,7) - 1; mv[m] = (mv[m] || 0) + S.days[k].total; });
+    grid = `<div class="mgrid">${M.map((m, i) => `<div class="cell" style="${shade(mv[i])}">${m}${mv[i] != null ? `<span class="p" style="color:${mv[i]>=0?'#9ff0c0':'#ffb3bf'}">${fmt(mv[i])}</span>` : ''}</div>`).join('')}</div>`;
+  }
+  el.innerHTML = `
+    <div class="cal-top">
+      <button class="navb" id="cp" ${atStart?'disabled':''}>‹</button>
+      <button class="navb" id="cn" ${atEnd?'disabled':''}>›</button>
+      <span class="cal-title">${daily ? M[S.calM] + (S.calY !== now.getFullYear() ? ' ' + S.calY : '') : S.calY}</span>
+      <span class="cal-total ${cls(total)}">${fmt(total)}</span>
+      <div class="seg" style="margin-left:14px"><button data-m="daily" class="${daily?'on':''}">Daily</button><button data-m="monthly" class="${!daily?'on':''}">Monthly</button></div>
+      <div class="seg"><button data-u="$" class="${S.calUnit==='$'?'on':''}">$</button><button data-u="%" class="${S.calUnit==='%'?'on':''}">%</button></div>
+      <div class="legend">${legend}</div>
+    </div>
+    ${hasData ? `<div class="cal-stats">◎ <b>${nz.length ? Math.round(W / nz.length * 100) : 0}%</b> <span class="dim">(${W}W ${L}L)</span> · best <b class="g">${fmt(best)}</b> · worst <b class="r">${fmt(worst)}</b>${S.calUnit==='%'?'<span class="dim" style="font-size:13px">% of current portfolio value</span>':''}</div>` : '<div class="cal-stats">No PnL history available for this wallet.</div>'}
+    ${grid}`;
+  wa$('#cp').onclick = () => { if (daily) { S.calM--; if (S.calM < 0) { S.calM = 11; S.calY--; } } else S.calY--; renderCalendar(); };
+  wa$('#cn').onclick = () => { if (daily) { S.calM++; if (S.calM > 11) { S.calM = 0; S.calY++; } } else S.calY++; renderCalendar(); };
+  el.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { S.calMode = b.dataset.m; renderCalendar(); });
+  el.querySelectorAll('[data-u]').forEach(b => b.onclick = () => { S.calUnit = b.dataset.u; renderCalendar(); });
+}
+
+// ---------- leaderboard ----------
+async function loadLeaderboard() {
+  const period = S.lbPeriod; S.lb = S.lb || {};
+  if (!S.lb[period]) {
+    renderLB(true);
+    const res = await Promise.all(['overall', ...CATS].map(c =>
+      safe(api('/v2/leaderboard', {user: S.addr, time_period: period, category: c})).then(j => [c, j?.data || null])));
+    S.lb[period] = Object.fromEntries(res);
+  }
+  if (S.lbPeriod === period) renderLB();
+}
+function renderLB(loading) {
+  const el = wa$('#lb'); if (!el) return;
+  const d = S.lb?.[S.lbPeriod] || {};
+  const ov = d.overall || {};
+  const rows = CATS.map(c => [c, d[c]]).filter(([, v]) => v && (num(v.pnl) !== 0 || v.rank_pnl != null))
+    .sort((a, b) => num(b[1].pnl) - num(a[1].pnl));
+  const max = Math.max(1, ...rows.map(([, v]) => Math.abs(num(v.pnl))));
+  el.innerHTML = `
+    <div class="card-h"><div><h3>🏆 Leaderboard Rankings</h3><div class="sub" style="margin-top:3px">PnL rank across Polymarket categories</div></div>
+      <div class="seg">${[['day','1D'],['week','1W'],['month','1M'],['all','All']].map(([k,l]) => `<button data-p="${k}" class="${S.lbPeriod===k?'on':''}">${l}</button>`).join('')}</div></div>
+    ${loading ? '<div class="loading" style="padding:40px"><span class="spin"></span>Loading ranks…</div>' : `
+    <div class="lb-overall"><div><div class="l">OVERALL</div><div class="n">${ov.rank_pnl != null ? '#' + num(ov.rank_pnl).toLocaleString() : 'Unranked'}</div></div>
+      <div class="cal-total ${cls(ov.pnl)}">${money(ov.pnl)}</div></div>
+    <div class="card-b scroll" style="max-height:420px">${rows.length ? rows.map(([c, v]) => {
+      const p = num(v.pnl), w = Math.abs(p) / max * 50;
+      return `<div class="lb-row"><span class="c">${c.toUpperCase()}</span><span>${v.rank_pnl != null ? '#' + shortRank(v.rank_pnl) : '—'}</span>
+        <div class="bar"><span style="${p >= 0 ? `left:50%;width:${w}%;background:var(--g)` : `right:50%;width:${w}%;background:var(--r)`}"></span></div>
+        <span class="mono ${cls(p)}" style="text-align:right">${money(p)}</span></div>`;
+    }).join('') : '<div class="empty">No category activity in this period</div>'}</div>`}`;
+  el.querySelectorAll('[data-p]').forEach(b => b.onclick = () => { S.lbPeriod = b.dataset.p; loadLeaderboard(); });
+}
+// re-render leaderboard when overview re-mounts
+const _ro = renderOverview; renderOverview = function () { _ro(); if (S.lb?.[S.lbPeriod]) renderLB(); else if (S.lb) loadLeaderboard(); };
+
+// ---------- positions tab ----------
+function renderPositions() {
+  S.posSort = S.posSort || ['current_value', -1];
+  const q = (S.posQ || '').toLowerCase();
+  const list = S.open.filter(p => !q || p.title.toLowerCase().includes(q))
+    .sort((a, b) => { const [k, d] = S.posSort; const va = a[k], vb = b[k]; return (typeof va === 'string' ? va.localeCompare(vb) : num(va) - num(vb)) * d; });
+  const tot = list.reduce((s, p) => s + num(p.current_value), 0), upnl = list.reduce((s, p) => s + num(p.unrealized_pnl), 0);
+  const cols = [['title','Market'],['outcome','Side'],['current_size','Shares',1],['avg_price','Avg',1],['current_price','Now',1],['total_cost_usdc','Cost',1],['current_value','Value',1],['unrealized_pnl','PnL',1],['percent_pnl','%',1],['end_date','Ends',1]];
+  wa$('#wabody').innerHTML = `<div class="card">
+    <div class="toolbar"><input id="pq" placeholder="Search markets…" value="${esc(S.posQ||'')}" style="flex:1;max-width:340px">
+      <span class="sub">${list.length} positions · value <b>${moneyFull(tot)}</b> · unrealized <b class="${cls(upnl)}">${money(upnl)}</b></span></div>
+    <div style="overflow-x:auto"><table><thead><tr>${cols.map(([k, l, n]) => `<th class="${n?'num':''}" data-k="${k}">${l}${S.posSort[0]===k ? (S.posSort[1]>0?' ▲':' ▼') : ''}</th>`).join('')}</tr></thead>
+    <tbody>${list.map(p => `<tr>
+      <td><div class="mk">${icon(p.icon)}<a class="ttl" href="${mlink(p)}" target="_blank">${esc(p.title)}</a></div></td>
+      <td>${outc(p.outcome)}</td>
+      <td class="num mono">${Math.round(num(p.current_size)).toLocaleString()}</td>
+      <td class="num mono mut">${cents(p.avg_price)}</td>
+      <td class="num mono">${cents(p.current_price)}</td>
+      <td class="num mono mut">${moneyFull(p.total_cost_usdc ?? num(p.avg_price)*num(p.current_size))}</td>
+      <td class="num mono"><b>${moneyFull(p.current_value)}</b></td>
+      <td class="num mono ${cls(p.unrealized_pnl)}">${money(p.unrealized_pnl)}</td>
+      <td class="num mono ${cls(p.percent_pnl)}">${p.percent_pnl != null ? num(p.percent_pnl).toFixed(1) + '%' : '—'}</td>
+      <td class="num dim" style="font-size:12px">${p.end_date ? new Date(p.end_date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'2-digit'}) : '—'}</td>
+    </tr>`).join('') || `<tr><td colspan="10" class="empty">No open positions</td></tr>`}</tbody></table></div></div>`;
+  wa$('#pq').oninput = e => { S.posQ = e.target.value; const pos = e.target.selectionStart; renderPositions(); const i = wa$('#pq'); i.focus(); i.setSelectionRange(pos, pos); };
+  document.querySelectorAll('th[data-k]').forEach(th => th.onclick = () => { const k = th.dataset.k; S.posSort = [k, S.posSort[0] === k ? -S.posSort[1] : -1]; renderPositions(); });
+}
+
+// ---------- activity tab ----------
+async function renderActivity() {
+  S.actType = S.actType || 'ALL';
+  if (!S.act || S.act.type !== S.actType) {
+    wa$('#wabody').innerHTML = '<div class="loading"><span class="spin"></span>Loading activity…</div>';
+    const j = await safe(api('/v2/activity', {user: S.addr, limit: 100, type: S.actType === 'ALL' ? null : S.actType}));
+    S.act = {type: S.actType, rows: j?.data || [], cursor: j?.pagination?.next_cursor};
+  }
+  if (S.tab !== 'activity') return;
+  const types = ['ALL','TRADE','REDEEM','SPLIT','MERGE','REWARD','YIELD','MAKER_REBATE','CONVERSION'];
+  const q = (S.actQ || '').toLowerCase();
+  const rows = S.act.rows.filter(a => !q || (a.title || '').toLowerCase().includes(q));
+  wa$('#wabody').innerHTML = `<div class="card">
+    <div class="toolbar"><select id="at">${types.map(t => `<option ${t===S.actType?'selected':''}>${t}</option>`).join('')}</select>
+      <input id="aq" placeholder="Filter loaded rows…" value="${esc(S.actQ||'')}" style="flex:1;max-width:340px"><span class="sub">${rows.length} rows</span></div>
+    <div style="overflow-x:auto"><table><thead><tr><th>Type</th><th>Market</th><th>Side</th><th>Outcome</th><th class="num">Shares</th><th class="num">Price</th><th class="num">USDC</th><th class="num">Time</th></tr></thead>
+    <tbody>${rows.map(a => `<tr>
+      <td><span class="badge">${esc(a.type)}</span></td>
+      <td><div class="mk">${a.icon ? icon(a.icon) : ''}${a.title ? `<a class="ttl" href="${mlink(a)}" target="_blank">${esc(a.title)}</a>` : '<span class="dim">—</span>'}</div></td>
+      <td>${a.side ? `<span class="${a.side==='SELL'?'side-s':'side-b'}">${a.side}</span>` : ''}</td>
+      <td>${a.outcome ? outc(a.outcome) : ''}</td>
+      <td class="num mono">${a.size ? Math.round(num(a.size)).toLocaleString() : ''}</td>
+      <td class="num mono mut">${a.price ? cents(a.price) : ''}</td>
+      <td class="num mono"><b>${moneyFull(a.usdc_size)}</b></td>
+      <td class="num dim" style="font-size:12px;white-space:nowrap" title="${new Date(a.timestamp*1000).toLocaleString()}">${new Date(a.timestamp*1000).toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}</td>
+    </tr>`).join('') || `<tr><td colspan="8" class="empty">No activity</td></tr>`}</tbody></table></div>
+    ${S.act.cursor ? '<button class="more" id="amore">Load more</button>' : ''}</div>`;
+  wa$('#at').onchange = e => { S.actType = e.target.value; renderActivity(); };
+  wa$('#aq').oninput = e => { S.actQ = e.target.value; const pos = e.target.selectionStart; renderActivity(); const i = wa$('#aq'); i.focus(); i.setSelectionRange(pos, pos); };
+  const m = wa$('#amore'); if (m) m.onclick = async () => {
+    m.disabled = true; m.textContent = 'Loading…';
+    const j = await safe(api('/v2/activity', {user: S.addr, limit: 100, cursor: S.act.cursor, type: S.actType === 'ALL' ? null : S.actType}));
+    S.act.rows = S.act.rows.concat(j?.data || []); S.act.cursor = j?.pagination?.next_cursor; renderActivity();
+  };
+}
+
+// ---------- history tab ----------
+async function ensureClosed() {
+  if (S.closed) return;
+  const j = await safe(api('/v2/positions', {user: S.addr, status: 'CLOSED', sort_by: 'TIMESTAMP', sort_direction: 'DESC', limit: 500}));
+  S.closed = j?.data || []; S.closedCursor = j?.pagination?.next_cursor;
+}
+async function renderHistory() {
+  if (!S.closed) { wa$('#wabody').innerHTML = '<div class="loading"><span class="spin"></span>Loading closed positions…</div>'; await ensureClosed(); }
+  if (S.tab !== 'history') return;
+  S.hSort = S.hSort || ['last_event_at', -1]; S.hF = S.hF || 'all';
+  const q = (S.hQ || '').toLowerCase();
+  const list = S.closed.filter(p => (!q || p.title.toLowerCase().includes(q)) && (S.hF === 'all' || (S.hF === 'w' ? num(p.realized_pnl) > 0 : num(p.realized_pnl) < 0)))
+    .sort((a, b) => { const [k, d] = S.hSort; const va = a[k], vb = b[k]; return (typeof va === 'string' && isNaN(+va) ? va.localeCompare(vb) : num(va) - num(vb)) * d; });
+  const tot = list.reduce((s, p) => s + num(p.realized_pnl), 0);
+  const cols = [['title','Market'],['outcome','Side'],['total_size','Shares',1],['avg_price','Avg entry',1],['total_cost_usdc','Cost',1],['realized_pnl','Realized PnL',1],['percent_realized_pnl','%',1],['last_event_at','Closed',1]];
+  wa$('#wabody').innerHTML = `<div class="card">
+    <div class="toolbar"><input id="hq" placeholder="Search markets…" value="${esc(S.hQ||'')}" style="flex:1;max-width:340px">
+      <div class="seg">${[['all','All'],['w','Wins'],['l','Losses']].map(([k,l]) => `<button data-f="${k}" class="${S.hF===k?'on':''}">${l}</button>`).join('')}</div>
+      <span class="sub">${list.length} closed · realized <b class="${cls(tot)}">${money(tot)}</b></span></div>
+    <div style="overflow-x:auto"><table><thead><tr>${cols.map(([k, l, n]) => `<th class="${n?'num':''}" data-k="${k}">${l}${S.hSort[0]===k ? (S.hSort[1]>0?' ▲':' ▼') : ''}</th>`).join('')}</tr></thead>
+    <tbody>${list.map(p => `<tr>
+      <td><div class="mk">${icon(p.icon)}<a class="ttl" href="${mlink(p)}" target="_blank">${esc(p.title)}</a></div></td>
+      <td>${outc(p.outcome)}</td>
+      <td class="num mono">${Math.round(num(p.total_size)).toLocaleString()}</td>
+      <td class="num mono mut">${cents(p.avg_price)}</td>
+      <td class="num mono mut">${moneyFull(p.total_cost_usdc)}</td>
+      <td class="num mono ${cls(p.realized_pnl)}"><b>${money(p.realized_pnl)}</b></td>
+      <td class="num mono ${cls(p.percent_realized_pnl)}">${p.percent_realized_pnl != null ? num(p.percent_realized_pnl).toFixed(1) + '%' : '—'}</td>
+      <td class="num dim" style="font-size:12px">${p.last_event_at ? new Date(num(p.last_event_at) * (num(p.last_event_at) < 1e12 ? 1000 : 1)).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'2-digit'}) : '—'}</td>
+    </tr>`).join('') || `<tr><td colspan="8" class="empty">No closed positions</td></tr>`}</tbody></table></div>
+    ${S.closedCursor ? '<button class="more" id="hmore">Load more</button>' : ''}</div>`;
+  wa$('#hq').oninput = e => { S.hQ = e.target.value; const pos = e.target.selectionStart; renderHistory(); const i = wa$('#hq'); i.focus(); i.setSelectionRange(pos, pos); };
+  document.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { S.hF = b.dataset.f; renderHistory(); });
+  document.querySelectorAll('th[data-k]').forEach(th => th.onclick = () => { const k = th.dataset.k; S.hSort = [k, S.hSort[0] === k ? -S.hSort[1] : -1]; renderHistory(); });
+  const m = wa$('#hmore'); if (m) m.onclick = async () => {
+    m.disabled = true; m.textContent = 'Loading…';
+    const j = await safe(api('/v2/positions', {user: S.addr, status: 'CLOSED', sort_by: 'TIMESTAMP', sort_direction: 'DESC', limit: 500, cursor: S.closedCursor}));
+    S.closed = S.closed.concat(j?.data || []); S.closedCursor = j?.pagination?.next_cursor; S.report = null; renderHistory();
+  };
+}
+
+// ---------- report tab ----------
+async function renderReport() {
+  if (!S.closed) { wa$('#wabody').innerHTML = '<div class="loading"><span class="spin"></span>Building report…</div>'; await ensureClosed(); }
+  if (S.tab !== 'report') return;
+  const c = S.closed, pn = c.map(p => num(p.realized_pnl));
+  const w = pn.filter(v => v > 0), l = pn.filter(v => v < 0);
+  const gw = w.reduce((a, b) => a + b, 0), gl = Math.abs(l.reduce((a, b) => a + b, 0));
+  // equity curve + drawdown from pnl points
+  const pts = (S.points || []).map(p => [p.timestamp, totalOf(p)]);
+  let peak = -Infinity, mdd = 0, mddPct = 0;
+  pts.forEach(([, v]) => { peak = Math.max(peak, v); const dd = peak - v; if (dd > mdd) { mdd = dd; mddPct = peak > 0 ? dd / peak : 0; } });
+  const dayVals = Object.values(S.days).map(d => d.total).filter(v => Math.abs(v) >= 0.005);
+  const greenDays = dayVals.filter(v => v > 0).length;
+  const mean = dayVals.reduce((a, b) => a + b, 0) / (dayVals.length || 1);
+  const sd = Math.sqrt(dayVals.reduce((a, b) => a + (b - mean) ** 2, 0) / (dayVals.length || 1));
+  const last30 = Object.entries(S.days).filter(([k]) => new Date(k) >= new Date(Date.now() - 30*864e5)).reduce((s, [, d]) => s + d.total, 0);
+  // streaks
+  let cur = 0, bestStreak = 0, worstStreak = 0;
+  Object.keys(S.days).sort().forEach(k => { const v = S.days[k].total; if (Math.abs(v) < .005) return; if (v > 0) cur = cur > 0 ? cur + 1 : 1; else cur = cur < 0 ? cur - 1 : -1; bestStreak = Math.max(bestStreak, cur); worstStreak = Math.min(worstStreak, cur); });
+  // concentration of open book
+  const openTot = S.open.reduce((s, p) => s + num(p.current_value), 0);
+  const top = groupByEvent(S.open, p => num(p.current_value)).sort((a, b) => b.total - a.total)[0];
+  const tile = (l, v, s = '', k = '') => `<div class="tile"><div class="l">${l}</div><div class="v mono ${k}">${v}</div>${s ? `<div class="s">${s}</div>` : ''}</div>`;
+  wa$('#wabody').innerHTML = `
+    <div class="card" style="margin-bottom:22px">
+      <div class="card-h"><h3>Performance Report</h3><span class="sub">Based on ${c.length} closed positions${S.closedCursor ? ' (most recent — load more in History)' : ''} &amp; daily PnL history</span></div>
+      <div class="tiles">
+        ${tile('Win rate (positions)', c.length ? Math.round(w.length / (w.length + l.length || 1) * 100) + '%' : '—', `${w.length}W · ${l.length}L`)}
+        ${tile('Profit factor', gl ? (gw / gl).toFixed(2) : (gw ? '∞' : '—'), 'gross win ÷ gross loss')}
+        ${tile('Avg win', money(w.length ? gw / w.length : 0), '', 'g')}
+        ${tile('Avg loss', money(l.length ? -gl / l.length : 0), '', 'r')}
+        ${tile('Realized (sample)', money(gw - gl), '', cls(gw - gl))}
+        ${tile('Last 30 days', money(last30), '', cls(last30))}
+        ${tile('Green days', dayVals.length ? Math.round(greenDays / dayVals.length * 100) + '%' : '—', `${greenDays} of ${dayVals.length} active days`)}
+        ${tile('Max drawdown', mdd ? money(-mdd) : '—', mddPct ? (mddPct * 100).toFixed(1) + '% from peak' : '', 'r')}
+        ${tile('Daily Sharpe-ish', sd ? (mean / sd * Math.sqrt(365)).toFixed(2) : '—', 'mean ÷ stdev × √365')}
+        ${tile('Streaks', `+${bestStreak} / ${worstStreak}`, 'best green / worst red run (days)')}
+        ${tile('Open exposure', moneyFull(openTot), `${S.open.length} positions`)}
+        ${tile('Top concentration', top && openTot ? Math.round(top.total / openTot * 100) + '%' : '—', top ? esc(groupTitle(top.list.map(p => p.title)).title).slice(0, 48) : '')}
+      </div>
+    </div>
+    <div class="card"><div class="card-h"><h3>Cumulative PnL</h3><span class="sub">peak-to-trough drawdown shaded</span></div><div class="chart">${equitySvg(pts)}</div></div>`;
+}
+function equitySvg(pts) {
+  if (pts.length < 2) return '<div class="empty">Not enough PnL history</div>';
+  const W = 1000, H = 260, P = 40;
+  const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(0, ...ys), y1 = Math.max(0, ...ys);
+  const X = x => P + (x - x0) / (x1 - x0 || 1) * (W - P - 10), Y = y => 10 + (1 - (y - y0) / (y1 - y0 || 1)) * (H - 40);
+  let peak = -Infinity; const peakLine = pts.map(([t, v]) => { peak = Math.max(peak, v); return [t, peak]; });
+  const line = pts.map(([t, v], i) => `${i ? 'L' : 'M'}${X(t).toFixed(1)},${Y(v).toFixed(1)}`).join('');
+  const dd = peakLine.map(([t, v], i) => `${i ? 'L' : 'M'}${X(t).toFixed(1)},${Y(v).toFixed(1)}`).join('') + pts.slice().reverse().map(([t, v]) => `L${X(t).toFixed(1)},${Y(v).toFixed(1)}`).join('') + 'Z';
+  const last = ys[ys.length - 1], col = last >= 0 ? '#5ccf8a' : '#f06a7d';
+  const ticks = [y0, (y0 + y1) / 2, y1].map(v => `<text x="${P - 6}" y="${Y(v) + 4}" fill="#8b95a8" font-size="11" text-anchor="end">${money(v, false)}</text><line x1="${P}" x2="${W}" y1="${Y(v)}" y2="${Y(v)}" stroke="#2c3446"/>`).join('');
+  const d = t => new Date(t * 1000).toLocaleDateString('en-US', {month: 'short', year: '2-digit'});
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${ticks}
+    <line x1="${P}" x2="${W}" y1="${Y(0)}" y2="${Y(0)}" stroke="#4b5468" stroke-dasharray="4 4"/>
+    <path d="${dd}" fill="rgba(240,106,125,.18)"/>
+    <path d="${line}" fill="none" stroke="${col}" stroke-width="2.2" vector-effect="non-scaling-stroke"/>
+    <text x="${P}" y="${H - 6}" fill="#8b95a8" font-size="11">${d(x0)}</text><text x="${W}" y="${H - 6}" fill="#8b95a8" font-size="11" text-anchor="end">${d(x1)}</text></svg>`;
+}
+
+
+
+wa$('#waf').addEventListener('submit', async e => {
+  e.preventDefault();
+  const raw = wa$('#waq').value;
+  wa$('#wago').disabled = true;
+  showErr('');
+  wa$('#waapp').innerHTML = '<div class="loading"><span class="spin"></span>Looking up '+esc(raw).slice(0,80)+'…</div>';
+  try {
+    const a = await resolveWallet(raw);
+    await load(a);
+  } catch (err) {
+    wa$('#waapp').innerHTML = '';
+    showErr(err.message || String(err));
+    wa$('#wago').disabled = false;
+  }
+});
+function openWallet(q){
+  try{q=decodeURIComponent(q)}catch(e){}
+  view('wallet');
+  const box=document.getElementById('waq');
+  if(box) box.value=q;
+  document.getElementById('waf').requestSubmit();
+}
+window.openWallet=openWallet;
+})();
+
 </script></body></html>
