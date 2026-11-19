@@ -192,7 +192,8 @@ table{font-size:11.5px}td,th{padding:5px 0}th{font-size:9.5px}.side{font-size:9p
 .mph{width:46px;height:46px;flex:none;border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.25);color:#ffffff;font-weight:600;font-size:18px}
 td.r,th.r{padding-left:8px;white-space:nowrap}
 /* position bar, trader picture, inflow total */
-td.tn{width:38%;padding-right:12px;font-size:11.5px;font-weight:400;letter-spacing:0;line-height:normal}
+td.tn{width:34%;padding-right:8px;font-size:11.5px;font-weight:400;letter-spacing:0;line-height:normal}
+.pp{font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
 .pbar{display:block;height:3px;border-radius:2px;background:#262626;margin-top:6px;max-width:160px;overflow:hidden}
 .pbar i{display:block;height:100%;border-radius:2px}
 .syb i{background:#86c99c}.snb i{background:#d79a9a}
@@ -210,7 +211,7 @@ tr.ex .tav{opacity:.5}
 .st:last-child{padding-right:0}
 .nowb .v{font-weight:600}
 a.ttl{flex:1;min-width:0}
-@media(max-width:520px){.stats{grid-template-columns:minmax(0,1fr) minmax(0,1.4fr)}.st:nth-child(3){grid-column:1/-1;border-left:0;border-top:1px solid #262626;padding-left:0}.st:nth-child(3) .nowb{max-width:50%}.ifx b{font-size:19px}}
+@media(max-width:520px){#grid table,#v-inflows table{font-size:12px}#grid td.r,#grid th.r,#v-inflows td.r,#v-inflows th.r{padding-left:5px}#grid .tav,#v-inflows .tav{width:22px;height:22px}#grid .tw,#v-inflows .tw{gap:7px}.pp{font-size:11px}.stats{grid-template-columns:minmax(0,1fr) minmax(0,1.4fr)}.st:nth-child(3){grid-column:1/-1;border-left:0;border-top:1px solid #262626;padding-left:0}.st:nth-child(3) .nowb{max-width:50%}.ifx b{font-size:19px}}
 
 /* wallet lookup */
 .lk{padding:6px 36px 60px;max-width:860px}
@@ -516,8 +517,7 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
     <div class="muted" style="font-size:12px;margin-bottom:12px" id="ifline">LAST 24H · TRACKED WALLETS</div>
     <h2>Money Flow</h2>
     <div class="sortnote" id="ifnote">Markets where smart traders put in $2K+ of new money today</div>
-   </div>
-   <div class="chips"><button class="chip on" data-m="in" onclick="ifMode('in')">Inflows</button><button class="chip" data-m="out" onclick="ifMode('out')">Outflows</button></div></div>
+   </div></div>
    <div class="grid" id="iflist"></div>
   </div>
 
@@ -591,6 +591,7 @@ const sm=`<svg width="18" height="18" viewBox="-11 -11 22 22"><g stroke="#fff" s
 
 const K=n=>n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?Math.round(n/1e3)+'K':Math.round(n)+'';
 const usdK=n=>'$'+(n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e4?Math.round(n/1e3)+'K':n>=1e3?(n/1e3).toFixed(1)+'K':Math.round(+n||0));
+const pnl=v=>{const a=Math.abs(v),f=a>=1e6?(a/1e6).toFixed(1)+'M':a>=1e4?Math.round(a/1e3)+'K':a>=1e3?(a/1e3).toFixed(1)+'K':Math.round(a);return `<span class="pp ${v>=0?'g':'rd'}">${v>=0?'+':'−'}$${f}</span>`};
 const c=p=>Math.round(p*100);
 const AV=__AVATARS__;
 function waBtn(n){return `<button type="button" class="wa-go" title="Wallet analysis" onclick="openWallet('${encodeURIComponent(n||'')}')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>`}
@@ -663,9 +664,9 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&FOC){FOC=null;grid.
 function render(){setTimeout(focR);pickD();D.sort(SORTS[SORT][2]);chipsR();headR();grid.innerHTML=D.map((m,i)=>[m,i]).filter(([m])=>(F=='All'||m.cat==F)&&qm(m)&&(SV?!!SAV[m.url]:(!SAV[m.url]&&(SHOWH||!HID.has(m.url))))).map(([m,mi])=>{const hid=HID.has(m.url),sav=!!SAV[m.url];
  const sides={};m.tr.filter(t=>!t.ex).forEach(t=>{const s=sides[t.side]||(sides[t.side]={sh:0,ap:0,k:0});s.sh+=t.sh;s.ap+=t.avg;s.k++});
  const valOf=t=>t.val||t.sh*(t.avg||0),maxV=Math.max(1,...m.tr.filter(t=>!t.ex).map(valOf));
- const row=t=>{const cls=t.side=='Yes'?'sy':t.side=='No'?'sn':'sx',S=t.side?String(t.side).toUpperCase():'—';return `<tr class="${t.ex?'ex':''}"><td class="tn"><div class="tw">${avImg(t.n)}<div><a class="tlk" href="https://polymarket.com/@${t.n}" target="_blank">${t.n}</a>${waBtn(t.n)}${t.ex?'':`<span class="pbar ${cls}b"><i style="width:${Math.max(3,Math.round(valOf(t)/maxV*100))}%"></i></span>`}</div></div></td><td>${t.side?`<span class="side ${t.ex?'sx':cls}">${S}</span>`:'<span class="side sx">—</span>'}</td><td class="r">${K(t.sh)} shares</td><td class="r">${t.ex?'—':'@'+c(t.avg)}</td><td class="r">${t.ex?'Exited @'+c(t.ex):usdK(valOf(t))}</td></tr>`};
+ const row=t=>{const cls=t.side=='Yes'?'sy':t.side=='No'?'sn':'sx',S=t.side?String(t.side).toUpperCase():'—';return `<tr class="${t.ex?'ex':''}"><td class="tn"><div class="tw">${avImg(t.n)}<div><a class="tlk" href="https://polymarket.com/@${t.n}" target="_blank">${t.n}</a>${waBtn(t.n)}${t.ex?'':`<span class="pbar ${cls}b"><i style="width:${Math.max(3,Math.round(valOf(t)/maxV*100))}%"></i></span>`}</div></div></td><td>${t.side?`<span class="side ${t.ex?'sx':cls}">${S}</span>`:'<span class="side sx">—</span>'}</td><td class="r">${K(t.sh)}</td><td class="r">@${c(t.avg)}</td><td class="r">${t.ex?'Exited @'+c(t.ex):usdK(valOf(t))}</td><td class="r">${t.ex?'—':pnl(valOf(t)-t.sh*t.avg)}</td></tr>`};
 const grpHtml=['Yes','No',null].map(sd=>{const g=m.tr.filter(t=>(t.side||null)==sd).sort((x,y)=>(!!x.ex-!!y.ex)||(valOf(y)-valOf(x)));if(!g.length)return '';const h=g.filter(t=>!t.ex),sh=h.reduce((q,t)=>q+t.sh,0);
-  return `<tr class="grp"><td colspan="5"><span class="side ${sd=='Yes'?'sy':sd=='No'?'sn':'sx'}">${sd?sd.toUpperCase():'OTHER'}</span><span class="gc">${h.length} holding · ${K(sh)} shares</span></td></tr>`+g.map(row).join('')}).join('');
+  return `<tr class="grp"><td colspan="6"><span class="side ${sd=='Yes'?'sy':sd=='No'?'sn':'sx'}">${sd?sd.toUpperCase():'OTHER'}</span><span class="gc">${h.length} holding · ${K(sh)} shares</span></td></tr>`+g.map(row).join('')}).join('');
  const rows=grpHtml;
  const tots=Object.entries(sides).map(([k,s])=>`<div class="tot muted">${k.toUpperCase()} · total size · avg price<b style="color:#fff">${K(s.sh)} sh @${c(s.ap/s.k)}</b></div>`).join('');
  const lean=m.top=='Yes'?'above':'below';
@@ -674,7 +675,7 @@ const grpHtml=['Yes','No',null].map(sd=>{const g=m.tr.filter(t=>(t.side||null)==
  <div class="stats"><div class="st"><label>TRADERS</label><div class="v">${m.n}<span class="unit">Smart Traders</span><small style="flex-basis:100%"><span class="badge ${m.top.toLowerCase()}">${m.cnt}/${m.n} ${m.top.toUpperCase()}</span></small></div></div>
  <div class="st"><label>AVG ENTRY</label>${sides.Yes&&sides.No?`<div class="split">${['Yes','No'].map(k=>`<div class="sp ${k=='Yes'?'spy':'spn'}"><span class="spl">${k.toUpperCase()}</span><div class="v mu">${c(sides[k].ap/sides[k].k)}¢</div><small>$${K(sides[k].val||sides[k].sh*sides[k].ap/sides[k].k)} value</small></div>`).join('')}</div>`:`<div class="v mu">${c(allAvg)}¢<small style="flex-basis:100%">$${K(Object.values(sides).reduce((a,s)=>a+(s.val||s.sh*s.ap/s.k),0))} value</small></div>`}</div>
  <div class="st"><label>NOW</label><div class="v"><span class="${yes?'g':'rd'}">${m.top.toUpperCase()} ${c(ask)}¢</span></div></div></div>
- <table><tr><th>Trader</th><th>Side</th><th class="r">Size</th><th class="r">Avg</th><th class="r">Value</th></tr>${rows}</table>
+ <table><tr><th>Trader</th><th>Side</th><th class="r">Size</th><th class="r">Avg</th><th class="r">Value</th><th class="r">PnL</th></tr>${rows}</table>
  ${CH[m.url]?`<button class="chb" onclick="openChart(${mi})"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>Open chart<span class="muted">· trader buys on chart</span></button>`:''}
  <details><summary><span>News &amp; analysis</span><span class="stags"><span class="pill acc">${m.cat}</span><span class="pill">Ends ${endS(m.end)}</span></span></summary>${ana(m,ask)}</details></div>`}).join('');masonry()}
 
@@ -721,16 +722,14 @@ async function lookup(){
 const TRS=__TRADERS__;let TR=TRS;
 function view(v){const r=(v=='saved'||v=='markets')?'markets':v;if(r=='markets'){SV=v=='saved';F='All';FOC=null}if(v=='traders')trR();document.querySelectorAll('main>.v').forEach(x=>x.style.display=x.id=='v-'+r?'block':'none');if(r=='markets')render();if(r=='live')liveRender();if(r=='inflows')ifRender();document.querySelectorAll('.nv').forEach(x=>x.classList.toggle('on',x.dataset.v==v));document.body.classList.remove('navopen');scrollTo(0,0)}
 const LIVE=/*__LIVE_START__*/__LIVE__/*__LIVE_END__*/;const BUILT=__BUILT__;const liveOpen=new Set();
-const INFLOW=__INFLOW__;const OUTFLOW=__OUTFLOW__;let IFM='in';
-function ifMode(m){IFM=m;document.querySelectorAll('#v-inflows .chip').forEach(c=>c.classList.toggle('on',c.dataset.m==m));ifRender()}
+const INFLOW=__INFLOW__;const OUTFLOW=__OUTFLOW__;
 function ifRender(){const MIN_IN=2000;const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const OUTM=IFM=='out', SRC=OUTM?OUTFLOW:INFLOW;
- const mk=(SRC.mk||[]).map(m=>{const y=Math.max(0,+m.yes||0),n=Math.max(0,+m.no||0);return Object.assign({},m,{y,n,net:y+n})}).filter(m=>m.net>=MIN_IN).sort((a,b)=>b.net-a.net);
+ const mk=(INFLOW.mk||[]).map(m=>{const y=Math.max(0,+m.yes||0),n=Math.max(0,+m.no||0);return Object.assign({},m,{y,n,net:y+n})}).filter(m=>m.net>=MIN_IN).sort((a,b)=>b.net-a.net);
  const el=document.getElementById('iflist');if(!el)return;
- const ago=Math.max(0,Math.round((Date.now()/1000-(SRC.built||0))/60));
- const note=document.getElementById('ifnote');if(note)note.textContent=OUTM?'Markets where smart traders sold $2K+ today (sells at 95¢+ and redemptions excluded)':'Markets where smart traders put in $2K+ of new money today';
- const line=document.getElementById('ifline');if(line)line.textContent=mk.length+' MARKETS · $2K+ '+(OUTM?'OUT':'IN')+' · LAST 24H · UPDATED '+(ago<60?ago+' MIN':Math.round(ago/60)+'H')+' AGO';
- if(!mk.length){el.innerHTML='<div class="if-empty">No market has $2K+ of smart-money '+(OUTM?'outflow':'inflow')+' in the last 24h yet.</div>';return}
+ const ago=Math.max(0,Math.round((Date.now()/1000-(INFLOW.built||0))/60));
+ const note=document.getElementById('ifnote');if(note)note.textContent='Markets where smart traders put in $2K+ of new money today';
+ const line=document.getElementById('ifline');if(line)line.textContent=mk.length+' MARKETS · $2K+ IN · LAST 24H · UPDATED '+(ago<60?ago+' MIN':Math.round(ago/60)+'H')+' AGO';
+ if(!mk.length){el.innerHTML='<div class="if-empty">No market has $2K+ of smart-money inflow in the last 24h yet.</div>';return}
  el.innerHTML=mk.map((m,i)=>{
   const lead=m.y>=m.n?'Yes':'No', names=new Set(m.tr.map(t=>t.n)), onLead=new Set(m.tr.filter(t=>t.out==lead).map(t=>t.n));
   const maxV=Math.max(1,...m.tr.map(t=>+t.usd||0));
@@ -738,11 +737,10 @@ function ifRender(){const MIN_IN=2000;const esc=s=>String(s==null?'':s).replace(
   const box=(sd,cls,usd,avg)=>`<div class="sp ${cls}${usd>0?'':' off'}"><span class="spl">${sd}</span><div class="v mu">${usd>0&&avg!=null?c(avg)+'¢':'—'}</div><small>${usdK(usd)} value</small></div>`;
   const grp=sd=>{const g=m.tr.filter(t=>t.out==sd).sort((a,b)=>b.usd-a.usd);if(!g.length)return '';
    const sh=g.reduce((a,t)=>a+(+t.sh||0),0), cls=sd=='Yes'?'sy':'sn', S=sd.toUpperCase();
-   return `<tr class="grp"><td colspan="5"><span class="side ${cls}">${S}</span><span class="gc">${g.length} ${OUTM?'selling':'buying'} · ${K(sh)} shares</span></td></tr>`+
-    g.map(t=>{const badge=OUTM?((t.exited?'EXITED ':'TRIMMED ')+S):S;
-     return `<tr class="${t.exited?'ex':''}"><td class="tn"><div class="tw">${avImg(t.n)}<div><a class="tlk" href="https://polymarket.com/@${encodeURIComponent(t.n)}" target="_blank" rel="noopener">${esc(t.n)}</a>${waBtn(t.n)}<span class="pbar ${cls}b"><i style="width:${Math.max(3,Math.round((+t.usd||0)/maxV*100))}%"></i></span></div></div></td><td><span class="side ${cls}">${esc(badge)}</span></td><td class="r">${K(t.sh||0)} shares</td><td class="r">${t.avg==null?'—':'@'+c(t.avg)}</td><td class="r">${usdK(t.usd)}</td></tr>`}).join('')};
+   return `<tr class="grp"><td colspan="6"><span class="side ${cls}">${S}</span><span class="gc">${g.length} buying · ${K(sh)} shares</span></td></tr>`+
+    g.map(t=>`<tr><td class="tn"><div class="tw">${avImg(t.n)}<div><a class="tlk" href="https://polymarket.com/@${encodeURIComponent(t.n)}" target="_blank" rel="noopener">${esc(t.n)}</a>${waBtn(t.n)}<span class="pbar ${cls}b"><i style="width:${Math.max(3,Math.round((+t.usd||0)/maxV*100))}%"></i></span></div></div></td><td><span class="side ${cls}">${S}</span></td><td class="r">${K(t.sh||0)}</td><td class="r">${t.avg==null?'—':'@'+c(t.avg)}</td><td class="r">${usdK(t.usd)}</td><td class="r">${m.px==null||!t.sh?'—':pnl((+t.sh)*(t.out=='Yes'?m.px:1-m.px)-(+t.sh)*(+t.avg||0))}</td></tr>`).join('')};
   const img=m.img?`<img class="mimg" src="${esc(m.img)}" alt="" loading="lazy" referrerpolicy="no-referrer">`:`<span class="mimg"></span>`;
-  return `<div class="card"><div class="ct"><div class="tl">${img}<a class="ttl" href="${esc(m.url)}" target="_blank" rel="noopener">${esc(m.t)}</a><div class="ifx"><b>${usdK(m.net)}</b><span>${OUTM?'Total out · 24h':'Total in · 24h'}</span>${i==0?`<span class="ifhot">${OUTM?'BIGGEST EXIT':'HOTTEST'}</span>`:''}</div></div></div><div class="stats"><div class="st"><label>TRADERS</label><div class="v">${names.size}<span class="unit">Smart Traders</span><small style="flex-basis:100%"><span class="badge ${lead=='Yes'?'yes':'no'}">${onLead.size}/${names.size} ${lead.toUpperCase()}</span></small></div></div><div class="st"><label>AVG ENTRY</label><div class="split">${box('YES','spy',m.y,m.yavg)}${box('NO','spn',m.n,m.navg)}</div></div><div class="st"><label>NOW</label>${now}</div></div><table><tbody><tr><th>Trader</th><th>Side</th><th class="r">Size</th><th class="r">Avg</th><th class="r">Value</th></tr>${grp(lead)}${grp(lead=='Yes'?'No':'Yes')}</tbody></table></div>`}).join('');
+  return `<div class="card"><div class="ct"><div class="tl">${img}<a class="ttl" href="${esc(m.url)}" target="_blank" rel="noopener">${esc(m.t)}</a><div class="ifx"><b>${usdK(m.net)}</b><span>Total in · 24h</span>${i==0?'<span class="ifhot">HOTTEST</span>':''}</div></div></div><div class="stats"><div class="st"><label>TRADERS</label><div class="v">${names.size}<span class="unit">Smart Traders</span><small style="flex-basis:100%"><span class="badge ${lead=='Yes'?'yes':'no'}">${onLead.size}/${names.size} ${lead.toUpperCase()}</span></small></div></div><div class="st"><label>AVG ENTRY</label><div class="split">${box('YES','spy',m.y,m.yavg)}${box('NO','spn',m.n,m.navg)}</div></div><div class="st"><label>NOW</label>${now}</div></div><table><tbody><tr><th>Trader</th><th>Side</th><th class="r">Size</th><th class="r">Avg</th><th class="r">Value</th><th class="r">PnL</th></tr>${grp(lead)}${grp(lead=='Yes'?'No':'Yes')}</tbody></table></div>`}).join('');
  masonry(el)}
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const dollars=n=>'$'+(+n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
