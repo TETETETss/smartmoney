@@ -649,6 +649,61 @@ def money_flow(addrs, names):
     print(f'top outflows: {len(outflow["mk"])} markets >= ${INFLOW_MIN:.0f}')
     return inflow, outflow
 
+def weekly(addrs, names):
+    """Markets where 3+ tracked traders first entered within 7 days and still hold.
+    first_entry_at is the data-api's first trade time for that outcome, so this does not page full history."""
+    print(f'\n== weekly entries: {len(addrs)} wallets, last 7d ==')
+    cutoff = time.time() - 7 * 86400
+    want = {a.lower() for a in addrs}
+    books = {}
+    for addr, P in RAW.items():
+        if str(addr).lower() not in want: continue
+        for p in P or []:
+            if _redeemable(p): continue
+            sh = _num(F(p, 'current_size', 'size')) or 0
+            if sh <= 0.01: continue
+            fe = _num(F(p, 'first_entry_at', 'firstEntryAt')) or 0
+            if fe > 1e11: fe /= 1000
+            if fe < cutoff: continue
+            ol = str(F(p, 'outcome') or '').strip().lower()
+            if ol == 'yes': side = 'Yes'
+            elif ol == 'no': side = 'No'
+            else: continue
+            cid = F(p, 'condition_id', 'conditionId') or ''
+            if not cid: continue
+            val = _num(F(p, 'current_value', 'currentValue'))
+            if val is None:
+                px = _num(F(p, 'current_price', 'cur_price', 'curPrice')) or 0
+                val = sh * px
+            avg = _num(F(p, 'avg_price', 'avgPrice')) or 0
+            b = books.setdefault(cid, {'t': '', 'url': '', 'img': '', 'tr': {}})
+            name = names.get(str(addr).lower()) or F(p, 'name') or (str(addr)[:6])
+            slot = b['tr'].get((str(addr).lower(), side))
+            if slot:
+                slot['sh'] += sh
+                slot['val'] += val
+                slot['fe'] = min(slot['fe'], int(fe))
+            else:
+                b['tr'][(str(addr).lower(), side)] = {'n': name, 'side': side, 'sh': sh, 'avg': avg, 'val': val, 'fe': int(fe)}
+            if not b['t']:
+                b['t'] = F(p, 'title', 'market_title', 'question') or ''
+                b['img'] = F(p, 'icon', 'image') or ''
+                b['url'] = market_url(F(p, 'slug', 'market_slug') or '', F(p, 'event_slug', 'eventSlug') or '')
+    mk = []
+    for cid, b in books.items():
+        if _resolved(cid) or not b['t'] or not str(b['url']).startswith('https://polymarket.com/event/'): continue
+        rows = list(b['tr'].values())
+        if len({r['n'] for r in rows}) < 3: continue
+        ask = _yes_price(cid)
+        tr = [{'n': r['n'], 'side': r['side'], 'sh': round(r['sh'], 2), 'avg': round(r['avg'], 4), 'val': round(r['val'], 2), 'fe': r['fe']} for r in rows]
+        tr.sort(key=lambda r: -r['val'])
+        mk.append({'t': b['t'], 'url': b['url'], 'img': b['img'] or '', 'ask': None if ask is None else round(ask, 4), 'tr': tr})
+    def rank(m):
+        return (-len({r['n'] for r in m['tr']}), -sum(r['val'] for r in m['tr']))
+    mk.sort(key=rank)
+    print(f'weekly: {len(mk)} markets with 3+ new traders')
+    return {'built': int(time.time()), 'mk': mk}
+
 def main():
     # One tracked list. Each wallet keeps its own position minimum (macro $500, fast $10).
     W = load_wallets('wallets.json')
@@ -659,17 +714,18 @@ def main():
     prefetch_positions(addrs)
     LIVE = live_feed(addrs, names)
     INFLOW, OUTFLOW = money_flow(addrs, names)
+    WEEKLY = weekly(addrs, names)
     for m in D: m.pop('tok', None)
     json.dump(RAW, open(os.path.join(HERE, 'raw.json'), 'w', encoding='utf-8'))
     if not ok:
         sys.exit('No data came back from Polymarket (network blocked?). index.html was NOT changed.')
     if not LIVE:
         sys.exit('No recent trades came back from the Polymarket data API. index.html was NOT changed.')
-    json.dump({'D': D, 'TR': T, 'CH': CH, 'LIVE': LIVE, 'INFLOW': INFLOW, 'OUTFLOW': OUTFLOW}, open(os.path.join(HERE, 'data.json'), 'w', encoding='utf-8'))
+    json.dump({'D': D, 'TR': T, 'CH': CH, 'LIVE': LIVE, 'INFLOW': INFLOW, 'OUTFLOW': OUTFLOW, 'WEEKLY': WEEKLY}, open(os.path.join(HERE, 'data.json'), 'w', encoding='utf-8'))
     html = open(os.path.join(HERE, 'template.html'), encoding='utf-8').read()
     html = html.replace('__CHARTS__', js_json(CH)).replace('__DATA__', js_json(D)).replace('__TRADERS__', js_json(T)).replace('__NTRADERS__', str(len(W)))
     html = html.replace('__LIVE__', js_json(LIVE)).replace('__NLIVE__', str(len(LIVE))).replace('__BUILT__', str(int(time.time())))
-    html = html.replace('__INFLOW__', js_json(INFLOW)).replace('__OUTFLOW__', js_json(OUTFLOW)).replace('__AVATARS__', js_json(wallet_avatars(W)))
+    html = html.replace('__INFLOW__', js_json(INFLOW)).replace('__OUTFLOW__', js_json(OUTFLOW)).replace('__WEEKLY__', js_json(WEEKLY)).replace('__AVATARS__', js_json(wallet_avatars(W)))
     open(os.path.join(HERE, 'index.html'), 'w', encoding='utf-8').write(html)
     print(f'\nDone: {len(W)} traders, {len(D)} markets shown -> index.html')
 

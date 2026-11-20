@@ -194,6 +194,7 @@ td.r,th.r{padding-left:8px;white-space:nowrap}
 /* position bar, trader picture, inflow total */
 td.tn{width:34%;padding-right:8px;font-size:11.5px;font-weight:400;letter-spacing:0;line-height:normal}
 .pp{font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
+.wkago{display:block;margin-top:1px;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:10px;letter-spacing:.2px;color:#777;font-weight:400;line-height:1.2}
 .pbar{display:block;height:3px;border-radius:2px;background:#262626;margin-top:6px;max-width:160px;overflow:hidden}
 .pbar i{display:block;height:100%;border-radius:2px}
 .syb i{background:#86c99c}.snb i{background:#d79a9a}
@@ -517,7 +518,8 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
     <div class="muted" style="font-size:12px;margin-bottom:12px" id="ifline">LAST 24H · TRACKED WALLETS</div>
     <h2>Money Flow</h2>
     <div class="sortnote" id="ifnote">Markets where smart traders put in $2K+ of new money today</div>
-   </div></div>
+   </div>
+   <div class="chips"><button class="chip on" data-m="day" onclick="ifMode('day')">24H · Money</button><button class="chip" data-m="week" onclick="ifMode('week')">7D · Traders</button></div></div>
    <div class="grid" id="iflist"></div>
   </div>
 
@@ -608,7 +610,7 @@ DS.forEach(m=>{const yes=m.top=='Yes',now=yes?m.ask:1-m.bid,h=m.tr.filter(t=>!t.
 function masonry(el){el=el||grid;if(!el)return;const cards=[...el.querySelectorAll('.card')];if(!cards.length)return;const w=el.clientWidth||innerWidth;const n=Math.max(1,Math.floor((w+14)/(300+14)));
  el.innerHTML='';const cols=[...Array(n)].map(()=>{const c=document.createElement('div');c.className='mcol';el.appendChild(c);return c});
  cards.forEach(cd=>{const s=cols.reduce((a,b)=>b.offsetHeight<a.offsetHeight?b:a);s.appendChild(cd)})}
-let mrT,lastW=innerWidth;addEventListener('resize',()=>{if(innerWidth===lastW)return;lastW=innerWidth;clearTimeout(mrT);mrT=setTimeout(()=>{if(dash.style.display!='none'){const y=scrollY;grid.style.minHeight=grid.offsetHeight+'px';render();const inf=document.getElementById('v-inflows');if(inf&&inf.style.display!=='none')ifRender();grid.style.minHeight='';scrollTo(0,y)}},150)});
+let mrT,lastW=innerWidth;addEventListener('resize',()=>{if(innerWidth===lastW)return;lastW=innerWidth;clearTimeout(mrT);mrT=setTimeout(()=>{if(dash.style.display!='none'){const y=scrollY;grid.style.minHeight=grid.offsetHeight+'px';render();const inf=document.getElementById('v-inflows');if(inf&&inf.style.display!=='none')(IFM=='week'?wkRender:ifRender)();grid.style.minHeight='';scrollTo(0,y)}},150)});
 function ana(m,ask){
  const val=t=>t.val||t.sh*t.avg,hs=m.tr.filter(t=>!t.ex),tp=hs.filter(t=>t.side==m.top);
  const tv=hs.reduce((a,t)=>a+val(t),0),topv=tp.reduce((a,t)=>a+val(t),0),pct=tv?Math.round(topv/tv*100):0,kp=hs.length?Math.round(tp.length/hs.length*100):0;
@@ -720,9 +722,11 @@ async function lookup(){
  }catch(e){lkout.innerHTML=`<div class="lke">Could not load this wallet (${String(e.message||e)}). If every lookup fails, Polymarket may be blocked on your connection: check your DNS setting or VPN, then try again.</div>`}
 }
 const TRS=__TRADERS__;let TR=TRS;
-function view(v){const r=(v=='saved'||v=='markets')?'markets':v;if(r=='markets'){SV=v=='saved';F='All';FOC=null}if(v=='traders')trR();document.querySelectorAll('main>.v').forEach(x=>x.style.display=x.id=='v-'+r?'block':'none');if(r=='markets')render();if(r=='live')liveRender();if(r=='inflows')ifRender();document.querySelectorAll('.nv').forEach(x=>x.classList.toggle('on',x.dataset.v==v));document.body.classList.remove('navopen');scrollTo(0,0)}
+function view(v){const r=(v=='saved'||v=='markets')?'markets':v;if(r=='markets'){SV=v=='saved';F='All';FOC=null}if(v=='traders')trR();document.querySelectorAll('main>.v').forEach(x=>x.style.display=x.id=='v-'+r?'block':'none');if(r=='markets')render();if(r=='live')liveRender();if(r=='inflows')(IFM=='week'?wkRender:ifRender)();document.querySelectorAll('.nv').forEach(x=>x.classList.toggle('on',x.dataset.v==v));document.body.classList.remove('navopen');scrollTo(0,0)}
 const LIVE=/*__LIVE_START__*/__LIVE__/*__LIVE_END__*/;const BUILT=__BUILT__;const liveOpen=new Set();
-const INFLOW=__INFLOW__;const OUTFLOW=__OUTFLOW__;
+const INFLOW=__INFLOW__;const OUTFLOW=__OUTFLOW__;const WEEKLY=__WEEKLY__;let IFM='day';
+function ifMode(m){IFM=m;document.querySelectorAll('#v-inflows .chip').forEach(c=>c.classList.toggle('on',c.dataset.m==m));if(m=='week')wkRender();else ifRender()}
+function feAgo(ts){const d=Math.max(0,Math.floor((Date.now()/1000-(+ts||0))/86400));return 'in '+(d<1?'<1':d)+'d ago'}
 function ifRender(){const MIN_IN=2000;const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const mk=(INFLOW.mk||[]).map(m=>{const y=Math.max(0,+m.yes||0),n=Math.max(0,+m.no||0);return Object.assign({},m,{y,n,net:y+n})}).filter(m=>m.net>=MIN_IN).sort((a,b)=>b.net-a.net);
  const el=document.getElementById('iflist');if(!el)return;
@@ -741,6 +745,28 @@ function ifRender(){const MIN_IN=2000;const esc=s=>String(s==null?'':s).replace(
     g.map(t=>`<tr><td class="tn"><div class="tw">${avImg(t.n)}<div><a class="tlk" href="https://polymarket.com/@${encodeURIComponent(t.n)}" target="_blank" rel="noopener">${esc(t.n)}</a>${waBtn(t.n)}<span class="pbar ${cls}b"><i style="width:${Math.max(3,Math.round((+t.usd||0)/maxV*100))}%"></i></span></div></div></td><td><span class="side ${cls}">${S}</span></td><td class="r">${K(t.sh||0)}</td><td class="r">${t.avg==null?'—':'@'+c(t.avg)}</td><td class="r">${usdK(t.usd)}</td><td class="r">${m.px==null||!t.sh?'—':pnl((+t.sh)*(t.out=='Yes'?m.px:1-m.px)-(+t.sh)*(+t.avg||0))}</td></tr>`).join('')};
   const img=m.img?`<img class="mimg" src="${esc(m.img)}" alt="" loading="lazy" referrerpolicy="no-referrer">`:`<span class="mimg"></span>`;
   return `<div class="card"><div class="ct"><div class="tl">${img}<a class="ttl" href="${esc(m.url)}" target="_blank" rel="noopener">${esc(m.t)}</a><div class="ifx"><b>${usdK(m.net)}</b><span>Total in · 24h</span>${i==0?'<span class="ifhot">HOTTEST</span>':''}</div></div></div><div class="stats"><div class="st"><label>TRADERS</label><div class="v">${names.size}<span class="unit">Smart Traders</span><small style="flex-basis:100%"><span class="badge ${lead=='Yes'?'yes':'no'}">${onLead.size}/${names.size} ${lead.toUpperCase()}</span></small></div></div><div class="st"><label>AVG ENTRY</label><div class="split">${box('YES','spy',m.y,m.yavg)}${box('NO','spn',m.n,m.navg)}</div></div><div class="st"><label>NOW</label>${now}</div></div><table><tbody><tr><th>Trader</th><th>Side</th><th class="r">Size</th><th class="r">Avg</th><th class="r">Value</th><th class="r">PnL</th></tr>${grp(lead)}${grp(lead=='Yes'?'No':'Yes')}</tbody></table></div>`}).join('');
+ masonry(el)}
+function wkRender(){const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const mk=(WEEKLY.mk||[]).map(m=>{const names=new Set((m.tr||[]).map(t=>t.n)), tot=(m.tr||[]).reduce((s,t)=>s+(+t.val||0),0);return Object.assign({},m,{names:names.size,tot})}).filter(m=>m.names>=3).sort((a,b)=>b.names-a.names||b.tot-a.tot);
+ const el=document.getElementById('iflist');if(!el)return;
+ const ago=Math.max(0,Math.round((Date.now()/1000-(WEEKLY.built||0))/60));
+ const note=document.getElementById('ifnote');if(note)note.textContent='Markets the most smart traders entered this week';
+ const line=document.getElementById('ifline');if(line)line.textContent=mk.length+' MARKETS · 3+ NEW TRADERS · LAST 7 DAYS · UPDATED '+(ago<60?ago+' MIN':Math.round(ago/60)+'H')+' AGO';
+ if(!mk.length){el.innerHTML='<div class="if-empty">No market has 3+ smart traders who entered in the last 7 days yet.</div>';return}
+ el.innerHTML=mk.map((m,i)=>{
+  const ys=m.tr.filter(t=>t.side=='Yes'), ns=m.tr.filter(t=>t.side=='No');
+  const yv=ys.reduce((s,t)=>s+(+t.val||0),0), nv=ns.reduce((s,t)=>s+(+t.val||0),0);
+  const lead=ys.length>ns.length||(ys.length==ns.length&&yv>=nv)?'Yes':'No';
+  const maxV=Math.max(1,...m.tr.map(t=>+t.val||0));
+  const now=m.ask==null?'<div class="v mu">—</div>':nowBox(lead,lead=='Yes'?m.ask:1-m.ask);
+  const avgOf=g=>g.length?g.reduce((s,t)=>s+(+t.avg||0),0)/g.length:null;
+  const box=(sd,cls,g)=>`<div class="sp ${cls}${g.length?'':' off'}"><span class="spl">${sd}</span><div class="v mu">${g.length&&avgOf(g)!=null?c(avgOf(g))+'¢':'—'}</div><small>${usdK(g.reduce((s,t)=>s+(+t.val||0),0))} value</small></div>`;
+  const grp=sd=>{const g=m.tr.filter(t=>t.side==sd).sort((a,b)=>(+b.val||0)-(+a.val||0));if(!g.length)return '';
+   const sh=g.reduce((a,t)=>a+(+t.sh||0),0), cls=sd=='Yes'?'sy':'sn', S=sd.toUpperCase();
+   return `<tr class="grp"><td colspan="6"><span class="side ${cls}">${S}</span><span class="gc">${g.length} new · ${K(sh)} shares</span></td></tr>`+
+    g.map(t=>`<tr><td class="tn"><div class="tw">${avImg(t.n)}<div><a class="tlk" href="https://polymarket.com/@${encodeURIComponent(t.n)}" target="_blank" rel="noopener">${esc(t.n)}</a>${waBtn(t.n)}<span class="wkago">${feAgo(t.fe)}</span><span class="pbar ${cls}b"><i style="width:${Math.max(3,Math.round((+t.val||0)/maxV*100))}%"></i></span></div></div></td><td><span class="side ${cls}">${S}</span></td><td class="r">${K(t.sh||0)}</td><td class="r">${t.avg==null?'—':'@'+c(t.avg)}</td><td class="r">${usdK(t.val)}</td><td class="r">${t.sh?pnl((+t.val||0)-(+t.sh)*(+t.avg||0)):'—'}</td></tr>`).join('')};
+  const img=m.img?`<img class="mimg" src="${esc(m.img)}" alt="" loading="lazy" referrerpolicy="no-referrer">`:`<span class="mimg"></span>`;
+  return `<div class="card"><div class="ct"><div class="tl">${img}<a class="ttl" href="${esc(m.url)}" target="_blank" rel="noopener">${esc(m.t)}</a><div class="ifx"><b>${m.names}</b><span>New traders · 7d</span>${i==0?'<span class="ifhot">MOST JOINED</span>':''}</div></div></div><div class="stats"><div class="st"><label>TRADERS</label><div class="v">${m.names}<span class="unit">Smart Traders</span><small style="flex-basis:100%"><span class="badge ${lead=='Yes'?'yes':'no'}">${new Set((lead=='Yes'?ys:ns).map(t=>t.n)).size}/${m.names} ${lead.toUpperCase()}</span></small></div></div><div class="st"><label>AVG ENTRY</label><div class="split">${box('YES','spy',ys)}${box('NO','spn',ns)}</div></div><div class="st"><label>NOW</label>${now}</div></div><table><tbody><tr><th>Trader</th><th>Side</th><th class="r">Size</th><th class="r">Avg</th><th class="r">Value</th><th class="r">PnL</th></tr>${grp(lead)}${grp(lead=='Yes'?'No':'Yes')}</tbody></table></div>`}).join('');
  masonry(el)}
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const dollars=n=>'$'+(+n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
