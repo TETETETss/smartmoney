@@ -258,5 +258,25 @@
     "address": "0x9e8ecc4cb3c4e48f544cba2fbbb252a6a65e8db8",
     "name": null,
     "min": 10
+  },
+  {
+    "address": "0x366600e2990af0bd4abc962f70b85a605fceaab6",
+    "name": "Unfinished-July",
+    "min": 500
+  },
+  {
+    "address": "0x77fbd6bdba89da0ce4ae6e5bee380d6a51de266c",
+    "name": "plumbis",
+    "min": 500
+  },
+  {
+    "address": "0x368ba69507fd67972059fa178af5e459b72f2458",
+    "name": "RockyZet",
+    "min": 500
+  },
+  {
+    "address": "0x847667d84fc4d81db36689c4f4c5845c8d125418",
+    "name": "DonationsReceiver",
+    "min": 500
   }
 ]
