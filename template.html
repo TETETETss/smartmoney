@@ -220,19 +220,9 @@ tr.ex .tav{opacity:.5}
 a.ttl{flex:1;min-width:0}
 @media(max-width:520px){#grid table,#v-inflows table{font-size:12px}#grid td.r,#grid th.r,#v-inflows td.r,#v-inflows th.r{padding-left:5px}#grid .tav,#v-inflows .tav{width:22px;height:22px}#grid .tw,#v-inflows .tw{gap:7px}.pp{font-size:11px}.stats{grid-template-columns:minmax(0,1fr) minmax(0,1.4fr)}.st:nth-child(3){grid-column:1/-1;border-left:0;border-top:1px solid #262626;padding-left:0}.st:nth-child(3) .nowb{max-width:50%}.ifx b{font-size:19px}}
 
-/* wallet lookup */
-.lk{padding:6px 36px 60px;max-width:860px}
+/* trader request form */
 .lkf{display:flex;gap:10px}.lkf input{flex:1;min-width:0;background:#0e0e0e;border:1px solid #333;border-radius:12px;color:#fff;padding:13px 14px;font:inherit;font-size:14px;outline:none}.lkf input:focus{border-color:#e8e8e8}
 .lkf button{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.45);color:#ffffff;border-radius:12px;padding:0 20px;font:600 13px Inter,Helvetica,sans-serif;letter-spacing:.4px;cursor:pointer}.lkf button:hover{background:rgba(255,255,255,.24)}
-.lkc{margin-top:18px;background:#121212;border:1px solid #262626;border-radius:20px;padding:24px}
-.lkh{display:flex;align-items:center;gap:12px;margin-bottom:18px}.lkh img,.lkh .mph{width:44px;height:44px;border-radius:50%;object-fit:cover}.lkh b{font-size:16px;font-weight:600;display:block}.lkh small{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:#777}.lkh>div{min-width:0}.lkh small{display:block;overflow-wrap:anywhere}.lkh a{margin-left:auto;flex:none}
-.lkt{text-align:center;padding-bottom:16px;border-bottom:1px solid #262626}.lkt label{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;letter-spacing:1.4px;color:#999}.lkt .big{font-size:46px;font-weight:600;letter-spacing:-1.5px;line-height:1.15;margin:4px 0}
-.lks{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;font-size:13px;color:#aaa}
-.lkg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0}.lkg>div,.lkb>div{background:rgba(255,255,255,.03);border:1px solid #222;border-radius:10px;padding:11px 12px;text-align:center}
-.lkg label,.lkb label{display:block;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:#777;margin-bottom:5px}.lkg b,.lkb b{font-size:17px;font-weight:600}
-.lkb{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.lkn{font-size:11px;color:#666;margin-top:14px;line-height:1.5}
-.lke{margin-top:18px;color:#d79a9a;font-size:13px;line-height:1.6}
-@media(max-width:900px){.lk{padding:6px 12px 40px}.lkg{grid-template-columns:repeat(2,1fr)}.lkb{grid-template-columns:repeat(2,1fr)}.lkt .big{font-size:36px}}
 
 .hb{flex:none;width:28px;height:28px;border-radius:50%;border:1px solid #333;background:none;color:#888;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s}.hb:hover{border-color:#e8e8e8;color:#ffffff}
 .card.ishid{opacity:.45}.card.ishid:hover{opacity:.8}.chip.hidc{border-style:dashed}
@@ -241,7 +231,6 @@ a.ttl{flex:1;min-width:0}
 .rq .th{display:flex;align-items:center;gap:12px;margin-bottom:12px}.rq .tg{display:block;color:#e8e8e8;font-size:11px;letter-spacing:.8px;font-family:ui-monospace,Menlo,Consolas,monospace}.rq .th b{display:block;text-transform:uppercase;font-weight:600;letter-spacing:.3px;font-size:16px;margin-top:2px}
 .rq>p{color:#aaa;font-size:13px;line-height:1.6;margin-bottom:14px}.rq .lkf{flex-wrap:wrap}.rq .lkf input:first-child{flex:2 1 280px}.rq .lkf input{flex:1 1 160px}.rq .lkf button{padding:12px 20px}
 .rqo{margin-top:10px;font-size:13px}.rqo a{color:#ffffff;margin-left:8px;text-decoration:underline}
-.lkr{margin-top:14px;background:none;border:1px dashed rgba(255,255,255,.45);color:#ffffff;border-radius:10px;padding:9px 14px;font:500 12px Inter,Helvetica,sans-serif;cursor:pointer}.lkr:hover{background:rgba(255,255,255,.1)}
 @media(max-width:900px){.rq{margin:12px 12px 40px}}
 
 .sortbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 36px 0}.sortbar .sortnote{padding:0}
@@ -492,6 +481,86 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
 @media(max-width:980px){#v-wallet .grid2{grid-template-columns:1fr}#v-wallet .kpis{margin-left:0}#v-wallet .wa-wrap{padding:0 16px 40px}}
 @media(max-width:760px){#v-wallet .cgrid{grid-template-columns:repeat(7,1fr)}#v-wallet .wk,#v-wallet .cgrid .dh.wkh{display:none}#v-wallet .cell{height:52px;font-size:12px}#v-wallet .cell .p{font-size:10px}}
 
+/* signals + wallet analysis (portfolio). Scoped so .track / .card rules stay on these pages. */
+#v-signals .sgwrap{padding:0 36px 60px;display:flex;flex-direction:column;gap:14px}
+#v-signals .sgbar{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
+#v-signals .sgctl{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+#v-signals .sgctl select{background:#121212;color:#ddd;border:1px solid #333;border-radius:99px;padding:8px 12px;font:12px ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+#v-signals .sgchk{display:flex;gap:6px;align-items:center;font:12px ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:#bbb;cursor:pointer}
+#v-signals .sgcard,#v-portfolio .sgcard{padding:20px;gap:0}
+#v-signals .card:hover,#v-portfolio .card:hover{box-shadow:none;border-color:#8a8a8a}
+#v-signals .sgrow{display:grid;grid-template-columns:28px minmax(0,1fr) 220px 84px 80px 60px;gap:16px;align-items:center;padding:14px 0;border-top:1px solid #222}
+#v-signals .sgrow:first-child{border-top:0}
+#v-signals .sgrow .rk{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:#777;font-size:11px}
+#v-signals .sgrow .mt a{font-weight:500;font-size:14px;line-height:1.35}
+#v-signals .sgrow .mt small{display:block;color:#777;font-size:11px;margin-top:3px;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.3px}
+#v-signals .sgv b{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+#v-signals .dots{display:flex;flex-wrap:wrap;gap:3px}
+#v-signals .dots i{width:9px;height:9px;border-radius:50%;display:block}
+#v-signals .dots .y{background:#4ade80}#v-signals .dots .n{background:#f87171}
+#v-signals .sgm,#v-signals .sga,#v-signals .sgn{text-align:right}
+#v-signals .sgm b,#v-signals .sgn b{display:block;font-size:15px;font-weight:600}
+#v-signals .sga b{display:block;font-size:15px;font-weight:500;color:#ddd}
+#v-signals .sgm span,#v-signals .sga span,#v-signals .sgn span{display:block;font-size:10px;color:#777;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.5px}
+#v-signals .sga span{letter-spacing:.3px;white-space:nowrap}#v-signals .sga em{font-style:normal}
+#v-signals .sghd{display:grid;grid-template-columns:28px minmax(0,1fr) 220px 84px 80px 60px;gap:16px;padding:0 0 10px;font:10px ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.8px;color:#777;text-transform:uppercase;border-bottom:1px solid #262626}
+#v-signals .sghd .r{text-align:right}
+#v-portfolio .pfsearch{display:flex;gap:8px;padding:0 36px 14px}
+#v-portfolio .pfsearch input{flex:1;min-width:0;background:#121212;color:#fff;border:1px solid #444;border-radius:99px;padding:12px 18px;font:13px Inter,Helvetica,sans-serif}
+#v-portfolio .pfsearch input:focus{outline:none;border-color:#e8e8e8}
+#v-portfolio .pfsearch button{background:#fff;color:#000;border:0;border-radius:99px;padding:0 20px;font:600 13px Inter,Helvetica,sans-serif;cursor:pointer}
+#v-portfolio .pfpick{background:#121212;color:#fff;border:1px solid #444;border-radius:99px;padding:0 16px;font:13px Inter,Helvetica,sans-serif;min-width:230px;max-width:280px;height:44px}
+#v-portfolio .pfor{align-self:center;font:11px ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:#777;letter-spacing:.6px;text-transform:uppercase}
+#v-portfolio .pfmsg{padding:28px;text-align:center;color:#999;font-size:13px}
+#v-portfolio .pfsrc{font:10px ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.6px;color:#777;border:1px solid #333;border-radius:99px;padding:3px 8px;margin-left:8px;vertical-align:middle;text-transform:none}
+#v-portfolio .pfwrap{padding:0 36px 60px;display:flex;flex-direction:column;gap:14px}
+#v-portfolio .pfhead{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+#v-portfolio .pfhead .big{width:56px;height:56px;border-radius:50%;object-fit:cover;background:#2a2a2a;border:1px solid #333;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:600;color:#bbb;flex:none}
+#v-portfolio .pfname{flex:1;min-width:160px}#v-portfolio .pfname b{display:block;font-size:22px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}#v-portfolio .pfname a{font:11px ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:#777;letter-spacing:.5px}
+#v-portfolio .pfk{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;width:100%}
+#v-portfolio .pfk>div{border:1px solid #262626;border-radius:12px;padding:12px 14px}
+#v-portfolio .pfk label{display:block;font:10px ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.8px;color:#777;text-transform:uppercase;margin-bottom:6px}
+#v-portfolio .pfk b{font-size:20px;font-weight:600;font-variant-numeric:tabular-nums}
+#v-portfolio .pfk .pp{font-size:20px}#v-portfolio .grph .pp,#v-portfolio .topic .pp{font-size:11px}#v-portfolio .ppl .pp{font-size:15px}
+#v-portfolio .pfk small{display:block;font-size:11px;color:#777;margin-top:3px}
+#v-portfolio .topics{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+#v-portfolio .topic{border:1px solid #262626;border-radius:12px;padding:12px 14px;cursor:pointer;background:none;color:#fff;text-align:left;font:inherit;transition:border-color .2s}
+#v-portfolio .topic:hover,#v-portfolio .topic.on{border-color:#8a8a8a}
+#v-portfolio .topic span{display:block;font:10px ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.8px;color:#aaa;text-transform:uppercase}
+#v-portfolio .topic b{display:block;font-size:17px;font-weight:600;margin:6px 0 2px;text-transform:none;letter-spacing:0}
+#v-portfolio .topic small{font-size:11px;color:#777}
+#v-portfolio .topic .tb{height:4px;border-radius:2px;background:#262626;margin-top:8px;overflow:hidden}#v-portfolio .topic .tb i{display:block;height:100%;background:#e8e8e8;border-radius:2px}
+#v-portfolio .grph{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding-bottom:10px;border-bottom:1px solid #262626;flex-wrap:wrap}
+#v-portfolio .grph b{text-transform:uppercase;font-weight:600;letter-spacing:.4px;font-size:14px}
+#v-portfolio .grph span{font:11px ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:#999;letter-spacing:.5px}
+#v-portfolio .prow{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(200px,1fr) 110px 76px;gap:18px;align-items:center;padding:14px 0;border-top:1px solid #1e1e1e}
+#v-portfolio .prow:first-of-type{border-top:0}
+#v-portfolio .pmk{display:flex;gap:10px;align-items:flex-start;min-width:0}
+#v-portfolio .pmk img,#v-portfolio .pmk .mph{width:32px;height:32px;border-radius:8px;object-fit:cover;flex:none;background:#1c1c1c;border:1px solid #262626;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#bbb}
+#v-portfolio .pmk a{font-size:14px;font-weight:500;line-height:1.35}
+#v-portfolio .pmk small{display:block;color:#777;font-size:11px;margin-top:4px;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.3px}
+#v-portfolio .track{position:relative;height:38px;margin:0 18px;background:none;border:0}
+#v-portfolio .track .ln{position:absolute;left:0;right:0;top:15px;height:2px;background:#2a2a2a;border-radius:1px}
+#v-portfolio .track .tk{position:absolute;top:11px;width:1px;height:10px;background:#333}
+#v-portfolio .track .seg{position:absolute;top:14px;height:4px;border-radius:2px;padding:0;border:0;background:none}
+#v-portfolio .track .seg.up{background:#4ade80}#v-portfolio .track .seg.dn{background:#f87171}
+#v-portfolio .track .in{position:absolute;top:9px;width:14px;height:14px;margin-left:-7px;border-radius:50%;border:2px solid #bbb;background:#121212}
+#v-portfolio .track .nw{position:absolute;top:9px;width:14px;height:14px;margin-left:-7px;border-radius:50%;border:2px solid #121212}
+#v-portfolio .track .nw.up{background:#4ade80}#v-portfolio .track .nw.dn{background:#f87171}#v-portfolio .track .nw.fl{background:#bbb}
+#v-portfolio .track .lb{position:absolute;top:26px;font:10px ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:#888;transform:translateX(-50%);white-space:nowrap}
+#v-portfolio .track .lb.n{color:#fff}
+#v-portfolio .psz{text-align:right}#v-portfolio .psz b{display:block;font-size:15px;font-weight:600}#v-portfolio .psz small{font-size:11px;color:#777}
+#v-portfolio .psz .sb{height:3px;border-radius:2px;background:#262626;margin-top:6px;overflow:hidden}#v-portfolio .psz .sb i{display:block;height:100%;background:#e8e8e8;border-radius:2px;margin-left:auto}
+#v-portfolio .ppl{text-align:right}#v-portfolio .ppl b{display:block;font-size:15px;font-weight:600}#v-portfolio .ppl small{font-size:11px;color:#777}
+#v-portfolio .pfleg{display:flex;gap:16px;flex-wrap:wrap;font:11px ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:#999;letter-spacing:.4px}
+#v-portfolio .pfleg span{display:flex;align-items:center;gap:6px}
+#v-portfolio .pfleg .o{width:12px;height:12px;border-radius:50%;border:2px solid #bbb;display:inline-block}#v-portfolio .pfleg .f{width:12px;height:12px;border-radius:50%;background:#4ade80;display:inline-block}#v-portfolio .pfleg .f.r{background:#f87171}
+#v-portfolio .sghead{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-start}
+#v-portfolio .sghead b{display:block;text-transform:uppercase;font-weight:600;letter-spacing:.3px;font-size:15px;margin-bottom:4px}
+#v-portfolio .sghead .muted{font-size:12px;line-height:1.5}
+@media(max-width:900px){#v-signals .sgwrap,#v-portfolio .pfwrap{padding:16px 12px 40px}#v-signals .sgcard,#v-portfolio .sgcard{padding:14px}#v-portfolio .pfsearch{padding:0 12px 12px}#v-portfolio .pfk{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){#v-signals .sgrow,#v-signals .sghd{grid-template-columns:minmax(0,1fr) 62px 62px 46px;gap:8px}#v-signals .sgrow .rk,#v-signals .sghd .rk{display:none}#v-signals .sgrow .sgv{grid-column:1/-1;order:3}#v-signals .sghd .h3{display:none}#v-signals .sgrow .mt a{font-size:13px}#v-portfolio .pfsearch{flex-wrap:wrap}#v-portfolio .pfpick{flex:1 1 100%;max-width:none}#v-portfolio .pfor{display:none}#v-portfolio .pfsearch input{flex:1 1 auto}#v-portfolio .prow{grid-template-columns:minmax(0,1fr) 84px 64px;gap:10px}#v-portfolio .prow .track{grid-column:1/-1;order:4;margin:2px 26px 0}#v-portfolio .topics{grid-template-columns:repeat(2,minmax(0,1fr))}#v-portfolio .topic b{font-size:15px}}
+
 </style></head><body class="indash">
 <canvas id="orb"></canvas>
 
@@ -503,10 +572,11 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
    <a class="nv on" data-v="markets" onclick="view('markets')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.8 5.6 3.8 9s-1.2 6.4-3.8 9c-2.6-2.6-3.8-5.6-3.8-9S9.4 5.6 12 3z"/></svg></em>Markets</a>
    <a class="nv" data-v="live" onclick="view('live')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2.5-6 4 12L16 12h5"/></svg></em>Live Trades</a>
    <a class="nv" data-v="inflows" onclick="view('inflows')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v14M6 11l6 6 6-6"/><path d="M4 21h16"/></svg></em>Money Flow</a>
+   <a class="nv" data-v="signals" onclick="view('signals')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V4M4 20h16"/><circle cx="9" cy="14" r="1.6"/><circle cx="14" cy="9" r="2.2"/><circle cx="18" cy="6" r="1.2"/></svg></em>Signals</a>
+   <a class="nv" data-v="portfolio" onclick="view('portfolio')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"/></svg></em>Wallet Analysis</a>
    <a class="nv" data-v="saved" onclick="view('saved')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></em>Bookmarked<span class="savn" id="savn"></span></a>
    <a class="nv" data-v="traders" onclick="view('traders')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.2 4.2-6.5 8-6.5s7 2.3 8 6.5"/></svg></em>Traders</a>
-   <a class="nv" data-v="lookup" onclick="view('lookup')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></em>Wallet lookup</a>
-   <a class="nv" data-v="wallet" onclick="view('wallet')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M16 15h2"/></svg></em>Wallet Analysis</a>
+   <a class="nv" data-v="wallet" onclick="view('wallet')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M16 15h2"/></svg></em>Wallet Lookup</a>
    <a class="nv" data-v="tips" onclick="view('tips')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.6 2.6 0 0 1 5 .8c0 1.7-2.5 2.3-2.5 4"/><circle cx="12" cy="17.2" r=".6" fill="currentColor"/></svg></em>How to use</a>
    <a class="nv" href="https://poly.market/brams" target="_blank" rel="noopener"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6L4.5 19a1.5 1.5 0 0 0 1.3 2h12.4a1.5 1.5 0 0 0 1.3-2L14 9V3"/><path d="M7 15h10"/></svg></em>AI Model Analysis<span class="cs">Coming soon</span></a>
   </nav>
@@ -543,7 +613,7 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
   <div class="v" id="v-wallet" style="display:none">
    <div class="hero"><div>
     <div class="muted" style="font-size:12px;margin-bottom:12px">ANY POLYMARKET WALLET</div>
-    <h2>Wallet Analysis</h2>
+    <h2>Wallet Lookup</h2>
     <div class="sortnote">Daily PnL, category ranks, open positions, trades, and a performance report</div>
    </div></div>
    <div class="wa-wrap">
@@ -572,12 +642,37 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
    </div>
    
   </div>
-  <div class="v" id="v-lookup" style="display:none">
-   <div class="hero"><div><div class="muted" style="font-size:12px;margin-bottom:8px">PASTE ANY POLYMARKET WALLET · LIVE STATS</div><h2>Wallet lookup</h2></div></div>
-   <div class="lk">
-    <form class="lkf" onsubmit="lookup();return false"><input id="lkin" type="text" placeholder="0x… wallet address or polymarket.com profile link" autocomplete="off" spellcheck="false"><button type="submit">Look up</button></form>
-    <div id="lkout"></div>
+  <div class="v" id="v-signals" style="display:none">
+   <div class="hero"><div>
+    <div class="muted" style="font-size:12px;margin-bottom:12px" id="sgline">TRACKED POSITIONS</div>
+    <h2>Signals</h2>
+    <div class="sortnote">Markets where most smart traders bet the same side</div>
+   </div></div>
+   <div class="sgwrap">
+    <div class="sgbar">
+     <div class="chips" id="sgtabs"></div>
+     <div class="sgctl">
+      <select id="sgcat" onchange="sgRender()"></select>
+      <label class="sgchk"><input type="checkbox" id="sghide" checked onchange="sgRender()">Hide 95¢+</label>
+     </div>
+    </div>
+    <div class="card sgcard"><div id="sglist"></div></div>
    </div>
+  </div>
+  <div class="v" id="v-portfolio" style="display:none">
+   <div class="hero"><div>
+    <div class="muted" style="font-size:12px;margin-bottom:12px">OPEN POSITIONS · GROUPED BY TOPIC</div>
+    <h2>Wallet Analysis</h2>
+    <div class="sortnote">Search any wallet to see where it is, what it paid, and how it's going</div>
+   </div></div>
+   <form class="pfsearch" onsubmit="pfSearch();return false">
+    <select id="pfsel" class="pfpick" onchange="pfPick()"></select>
+    <span class="pfor">or</span>
+    <input id="pfq" list="pftr" placeholder="Search any other wallet: 0x… or polymarket.com/profile link" autocomplete="off" spellcheck="false">
+    <datalist id="pftr"></datalist>
+    <button type="submit">Search</button>
+   </form>
+   <div class="pfwrap" id="pfwrap"></div>
   </div>
   <div class="v" id="v-tips" style="display:none">
    <div class="hero"><div><div class="muted" style="font-size:12px;margin-bottom:8px">READ THE DATA · SIZE YOUR BETS · MANAGE RISK</div><h2>How to use</h2></div></div>
@@ -614,7 +709,7 @@ const pnl=v=>{if(v==null||!isFinite(+v))return '—';const n=+v,s=Math.abs(n).to
 const pnlPct=(cur,cost)=>cur==null||!(+cost>0)||!isFinite(+cur)?'—':pnl(((+cur)-(+cost))/(+cost)*100);
 const c=p=>Math.round(p*100);
 let AV=/*__AV_S__*/__AVATARS__/*__AV_E__*/;
-function waBtn(n){return `<button type="button" class="wa-go" title="Wallet analysis" onclick="openWallet('${encodeURIComponent(n||'')}')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>`}
+function waBtn(n){return `<button type="button" class="wa-go" title="Wallet lookup" onclick="openWallet('${encodeURIComponent(n||'')}')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>`}
 const avImg=n=>AV[n]?`<img class="tav" src="${AV[n]}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.outerHTML='<span class=&quot;tav&quot;>${String(n||'?')[0].toUpperCase()}</span>'">`:`<span class="tav">${String(n||'?')[0].toUpperCase()}</span>`;
 const nowBox=(sd,p)=>`<div class="sp ${sd=='Yes'?'spy':'spn'} nowb"><span class="spl">${sd.toUpperCase()}</span><div class="v ${sd=='Yes'?'g':'rd'}">${Math.round((+p||0)*100)}¢</div></div>`;
 function noAcc(){}
@@ -701,13 +796,7 @@ const grpHtml=['Yes','No',null].map(sd=>{const g=m.tr.filter(t=>(t.side||null)==
  <details><summary><span>News &amp; analysis</span><span class="stags"><span class="pill acc">${m.cat}</span><span class="pill">Ends ${endS(m.end)}</span></span></summary>${ana(m,ask)}</details></div>`}).join('');masonry()}
 
 const API='https://data-api.polymarket.com/v2/';
-const $m=v=>(v<0?'−':'')+'$'+Math.abs(v).toLocaleString('en-US',{maximumFractionDigits:Math.abs(v)<10?2:0});
-const $c=v=>v>0?'g':v<0?'rd':'mu';
 async function jget(route,q){const r=await fetch(API+route+'?'+new URLSearchParams(q));if(!r.ok)throw new Error(route+' '+r.status);return r.json()}
-async function usdc(a){ // on-chain USDC (USDC.e + native) held by the wallet on Polygon
- const toks=['0x2791bca1f2de4661ed88a30c99a7a9449aa84174','0x3c499c542cef5e3811e1192ce70d8cc03d5c3359'];let t=0;
- for(const k of toks){const r=await fetch('https://polygon-rpc.com',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:1,method:'eth_call',params:[{to:k,data:'0x70a08231'+a.slice(2).padStart(64,'0')},'latest']})});const j=await r.json();if(j.result)t+=parseInt(j.result,16)/1e6}
- return t}
 
 function reqW(w){
  const raw=w||rqin.value.trim(),m=raw.match(/0x[a-fA-F0-9]{40}/),o=document.getElementById('rqout');
@@ -718,30 +807,222 @@ function reqW(w){
  window.open('https://x.com/intent/post?text='+encodeURIComponent(txt),'_blank','noopener');
  o.innerHTML='<span class="g">Opened X with your request ready to post.</span> <a href="#" onclick="navigator.clipboard&&navigator.clipboard.writeText(this.dataset.t);this.textContent=\'Copied\';return false" data-t="'+txt.replace(/"/g,'&quot;')+'">Copy text instead</a>';
 }
-async function lookup(){
- const raw=lkin.value.trim(),m=raw.match(/0x[a-fA-F0-9]{40}/);
- if(!m){lkout.innerHTML='<div class="lke">Paste a wallet address (0x… 42 characters) or a polymarket.com/profile/0x… link.</div>';return}
- const a=m[0].toLowerCase();lkout.innerHTML='<div class="lkc muted">Loading '+a.slice(0,6)+'…'+a.slice(-4)+' …</div>';
- try{
-  const [pn,bal]=await Promise.all([jget('user-pnl',{user:a,interval:'all',fidelity:'1d'}),usdc(a).catch(()=>null)]);
-  const pts=(pn.data&&pn.data.points)||[];if(!pts.length)throw new Error('no PnL history for this wallet');
-  const L=pts[pts.length-1],n=k=>+(L[k]||0);
-  let pos=[],cur=null;for(let i=0;i<20;i++){const d=await jget('positions',Object.assign({user:a,limit:100},cur?{cursor:cur}:{}));pos=pos.concat(d.data||[]);cur=d.pagination&&d.pagination.next_cursor;if(!cur)break}
-  const port=pos.reduce((s,p)=>s+(+p.current_value||0),0),who=pos.find(p=>p.name)||{};
-  const overall=n('economic_pnl'),trading=n('trade_pnl'),fees=n('fees_paid'),lp=n('reward_income')+n('realized_lp_pnl'),yld=n('yield_income'),reb=n('maker_rebate')+n('taker_rebate'),ref=n('referral_income'),combo=n('realized_combo_pnl'),spon=n('sponsored_income');
-  const L1=((who.name||'')+a).match(/[A-Za-z0-9]/)[0].toUpperCase();
-  lkout.innerHTML=`<div class="lkc">
-  <div class="lkh">${who.profile_image?`<img src="${who.profile_image}" alt="" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mph',textContent:'${L1}'}))">`:`<span class="mph">${L1}</span>`}<div><b>${who.name||'Unnamed wallet'}</b><small>${a}</small></div><a class="arr" href="https://polymarket.com/profile/${a}" target="_blank" rel="noopener" title="Open on Polymarket"><span class="cir"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11L11 3M5 3h6v6"/></svg></span></a></div>
-  <div class="lkt"><label>OVERALL PNL</label><div class="big ${$c(overall)}">${$m(overall)}</div>
-   <div class="lks"><span>Combos: <b class="${$c(combo)}">${combo>=0?'+':''}${$m(combo)}</b></span><span>Fees: <b class="rd">${$m(fees)}</b></span></div></div>
-  <div class="lkg"><div><label>Trading</label><b class="${$c(trading)}">${$m(trading)}</b></div><div><label>LP rewards</label><b class="${$c(lp)}">${$m(lp)}</b></div><div><label>Yield</label><b class="${$c(yld)}">${$m(yld)}</b></div>
-   <div><label>Rebates</label><b class="${$c(reb)}">${$m(reb)}</b></div><div><label>Referral</label><b class="${$c(ref)}">${$m(ref)}</b></div><div><label>Trades</label><b>${(+L.trade_count||0).toLocaleString('en-US')}</b></div></div>
-  <div class="lkb"><div><label>USDC balance</label><b>${bal==null?'—':$m(bal)}</b></div><div><label>Portfolio</label><b>${$m(port)}</b></div><div><label>Total assets</label><b>${bal==null?'—':$m(bal+port)}</b></div><div><label>Total volume</label><b>${$m(+L.volume_usdc||0)}</b></div></div>
-  <button class="lkr" onclick="reqW('${a}')">+ Request to add this wallet</button><p class="lkn">${pos.length} open positions · PnL history since ${new Date(pts[0].timestamp*1000).toISOString().slice(0,10)} · live from Polymarket's data API, so numbers can differ slightly from other trackers.</p></div>`;
- }catch(e){lkout.innerHTML=`<div class="lke">Could not load this wallet (${String(e.message||e)}). If every lookup fails, Polymarket may be blocked on your connection: check your DNS setting or VPN, then try again.</div>`}
-}
 let TRS=/*__TR_S__*/__TRADERS__/*__TR_E__*/;let TR=TRS;
-function view(v){const r=(v=='saved'||v=='markets')?'markets':v;if(r=='markets'){SV=v=='saved';F='All';FOC=null}if(v=='traders')trR();document.querySelectorAll('main>.v').forEach(x=>x.style.display=x.id=='v-'+r?'block':'none');if(r=='markets')render();if(r=='live')liveRender();if(r=='inflows')(IFM=='week'?wkRender:ifRender)();document.querySelectorAll('.nv').forEach(x=>x.classList.toggle('on',x.dataset.v==v));document.body.classList.remove('navopen');scrollTo(0,0)}
+function view(v){const r=(v=='saved'||v=='markets')?'markets':v;if(r=='markets'){SV=v=='saved';F='All';FOC=null}if(v=='traders')trR();document.querySelectorAll('main>.v').forEach(x=>x.style.display=x.id=='v-'+r?'block':'none');if(r=='markets')render();if(r=='live')liveRender();if(r=='inflows')(IFM=='week'?wkRender:ifRender)();if(r=='signals')sgRender();if(r=='portfolio')pfRender();document.querySelectorAll('.nv').forEach(x=>x.classList.toggle('on',x.dataset.v==v));document.body.classList.remove('navopen');scrollTo(0,0)}
+
+/* Signals + Wallet Analysis. Built from the same open positions as Markets (DS) and traders (TRS).
+   A picked wallet is then loaded live from the data API, same as the prototype. */
+let SGTAB='strong';
+let PFTOP=null,PFCUR=null,PFLIVE0=false,pfTok=0,pfInitBuilt=-1;
+const TOPIC_RULES=[['Iran/Israel',/\b(iran|israel|gaza|hezbollah|netanyahu|khamenei|hormuz|tehran|houthi|kharg|pahlavi)\b/i],['Crypto',/\b(bitcoin|btc|ethereum|eth|solana|crypto|token|airdrop|coinbase|xrp|doge)\b/i],
+ ['Sports',/\b(nba|nfl|nhl|mlb|ufc|fifa|uefa|premier league|champions league|world cup|vs\.?|grand prix|f1|tennis|super bowl|euro 20)\b/i],['2028',/\b2028\b/],
+ ['US politics',/\b(trump|biden|senate|house|congress|governor|mayor|republican|democrat|supreme court|white house|fed |federal reserve|impeach|cabinet|secretary)\b/i],
+ ['Tech & economy',/\b(nvidia|openai|anthropic|google|apple|tesla|ai |gdp|inflation|rate|ipo|market cap|recession|stock)\b/i],
+ ['Pop culture',/\b(oscar|grammy|emmy|album|movie|box office|taylor|time person|spotify|youtube|netflix)\b/i],
+ ['World',/\b(russia|ukraine|china|taiwan|venezuela|uk |france|germany|spain|sweden|canada|mexico|brazil|india|japan|korea|cuba|election)\b/i]];
+function pfData(){
+ if(pfData.cache&&pfData.built===BUILT) return pfData.cache;
+ const M=[],idx={};
+ (DS||[]).forEach(m=>{
+  const path=String(m.url||'').replace(/^https:\/\/polymarket\.com\/event\//,'');
+  idx[m.cid||m.url]=M.length;
+  M.push([m.t,path,m.cat||'Other',+m.ask||0,m.end||'',m.img||'']);
+ });
+ const T=(TRS||[]).map(t=>t.n);
+ const ti={};T.forEach((n,i)=>ti[n]=i);
+ const P=[];
+ (DS||[]).forEach(m=>{
+  const mi=idx[m.cid||m.url];
+  (m.tr||[]).forEach(t=>{
+   if(t.ex||ti[t.n]==null) return;
+   P.push([ti[t.n],mi,t.side=='Yes'?1:0,+t.sh||0,+t.avg||0,+t.val||0]);
+  });
+ });
+ const trs={};
+ (TRS||[]).forEach(t=>{trs[t.n]={pnl:t.pnl,a:t.a}});
+ const cat={};M.forEach(m=>{const slug=String(m[1]||'').split('/').pop();if(slug)cat[slug]=m[2]});
+ pfData.cache={T,M,P,trs,cat};pfData.built=BUILT;
+ return pfData.cache;
+}
+const topicOf=(slug,title)=>{const PF=pfData();return PF.cat[slug]||(TOPIC_RULES.find(([,r])=>r.test(title||''))||['Other'])[0]};
+function pfFromTracked(ti){
+ const PF=pfData(),name=PF.T[ti],info=PF.trs[name]||{};
+ return {name:name||'Wallet',addr:info.a||null,pic:(typeof AV!=='undefined'&&AV[name])||null,allPnl:info.pnl!=null?info.pnl:null,vol:null,src:'Tracked trader',
+  pos:(PF.P||[]).filter(p=>p[0]==ti).map(p=>{const m=PF.M[p[1]],yes=p[2]==1;return {t:m[0],u:'https://polymarket.com/event/'+m[1],cat:m[2],end:m[4],img:m[5],side:yes?'YES':'NO',sh:p[3],avg:p[4],now:yes?m[3]:1-(+m[3]||0),val:p[5]}})};
+}
+async function pfFromWallet(a){
+ const g=(o,...k)=>{for(const x of k)if(o&&o[x]!=null&&o[x]!=='')return o[x]};
+ let raw=[],cur=null;
+ for(let i=0;i<20;i++){const d=await jget('positions',Object.assign({user:a,limit:100},cur?{cursor:cur}:{}));raw=raw.concat(d.data||d||[]);cur=d.pagination&&d.pagination.next_cursor;if(!cur)break}
+ let allPnl=null,vol=null;
+ try{const pn=await jget('user-pnl',{user:a,interval:'all',fidelity:'1d'});const pts=(pn.data&&pn.data.points)||[];if(pts.length){const L=pts[pts.length-1];allPnl=+(L.economic_pnl||0);vol=+(L.volume_usdc||0)}}catch(e){}
+ const who=raw.find(p=>g(p,'name'))||{};
+ const pos=raw.filter(p=>!(p.redeemable===true||p.redeemable==='true')).map(p=>{const sh=+g(p,'current_size','size','shares')||0,avg=+g(p,'avg_price','avgPrice')||0,now=+g(p,'current_price','cur_price','curPrice','price')||0,
+  val=+g(p,'current_value','currentValue')||sh*now,slug=g(p,'slug','market_slug')||'',ev=g(p,'event_slug','eventSlug')||slug,title=g(p,'title','question')||slug;
+  return {t:title,u:'https://polymarket.com/event/'+(ev&&ev!=slug?ev+'/':'')+slug,cat:topicOf(slug,title),end:String(g(p,'end_date','endDate')||'').slice(0,10),img:g(p,'icon','image')||'',
+   side:String(g(p,'outcome')||'').toUpperCase().slice(0,3)=='YES'?'YES':String(g(p,'outcome')||'NO').toUpperCase(),sh,avg,now,val}}).filter(x=>x.sh>0.5&&x.now>0.001&&x.now<0.999);
+ return {name:g(who,'name')||a.slice(0,6)+'…'+a.slice(-4),addr:a,pic:g(who,'profile_image','profileImage')||null,allPnl,vol,src:'Live wallet',pos};
+}
+async function pfResolveName(q){
+ let name=String(q||'').trim();
+ const at=name.match(/polymarket\.com\/@([^/?#]+)/i);
+ if(at){try{name=decodeURIComponent(at[1])}catch(e){name=at[1]}}
+ name=name.replace(/^@/,'').trim();
+ if(!name) return null;
+ const u=new URL('https://gamma-api.polymarket.com/public-search');
+ u.searchParams.set('q',name);u.searchParams.set('search_profiles','true');u.searchParams.set('search_tags','false');u.searchParams.set('limit_per_type','10');
+ const r=await fetch(u);if(!r.ok) throw new Error('Profile search HTTP '+r.status);
+ const j=await r.json(),profs=j.profiles||[];
+ const hit=profs.find(p=>(p.name||'').toLowerCase()===name.toLowerCase()&&p.proxyWallet)||profs.find(p=>p.proxyWallet);
+ return hit?String(hit.proxyWallet).toLowerCase():null;
+}
+async function pfLoadTracked(ti){
+ const token=++pfTok;PFTOP=null;const PF=pfData(),name=PF.T[ti],a=(PF.trs[name]||{}).a,w=document.getElementById('pfwrap');
+ if(!a){PFCUR=pfFromTracked(ti);return pfRender()}
+ if(w) w.innerHTML='<div class="card sgcard pfmsg">Loading '+String(name).replace(/</g,'&lt;')+'\'s full wallet from Polymarket…</div>';
+ try{
+  const L=await pfFromWallet(a);if(token!==pfTok) return;
+  L.name=name;L.pic=L.pic||(typeof AV!=='undefined'&&AV[name])||null;L.src='Tracked trader · live';
+  if(L.allPnl==null) L.allPnl=(PF.trs[name]||{}).pnl;
+  PFCUR=L;
+ }catch(e){if(token!==pfTok) return;PFCUR=pfFromTracked(ti);PFCUR.src='Tracked trader · site data (live failed)'}
+ if(token===pfTok) pfRender();
+}
+function pfPick(){const v=document.getElementById('pfsel').value;if(v==='')return;document.getElementById('pfq').value='';pfLoadTracked(+v)}
+function pfInit(){
+ if(pfInitBuilt===BUILT) return;
+ pfInitBuilt=BUILT;
+ const PF=pfData(),dl=document.getElementById('pftr'),sel=document.getElementById('pfsel');
+ if(!sel) return;
+ const cnt={};PF.P.forEach(p=>cnt[p[0]]=(cnt[p[0]]||0)+1);
+ const prev=sel.value;
+ const def=PF.T.indexOf('PMTraderAdam'),defi=def>=0?def:(PF.T.length?0:-1);
+ sel.innerHTML='<option value="" disabled>Tracked traders</option>'+PF.T.map((n,i)=>[n,i]).sort((a,b)=>a[0].localeCompare(b[0],undefined,{sensitivity:'base'})).map(([n,i])=>'<option value="'+i+'"'+(i===defi?' selected':'')+'>'+String(n).replace(/</g,'&lt;')+' · '+(cnt[i]||0)+' positions</option>').join('');
+ if(prev!==''&&PF.T[prev]) sel.value=prev;
+ if(dl) dl.innerHTML=PF.T.slice().sort((a,b)=>a.localeCompare(b,undefined,{sensitivity:'base'})).map(n=>'<option value="'+String(n).replace(/"/g,'&quot;')+'">').join('');
+ if(!PFCUR&&PF.T.length){const ti=PF.T.indexOf('PMTraderAdam');PFCUR=pfFromTracked(ti>=0?ti:0)}
+}
+async function pfApplyAddr(a,token){
+ const PF=pfData(),tj=PF.T.findIndex(n=>(PF.trs[n]||{}).a==a);
+ const L=await pfFromWallet(a);if(token!==pfTok) return;
+ if(tj>=0){document.getElementById('pfsel').value=tj;L.name=PF.T[tj];L.pic=L.pic||(typeof AV!=='undefined'&&AV[PF.T[tj]])||null;L.src='Tracked trader · live';if(L.allPnl==null)L.allPnl=(PF.trs[L.name]||{}).pnl}
+ PFCUR=L;pfRender();
+}
+async function pfSearch(){
+ const q=document.getElementById('pfq').value.trim(),w=document.getElementById('pfwrap');if(!q) return;
+ const PF=pfData();
+ const ti=PF.T.findIndex(n=>n.toLowerCase()==q.toLowerCase());
+ const m=q.match(/0x[a-fA-F0-9]{40}/);
+ PFTOP=null;
+ const sel=document.getElementById('pfsel');
+ if(!m&&ti>=0){sel.value=ti;return pfLoadTracked(ti)}
+ const token=++pfTok;
+ if(w) w.innerHTML='<div class="card sgcard pfmsg">Loading wallet from Polymarket…</div>';
+ try{
+  let a=m?m[0].toLowerCase():null;
+  if(!a) a=await pfResolveName(q);
+  if(token!==pfTok) return;
+  if(!a){if(w) w.innerHTML='<div class="card sgcard pfmsg">Paste a wallet address (0x… 42 characters), a polymarket.com/profile/0x… link, a Polymarket username, or pick a tracked trader.</div>';return}
+  sel.value='';
+  await pfApplyAddr(a,token);
+ }catch(e){if(token!==pfTok) return;if(w) w.innerHTML='<div class="card sgcard pfmsg">Could not load this wallet ('+String(e.message||e)+'). If every search fails, Polymarket may be blocked on your connection: check your DNS setting or VPN, then try again.</div>'}
+}
+async function pfReload(){
+ const cur=PFCUR,top=PFTOP;
+ if(!cur){pfRender();return}
+ if(!cur.addr){pfRender();return}
+ const token=++pfTok,w=document.getElementById('pfwrap');
+ if(w) w.innerHTML='<div class="card sgcard pfmsg">Refreshing '+String(cur.name||'wallet').replace(/</g,'&lt;')+'…</div>';
+ try{
+  const L=await pfFromWallet(cur.addr);if(token!==pfTok) return;
+  L.name=cur.name||L.name;L.pic=L.pic||cur.pic||null;L.src=cur.src||L.src;
+  if(L.allPnl==null&&cur.allPnl!=null) L.allPnl=cur.allPnl;
+  PFCUR=L;PFTOP=top;
+ }catch(e){if(token!==pfTok) return;PFTOP=top}
+ pfRender();
+}
+function pfRender(){
+ pfInit();
+ const PF=pfData();
+ if(!PFLIVE0){PFLIVE0=true;const named=PF.T.indexOf('PMTraderAdam'),ti=named>=0?named:0;if(PF.T.length){const sel=document.getElementById('pfsel');if(sel)sel.value=String(ti);pfLoadTracked(ti);return}}
+ const P=PFCUR,box=document.getElementById('pfwrap');if(!box) return;
+ const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ if(!P){box.innerHTML='<div class="card sgcard pfmsg">Pick a tracked trader or search a wallet.</div>';return}
+ const pos=(P.pos||[]).map(x=>({...x,cost:(+x.sh||0)*(+x.avg||0),pl:(+x.val||0)-(+x.sh||0)*(+x.avg||0)}));
+ if(!pos.length){box.innerHTML='<div class="card sgcard pfmsg">'+esc(P.name)+' has no open positions right now.</div>';return}
+ const tv=pos.reduce((a,x)=>a+(+x.val||0),0),cost=pos.reduce((a,x)=>a+x.cost,0),win=pos.filter(x=>x.pl>0).length,maxV=Math.max(...pos.map(x=>+x.val||0),1);
+ const groups={};pos.forEach(x=>(groups[x.cat]=groups[x.cat]||[]).push(x));
+ const G=Object.entries(groups).map(([c,a])=>({c,a:a.sort((x,y)=>(+y.val||0)-(+x.val||0)),v:a.reduce((s,x)=>s+(+x.val||0),0),cost:a.reduce((s,x)=>s+x.cost,0)})).sort((a,b)=>b.v-a.v);
+ if(PFTOP&&!groups[PFTOP]) PFTOP=null;
+ const d=s=>{if(!s) return '—';const x=new Date(s);return isNaN(x)?s:x.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'2-digit'})};
+ const track=x=>{const a=Math.max(0,Math.min(100,Math.round((+x.avg||0)*100))),n=Math.max(0,Math.min(100,Math.round((+x.now||0)*100))),dir=n>a?'up':n<a?'dn':'fl';
+  const lo=Math.min(a,n),hi=Math.max(a,n),close=Math.abs(a-n)<12;
+  return '<div class="track" title="Paid '+a+'¢ · now '+n+'¢ (0–100¢ scale)"><div class="ln"></div>'+[0,25,50,75,100].map(t=>'<div class="tk" style="left:'+t+'%"></div>').join('')+
+   (dir!='fl'?'<div class="seg '+dir+'" style="left:'+lo+'%;width:'+(hi-lo)+'%"></div>':'')+
+   '<div class="in" style="left:'+a+'%"></div><div class="nw '+dir+'" style="left:'+n+'%"></div>'+
+   (dir=='fl'?'<div class="lb" style="left:'+a+'%">in '+a+'¢</div>':(function(){const L=a<n?['in',a,'']:['now',n,' n'],R=a<n?['now',n,' n']:['in',a,''];
+    return close?'<div class="lb'+L[2]+'" style="left:'+L[1]+'%;transform:translateX(calc(-100% - 6px))">'+L[0]+' '+L[1]+'¢</div><div class="lb'+R[2]+'" style="left:'+R[1]+'%;transform:translateX(6px)">'+R[0]+' '+R[1]+'¢</div>'
+     :'<div class="lb'+L[2]+'" style="left:'+L[1]+'%">'+L[0]+' '+L[1]+'¢</div><div class="lb'+R[2]+'" style="left:'+R[1]+'%">'+R[0]+' '+R[1]+'¢</div>'})())+'</div>'};
+ const name=P.name||'Wallet';
+ const link=P.addr?'<a href="https://polymarket.com/profile/'+P.addr+'" target="_blank" rel="noopener">'+P.addr.slice(0,6)+'…'+P.addr.slice(-4)+' ↗</a>':'';
+ const L1=esc((String(name).match(/[A-Za-z0-9]/)||['?'])[0].toUpperCase());
+ const pic=P.pic?'<img class="big" src="'+esc(P.pic)+'" alt="" referrerpolicy="no-referrer" onerror="this.outerHTML=\'<span class=&quot;big&quot;>'+L1+'</span>\'">':'<span class="big">'+L1+'</span>';
+ const shown=PFTOP?G.filter(g=>g.c==PFTOP):G;
+ const at='<span class="mu">—</span>';
+ box.innerHTML=
+  '<div class="card sgcard"><div class="pfhead">'+pic+'<div class="pfname"><b>'+esc(name)+'<span class="pfsrc">'+esc(P.src||'')+'</span></b>'+link+'</div></div>'+
+  '<div class="pfk" style="margin-top:14px">'+
+   '<div><label>Open value</label><b>'+usdK(tv)+'</b><small>'+pos.length+' positions</small></div>'+
+   '<div><label>Open PnL</label><b>'+pnlPct(tv,cost)+'</b><small>vs what they paid</small></div>'+
+   '<div><label>Winning</label><b>'+win+'/'+pos.length+'</b><small>positions in profit</small></div>'+
+   '<div><label>All-time PnL</label><b>'+at+'</b><small>lifetime has no cost for %</small></div>'+
+  '</div></div>'+
+  '<div class="card sgcard"><div class="sghead" style="margin-bottom:12px"><div><b>Topics</b><span class="muted">Where their money is. Click a topic to show only that one.</span></div>'+(PFTOP?'<button type="button" class="chip" data-pfall>Show all</button>':'')+'</div>'+
+  '<div class="topics">'+G.map(g=>'<button type="button" class="topic'+(g.c==PFTOP?' on':'')+'" data-topic="'+esc(g.c)+'"><span>'+esc(g.c)+'</span><b>'+usdK(g.v)+'</b><small>'+g.a.length+' pos · '+pnlPct(g.v,g.cost)+'</small><div class="tb"><i style="width:'+Math.max(2,tv?g.v/tv*100:0)+'%"></i></div></button>').join('')+'</div></div>'+
+  '<div class="pfleg"><span><i class="o"></i>Price they paid</span><span><i class="f"></i>Price now (going their way)</span><span><i class="f r"></i>Price now (going against them)</span><span>Line = 0¢ to 100¢</span></div>'+
+  shown.map(g=>'<div class="card sgcard"><div class="grph"><b>'+esc(g.c)+'</b><span>'+g.a.length+' positions · '+usdK(g.v)+' · '+pnlPct(g.v,g.cost)+'</span></div>'+
+   g.a.map(x=>{const img=x.img?'<img src="'+esc(x.img)+'" alt="" loading="lazy" referrerpolicy="no-referrer">':'<span class="mph">'+esc((String(x.t).match(/[A-Za-z0-9]/)||['?'])[0].toUpperCase())+'</span>';
+    return '<div class="prow"><div class="pmk">'+img+'<div><a class="tlk" href="'+esc(x.u)+'" target="_blank" rel="noopener">'+esc(x.t)+'</a><small><span class="side '+(x.side=='YES'?'sy':'sn')+'">'+esc(x.side)+'</span> · ends '+d(x.end)+'</small></div></div>'+
+     track(x)+'<div class="psz"><b>'+usdK(x.val)+'</b><small>'+K(x.sh)+' shares</small><div class="sb"><i style="width:'+Math.max(3,maxV?x.val/maxV*100:0)+'%"></i></div></div>'+
+     '<div class="ppl"><b>'+pnlPct(x.val,x.cost)+'</b><small>vs cost</small></div></div>'}).join('')+'</div>').join('');
+}
+document.getElementById('pfwrap')&&document.getElementById('pfwrap').addEventListener('click',e=>{
+ const all=e.target.closest('[data-pfall]');if(all){PFTOP=null;pfRender();return}
+ const b=e.target.closest('[data-topic]');if(b){PFTOP=b.getAttribute('data-topic');pfRender()}
+});
+function sgRows(){
+ return (DS||[]).map(m=>{
+  const open=(m.tr||[]).filter(t=>!t.ex),n=open.length;if(n<3) return null;
+  const on=open.filter(t=>t.side==m.top),k=on.length,sh=on.reduce((s,t)=>s+(+t.sh||0),0);
+  const avg=sh>0?on.reduce((s,t)=>s+(+t.sh||0)*(+t.avg||0),0)/sh:null;
+  const yes=+m.ask||0;
+  return {t:m.t,u:m.url,cat:m.cat||'Other',n,k,v:on.reduce((s,t)=>s+(+t.val||0),0),side:m.top=='Yes'?'YES':'NO',now:m.top=='Yes'?yes:1-yes,end:m.end||'',ag:k/n,avg};
+ }).filter(Boolean);
+}
+function sgRender(){
+ const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const all=sgRows();
+ const sel=document.getElementById('sgcat');if(!sel) return;
+ const cats=['All categories',...[...new Set(all.map(m=>m.cat))].sort()];
+ const prev=sel.value||'All categories';
+ const html=cats.map(c=>'<option>'+esc(c)+'</option>').join('');
+ if(sel.dataset.h!==html){sel.innerHTML=html;sel.dataset.h=html;if([...sel.options].some(o=>o.value===prev)) sel.value=prev}
+ const cat=sel.value||'All categories',hide=document.getElementById('sghide').checked;
+ const base=all.filter(m=>(cat=='All categories'||m.cat==cat)&&(!hide||m.now<0.95));
+ const tier=m=>m.ag>=0.8&&m.v>=20000?'strong':m.ag>=0.65?'leaning':'split';
+ const T={strong:'Strong',leaning:'Leaning',split:'Split'};
+ const cnt=k=>base.filter(m=>tier(m)==k).length;
+ document.getElementById('sgtabs').innerHTML=Object.keys(T).map(k=>'<button type="button" class="chip '+(k==SGTAB?'on':'')+'" onclick="SGTAB=\''+k+'\';sgRender()">'+T[k]+' · '+cnt(k)+'</button>').join('');
+ const rows=base.filter(m=>tier(m)==SGTAB).sort((a,b)=>b.k-a.k||b.v-a.v);
+ const line=document.getElementById('sgline');
+ if(line) line.textContent={strong:'80%+ OF TRADERS ON ONE SIDE · $20K+ BEHIND IT',leaning:'65–79% OF TRADERS ON ONE SIDE',split:'TRADERS DISAGREE · UNDER 65% ON ONE SIDE'}[SGTAB];
+ const dots=m=>{const other=m.side=='YES'?'n':'y',me=m.side=='YES'?'y':'n',n=Math.min(m.n,30);return Array.from({length:n},(_,j)=>'<i class="'+(j<Math.round(m.k*n/m.n)?me:other)+'"></i>').join('')};
+ const mv=m=>{if(m.avg==null) return '';const diff=Math.round(m.now*100)-Math.round(m.avg*100);return diff>0?'<em class="g">+'+diff+'¢ since</em>':diff<0?'<em class="rd">'+diff+'¢ since</em>':'flat'};
+ const d=s=>{const x=new Date(s);return isNaN(+x)?esc(s||'—'):x.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'2-digit'})};
+ document.getElementById('sglist').innerHTML=rows.length?'<div class="sghd"><span class="rk"></span><span>Market</span><span class="h3">Traders</span><span class="r">On that side</span><span class="r">Avg in</span><span class="r">Now</span></div>'+
+  rows.map((m,i)=>'<div class="sgrow"><span class="rk">'+String(i+1).padStart(2,'0')+'</span><div class="mt"><a class="tlk" href="'+esc(m.u)+'" target="_blank" rel="noopener">'+esc(m.t)+'</a><small>'+esc(m.cat)+' · ends '+d(m.end)+'</small></div><div class="sgv"><b><span class="'+(m.side=='YES'?'g':'rd')+'">'+m.k+' of '+m.n+'</span> traders bet '+m.side+'</b><div class="dots">'+dots(m)+'</div></div><div class="sgm"><b>'+usdK(m.v)+'</b><span>ON '+m.side+'</span></div><div class="sga"><b>'+(m.avg==null?'—':Math.round(m.avg*100)+'¢')+'</b><span>'+mv(m)+'</span></div><div class="sgn"><b class="'+(m.side=='YES'?'g':'rd')+'">'+Math.round(m.now*100)+'¢</b><span>'+m.side+' NOW</span></div></div>').join('')
+  :'<div class="muted" style="padding:24px 0;text-align:center">No markets here with these filters.</div>';
+}
 let LIVE=/*__LIVE_START__*/__LIVE__/*__LIVE_END__*/;let BUILT=/*__BU_S__*/__BUILT__/*__BU_E__*/;const liveOpen=new Set();
 let INFLOW=/*__IN_S__*/__INFLOW__/*__IN_E__*/;let OUTFLOW=/*__OUT_S__*/__OUTFLOW__/*__OUT_E__*/;let WEEKLY=/*__WK_S__*/__WEEKLY__/*__WK_E__*/;let IFM='day';
 function ifMode(m){IFM=m;document.querySelectorAll('#v-inflows .chip').forEach(c=>c.classList.toggle('on',c.dataset.m==m));if(m=='week')wkRender();else ifRender()}
@@ -1575,7 +1856,7 @@ async function refreshView(btn){
  const id=shown?shown.id:'v-markets';
  try{
   if(id==='v-wallet'&&typeof waReload==='function'){await waReload();return}
-  if(id==='v-lookup'){const inp=document.getElementById('lkin');if(inp&&/0x[a-fA-F0-9]{40}/.test(inp.value))await lookup();return}
+  if(id==='v-portfolio'){await pfReload();return}
   const r=await fetch((location.pathname||'/')+'?t='+Date.now(),{cache:'no-store'});
   if(!r.ok)throw new Error('refresh');
   const html=await r.text();
@@ -1596,6 +1877,8 @@ async function refreshView(btn){
   if(id==='v-live')liveRender();
   else if(id==='v-inflows')(IFM=='week'?wkRender:ifRender)();
   else if(id==='v-traders')trR();
+  else if(id==='v-signals')sgRender();
+  else if(id==='v-portfolio')pfRender();
   else if(id==='v-markets')render();
  }catch(e){}
  finally{if(btn)btn.classList.remove('busy')}
