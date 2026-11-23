@@ -578,7 +578,7 @@ def _flow_markets(books, held, is_out):
             ysh = (b.get('yes_buy_sh') or 0) - (b.get('yes_sell_sh') or 0)
             nsh = (b.get('no_buy_sh') or 0) - (b.get('no_sell_sh') or 0)
             yavg, navg = _avg(b.get('yes_buy_usd') or 0, b.get('yes_buy_sh') or 0), _avg(b.get('no_buy_usd') or 0, b.get('no_buy_sh') or 0)
-        mk.append({'t': b['t'], 'url': b['url'], 'img': b['img'] or '', 'yes': round(b['yes']), 'no': round(b['no']),
+        mk.append({'cid': cid, 't': b['t'], 'url': b['url'], 'img': b['img'] or '', 'yes': round(b['yes']), 'no': round(b['no']),
                    'ysh': round(ysh, 2) if ysh and ysh > 0 else 0, 'yavg': yavg,
                    'nsh': round(nsh, 2) if nsh and nsh > 0 else 0, 'navg': navg,
                    'px': None if px is None else round(px, 4), 'tr': tr})
@@ -697,7 +697,7 @@ def weekly(addrs, names):
         ask = _yes_price(cid)
         tr = [{'n': r['n'], 'side': r['side'], 'sh': round(r['sh'], 2), 'avg': round(r['avg'], 4), 'val': round(r['val'], 2), 'fe': r['fe']} for r in rows]
         tr.sort(key=lambda r: -r['val'])
-        mk.append({'t': b['t'], 'url': b['url'], 'img': b['img'] or '', 'ask': None if ask is None else round(ask, 4), 'tr': tr})
+        mk.append({'cid': cid, 't': b['t'], 'url': b['url'], 'img': b['img'] or '', 'ask': None if ask is None else round(ask, 4), 'tr': tr})
     def rank(m):
         return (-len({r['n'] for r in m['tr']}), -sum(r['val'] for r in m['tr']))
     mk.sort(key=rank)
