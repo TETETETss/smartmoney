@@ -563,6 +563,40 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
 @media(max-width:900px){#v-signals .sgwrap,#v-portfolio .pfwrap{padding:16px 12px 40px}#v-signals .sgcard,#v-portfolio .sgcard{padding:14px}#v-portfolio .pfsearch{padding:0 12px 12px}#v-portfolio .pfk{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:700px){#v-signals .sgrow,#v-signals .sghd{grid-template-columns:minmax(0,1fr) 62px 62px 46px;gap:8px}#v-signals .sgrow .rk,#v-signals .sghd .rk{display:none}#v-signals .sgrow .sgv{grid-column:1/-1;order:3}#v-signals .sghd .h3{display:none}#v-signals .sgrow .mt a{font-size:13px}#v-portfolio .pfsearch{flex-wrap:wrap}#v-portfolio .pfpick{flex:1 1 100%;max-width:none}#v-portfolio .pfor{display:none}#v-portfolio .pfsearch input{flex:1 1 auto}#v-portfolio .prow{grid-template-columns:minmax(0,1fr) 84px 64px;gap:10px}#v-portfolio .prow .track{grid-column:1/-1;order:4;margin:2px 26px 0}#v-portfolio .topics{grid-template-columns:repeat(2,minmax(0,1fr))}#v-portfolio .topic b{font-size:15px}}
 
+#v-strength{color:#fff;font-size:14px}
+#v-strength .ms-wrap{padding:0 36px 60px}@media(max-width:900px){#v-strength .ms-wrap{padding:0 12px 40px}}
+#v-strength .ms-search{display:flex;gap:8px;max-width:720px;margin:0 0 18px;flex-wrap:wrap}
+#v-strength .ms-search input{flex:1;min-width:220px;background:#0e0e0e;border:1px solid #333;border-radius:12px;padding:12px 14px;color:#fff;font:inherit;outline:none}
+#v-strength .ms-search input:focus{border-color:#e8e8e8}
+#v-strength .ms-btn{background:#fff;color:#000;font-weight:600;border-radius:12px;padding:12px 18px;border:0;cursor:pointer}
+#v-strength .ms-btn2{background:none;color:#ccc;border:1px solid #333;border-radius:12px;padding:12px 16px;cursor:pointer;font:inherit}
+#v-strength .ms-err{background:#2a1215;border:1px solid #5c2329;color:#fca5a5;padding:12px 16px;border-radius:12px;margin-bottom:16px}
+#v-strength .ms-card{background:#121212;border:1px solid #262626;border-radius:16px;padding:22px}
+#v-strength .ms-mk{display:flex;gap:14px;align-items:center;margin-bottom:20px}
+#v-strength .ms-mk img{width:44px;height:44px;border-radius:10px;object-fit:cover;background:#222}
+#v-strength .ms-mk h3{font-size:17px;font-weight:600}#v-strength .ms-mk a:hover{text-decoration:underline}
+#v-strength .ms-mk select{background:#0c0c0c;color:#fff;border:1px solid #333;border-radius:8px;padding:6px 10px;font:inherit;margin-top:6px;max-width:100%}
+#v-strength .ms-ttl{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}#v-strength .ms-ttl b{font-size:19px;font-weight:600}
+#v-strength .ms-bar{height:34px;border-radius:8px;overflow:hidden;display:flex;font-size:13px;font-weight:700;background:#1a1a1a}
+#v-strength .ms-bar div{display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;min-width:0}
+#v-strength .ms-lg{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:#8a8a8a;margin-top:9px}
+#v-strength .ms-sq{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+#v-strength .ms-note{font-size:12px;color:#666;margin-top:6px}
+#v-strength .ms-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;margin-top:18px}@media(max-width:760px){#v-strength .ms-cols{grid-template-columns:1fr}}
+#v-strength .ms-side{border:1px solid #262626;border-radius:14px;padding:16px 18px;background:#0c0c0c}
+#v-strength .ms-side h4{font-size:18px;font-weight:600;margin-bottom:10px}
+#v-strength .ms-ln{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px 0;color:#c8c8c8}
+#v-strength .ms-ln b{font-weight:700;color:#fff;white-space:nowrap}
+#v-strength .ms-tk{font-size:12.5px;padding:3px 10px;border-radius:6px;background:rgba(250,204,21,.12);color:#facc15;margin-left:16px;border:0;cursor:pointer}
+#v-strength .ms-wl{margin:6px 0 4px 16px;border-left:2px solid #262626;padding-left:10px}
+#v-strength .ms-wl a{display:flex;justify-content:space-between;gap:10px;padding:4px 0;font-size:13px;color:#8a8a8a;cursor:pointer}#v-strength .ms-wl a:hover{color:#fff}
+#v-strength .ms-st{color:#facc15}
+#v-strength .ms-sep{border-top:1px solid #262626;margin-top:8px;padding-top:10px}
+#v-strength .ms-g{color:#4ade80}#v-strength .ms-r{color:#f87171}#v-strength .ms-mut{color:#8a8a8a}
+#v-strength .ms-ch{font-weight:600;font-size:15px;margin:24px 0 4px}
+#v-strength .ms-chart svg{width:100%;height:200px;display:block}
+#v-strength .ms-load{padding:50px;text-align:center;color:#8a8a8a}
+#v-strength .ms-hide{display:none!important}
 </style></head><body class="indash">
 <canvas id="orb"></canvas>
 
@@ -574,6 +608,7 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
    <a class="nv on" data-v="markets" onclick="view('markets')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.8 5.6 3.8 9s-1.2 6.4-3.8 9c-2.6-2.6-3.8-5.6-3.8-9S9.4 5.6 12 3z"/></svg></em>Markets</a>
    <a class="nv" data-v="live" onclick="view('live')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2.5-6 4 12L16 12h5"/></svg></em>Live Trades</a>
    <a class="nv" data-v="inflows" onclick="view('inflows')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v14M6 11l6 6 6-6"/><path d="M4 21h16"/></svg></em>Money Flow</a>
+   <a class="nv" data-v="strength" onclick="view('strength')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h7M14 12h7"/><rect x="3" y="8" width="18" height="8" rx="2"/><path d="M12 6v12"/></svg></em>Market Strength</a>
    <a class="nv" data-v="signals" onclick="view('signals')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V4M4 20h16"/><circle cx="9" cy="14" r="1.6"/><circle cx="14" cy="9" r="2.2"/><circle cx="18" cy="6" r="1.2"/></svg></em>Signals</a>
    <a class="nv" data-v="portfolio" onclick="view('portfolio')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"/></svg></em>Wallet Analysis</a>
    <a class="nv" data-v="saved" onclick="view('saved')"><em><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></em>Bookmarked<span class="savn" id="savn"></span></a>
@@ -610,6 +645,23 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
    </div>
    <div class="chips"><button class="chip on" data-m="day" onclick="ifMode('day')">24H · Money</button><button class="chip" data-m="week" onclick="ifMode('week')">7D · Traders</button></div></div>
    <div class="grid" id="iflist"></div>
+  </div>
+
+  <div class="v" id="v-strength" style="display:none">
+   <div class="hero"><div>
+    <div class="muted" style="font-size:12px;margin-bottom:12px">ANY POLYMARKET MARKET</div>
+    <h2>Market Strength</h2>
+    <div class="sortnote">Who's on each side: smart money vs regular wallets</div>
+   </div></div>
+   <div class="ms-wrap">
+    <form class="ms-search" id="msf">
+     <input id="msq" type="search" placeholder="Paste a Polymarket market or event link" autocomplete="off" spellcheck="false">
+     <button class="ms-btn" type="submit">Analyze</button>
+     <button class="ms-btn2" type="button" id="msdemo">Demo</button>
+    </form>
+    <div id="mserr" class="ms-err ms-hide"></div>
+    <div id="msout"></div>
+   </div>
   </div>
 
   <div class="v" id="v-wallet" style="display:none">
@@ -811,7 +863,7 @@ function reqW(w){
  o.innerHTML='<span class="g">Opened X with your request ready to post.</span> <a href="#" onclick="navigator.clipboard&&navigator.clipboard.writeText(this.dataset.t);this.textContent=\'Copied\';return false" data-t="'+txt.replace(/"/g,'&quot;')+'">Copy text instead</a>';
 }
 let TRS=/*__TR_S__*/__TRADERS__/*__TR_E__*/;let TR=TRS;
-function view(v){if(!view.hold)REVEAL='';const r=(v=='saved'||v=='markets')?'markets':v;if(r=='markets'){SV=v=='saved';F='All';FOC=null}if(v=='traders')trR();document.querySelectorAll('main>.v').forEach(x=>x.style.display=x.id=='v-'+r?'block':'none');if(r=='markets')render();if(r=='live')liveRender();if(r=='inflows')(IFM=='week'?wkRender:ifRender)();if(r=='signals')sgRender();if(r=='portfolio')pfRender();document.querySelectorAll('.nv').forEach(x=>x.classList.toggle('on',x.dataset.v==v));document.body.classList.remove('navopen');scrollTo(0,0)}
+function view(v){if(!view.hold)REVEAL='';const r=(v=='saved'||v=='markets')?'markets':v;if(r=='markets'){SV=v=='saved';F='All';FOC=null}if(v=='traders')trR();document.querySelectorAll('main>.v').forEach(x=>x.style.display=x.id=='v-'+r?'block':'none');if(r=='markets')render();if(r=='live')liveRender();if(r=='inflows')(IFM=='week'?wkRender:ifRender)();if(r=='signals')sgRender();if(r=='portfolio')pfRender();if(r=='strength')msInit();document.querySelectorAll('.nv').forEach(x=>x.classList.toggle('on',x.dataset.v==v));document.body.classList.remove('navopen');scrollTo(0,0)}
 
 /* Signals + Wallet Analysis. Built from the same open positions as Markets (DS) and traders (TRS).
    A picked wallet is then loaded live from the data API, same as the prototype. */
@@ -1891,4 +1943,110 @@ async function refreshView(btn){
 }
 document.querySelectorAll('main .hero').forEach(h=>{if(h.querySelector('.pg-rf'))return;const b=document.createElement('button');b.type='button';b.className='pg-rf';b.title='Refresh';b.setAttribute('aria-label','Refresh');b.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.3L21 8"/><path d="M21 3v5h-5"/></svg>';b.addEventListener('click',()=>refreshView(b));h.appendChild(b)});
 
+
+/* Market Strength: smart money vs regular wallets on each side of one market.
+   Smart = a tracked trader (TRS, starred) or any wallet passing MS_RULES. Loaded live from the data API. */
+const MS_DATA='https://data-api.polymarket.com',MS_GAMMA='https://gamma-api.polymarket.com',MS_REF='via=brams';
+const MS_RULES={minPnl:10000,minMarkets:20,maxLuck:0.5},MS_MAX=250;
+const MS_STATS={};let msDemoOn=false,msTok=0;
+const ms$=s=>document.querySelector(s);
+const msEsc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const msNum=v=>(v==null||isNaN(+v))?0:+v;
+const msPick=(o,...k)=>{for(const x of k)if(o&&o[x]!=null)return o[x]};
+function msMoney(v,sign){v=msNum(v);const a=Math.abs(v),s=v<0?'-':(sign&&v>0?'+':'');return s+'$'+(a>=1e6?(a/1e6).toFixed(2)+'M':a>=1e3?(a/1e3).toFixed(1)+'K':a.toFixed(0))}
+function msErr(m){const e=ms$('#mserr');e.textContent=m||'';e.classList.toggle('ms-hide',!m)}
+async function msGet(base,path,p={}){const u=new URL(base+path);Object.entries(p).forEach(([k,v])=>v!=null&&v!==''&&u.searchParams.set(k,v));const r=await fetch(u);if(!r.ok)throw new Error(path+' → HTTP '+r.status);return r.json()}
+async function msPool(items,n,fn){const out=new Array(items.length);let i=0;await Promise.all(Array.from({length:n},async()=>{while(i<items.length){const j=i++;out[j]=await fn(items[j]).catch(()=>null)}}));return out}
+const msTracked=()=>{const m={};(TRS||[]).forEach(t=>{if(t.a)m[String(t.a).toLowerCase()]=t.n});return m};
+function msSlug(s){s=s.trim();const m=s.match(/polymarket\.com\/(event|market)\/([^/?#]+)(?:\/([^/?#]+))?/);if(m)return{event:m[1]=='event'?m[2]:null,market:m[3]||(m[1]=='market'?m[2]:null)};return{event:s,market:s}}
+async function msFind(input){
+ const {event,market}=msSlug(input);
+ if(market){const ms=await msGet(MS_GAMMA,'/markets',{slug:market}).catch(()=>[]);if(ms&&ms.length)return{markets:ms,chosen:ms[0]}}
+ if(event){const ev=await msGet(MS_GAMMA,'/events',{slug:event}).catch(()=>[]);const ms=((ev&&ev[0]&&ev[0].markets)||[]).filter(m=>!m.closed).sort((a,b)=>msNum(b.volume)-msNum(a.volume));if(ms.length)return{markets:ms,chosen:ms[0]}}
+ throw new Error('Market not found. Paste a polymarket.com/event/… link.')}
+const msJ=(s,d)=>{try{return JSON.parse(s)}catch(e){return d}};
+async function msClassify(ws){
+ const TK=msTracked(),need=ws.filter(w=>!(w in MS_STATS));
+ const got=await msPool(need,8,w=>msGet(MS_DATA,'/v2/user-stats',{user:w}).then(j=>j.data||{}));
+ need.forEach((w,i)=>MS_STATS[w]=got[i]||{});
+ const res={};ws.forEach(w=>{const s=MS_STATS[w]||{},pnl=msNum(s.all_time_pnl),big=msNum(s.biggest_win),mk=msNum(s.trades),tracked=w in TK;
+  res[w]={tracked,tname:TK[w],pnl,smart:tracked||(pnl>=MS_RULES.minPnl&&mk>=MS_RULES.minMarkets&&big<pnl*MS_RULES.maxLuck)}});
+ return res}
+async function msAnalyze(m){
+ const cond=m.conditionId,outs=msJ(m.outcomes,['Yes','No']),px=msJ(m.outcomePrices,[.5,.5]).map(Number);
+ const h=await msGet(MS_DATA,'/v2/holders',{condition:cond,include_pnl:true,limit:100});
+ const holders=[];
+ (h.data||[]).forEach(tok=>(tok.holders||[]).forEach(x=>{const side=msNum(msPick(x,'outcome_index','outcomeIndex')),size=msNum(msPick(x,'amount','size','shares'));
+  holders.push({w:String(msPick(x,'proxy_wallet','proxyWallet')).toLowerCase(),name:msPick(x,'name','pseudonym'),side,value:size*(px[side]||0),mpnl:msPick(x,'pnl','total_pnl','cash_pnl')})}));
+ let trades=[],cur=null;
+ do{const j=await msGet(MS_DATA,'/v2/trades',{condition:cond,limit:1000,cursor:cur}).catch(()=>null);if(!j)break;trades=trades.concat(j.data||[]);cur=j.pagination&&j.pagination.next_cursor}while(cur&&trades.length<10000);
+ const usd=t=>msNum(msPick(t,'usdc_size'))||msNum(t.size)*msNum(t.price),who=t=>String(msPick(t,'proxy_wallet','proxyWallet')).toLowerCase();
+ const vol={};trades.forEach(t=>{vol[who(t)]=(vol[who(t)]||0)+usd(t)});
+ const ws=[...new Set([...holders.map(x=>x.w),...Object.keys(vol).sort((a,b)=>vol[b]-vol[a])])].slice(0,MS_MAX);
+ const cls=await msClassify(ws);
+ holders.forEach(x=>Object.assign(x,cls[x.w]||{smart:false,tracked:false}));
+ const net={s:[0,0],r:[0,0]},ser={},pct=n=>n[0]+n[1]>0?n[1]/(n[0]+n[1])*100:null;
+ trades.slice().sort((a,b)=>a.timestamp-b.timestamp).forEach(t=>{const g=cls[who(t)]&&cls[who(t)].smart?'s':'r',i=msNum(msPick(t,'outcome_index','outcomeIndex'))?1:0;
+  net[g][i]=Math.max(0,net[g][i]+(t.side=='SELL'?-usd(t):usd(t)));ser[new Date(msNum(t.timestamp)*1000).toISOString().slice(0,10)]={s:pct(net.s),r:pct(net.r)}});
+ return{outs,holders,series:Object.entries(ser).slice(-30)}}
+function msSvg(series,label){
+ if(series.length<2)return'<div class="ms-load" style="padding:30px">Not enough trade history yet</div>';
+ const W=1000,H=200,P=36,X=i=>P+i/(series.length-1)*(W-P-8),Y=v=>8+(1-v/100)*(H-34);
+ const path=k=>{let d='',pen=false;series.forEach(([,v],i)=>{if(v[k]==null){pen=false;return}d+=(pen?'L':'M')+X(i).toFixed(1)+','+Y(v[k]).toFixed(1);pen=true});return d};
+ const grid=[0,25,50,75,100].map(v=>`<line x1="${P}" x2="${W}" y1="${Y(v)}" y2="${Y(v)}" stroke="#222"/><text x="${P-6}" y="${Y(v)+4}" fill="#666" font-size="11" text-anchor="end">${v}%</text>`).join('');
+ const d=s=>new Date(s).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+ return`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Smart vs regular share on ${msEsc(label)} over time">${grid}
+  <path d="${path('r')}" fill="none" stroke="#8a8a8a" stroke-width="2" stroke-dasharray="6 5" vector-effect="non-scaling-stroke"/>
+  <path d="${path('s')}" fill="none" stroke="#dc2626" stroke-width="2.5" vector-effect="non-scaling-stroke"/>
+  <text x="${P}" y="${H-4}" fill="#666" font-size="11">${d(series[0][0])}</text><text x="${W}" y="${H-4}" fill="#666" font-size="11" text-anchor="end">${d(series[series.length-1][0])}</text></svg>`}
+function msRender(m,data,markets){
+ const {outs,holders,series}=data;
+ const sides=[0,1].map(i=>{const hs=holders.filter(h=>h.side===i),sm=hs.filter(h=>h.smart),rg=hs.filter(h=>!h.smart),sum=a=>a.reduce((s,h)=>s+h.value,0),mp=sm.filter(h=>h.mpnl!=null);
+  return{label:outs[i]||(i?'No':'Yes'),total:sum(hs),smart:sum(sm),reg:sum(rg),sN:sm.length,rN:rg.length,tk:sm.filter(h=>h.tracked).length,
+   list:sm.sort((a,b)=>(b.tracked-a.tracked)||b.value-a.value),sp:mp.length?mp.reduce((s,h)=>s+msNum(h.mpnl),0):null}});
+ const [Y,N]=sides,all=Y.total+N.total||1,sA=Y.smart+N.smart,rA=Y.reg+N.reg;
+ const sSide=N.smart>=Y.smart?N:Y,rSide=N.reg>=Y.reg?N:Y;
+ const sPct=sA?Math.round(sSide.smart/sA*100):0,rPct=rA?Math.round(rSide.reg/rA*100):0;
+ const w=v=>(v/all*100).toFixed(2)+'%',lab=(v,t,c)=>v/all>.12?`<span style="color:${c}">${t}</span>`:'';
+ const card=(s,i)=>`<div class="ms-side"><h4 class="${i?'ms-r':'ms-g'}">${msEsc(s.label)} · ${msMoney(s.total)}</h4>
+   <div class="ms-ln"><span><span class="ms-sq" style="background:${i?'#991b1b':'#166534'}"></span>Smart (${s.sN} wallets)</span><b>${msMoney(s.smart)} · ${s.total?Math.round(s.smart/s.total*100):0}%</b></div>
+   ${s.sN?`<button class="ms-tk" data-i="${i}">${s.tk?'★ ':''}${s.tk} on your list ▾</button><div class="ms-wl ms-hide" id="mswl${i}">${s.list.map(h=>`<a href="https://polymarket.com/profile/${h.w}?${MS_REF}" target="_blank" rel="noopener"><span>${h.tracked?'<span class="ms-st">★</span> ':''}${msEsc(h.tname||h.name||(h.w.slice(0,6)+'…'+h.w.slice(-4)))}</span><span>${msMoney(h.value)} · ${msMoney(h.pnl,true)} all-time</span></a>`).join('')}</div>`:''}
+   <div class="ms-ln"><span><span class="ms-sq" style="background:${i?'#fca5a5':'#86efac'}"></span>Regular (${s.rN} wallets)</span><b>${msMoney(s.reg)} · ${s.total?Math.round(s.reg/s.total*100):0}%</b></div>
+   <div class="ms-ln ms-sep"><span>Smart PnL on this market</span><b class="${msNum(s.sp)>=0?'ms-g':'ms-r'}">${s.sp==null?'—':msMoney(s.sp,true)}</b></div></div>`;
+ ms$('#msout').innerHTML=`<div class="ms-card">
+  <div class="ms-mk">${m.image||m.icon?`<img src="${msEsc(m.image||m.icon)}" alt="" onerror="this.remove()">`:''}<div>
+   <h3>${m.slug&&m.slug!='demo'?`<a href="https://polymarket.com/market/${msEsc(m.slug)}?${MS_REF}" target="_blank" rel="noopener">${msEsc(m.question)}</a>`:msEsc(m.question)}</h3>
+   ${markets.length>1?`<select id="mssel">${markets.map((x,i)=>`<option value="${i}" ${x===m?'selected':''}>${msEsc(x.groupItemTitle||x.question)}</option>`).join('')}</select>`:''}</div></div>
+  <div class="ms-ttl"><b>Market strength</b><span class="${sSide===N?'ms-r':'ms-g'}">Smart money: ${sPct}% on ${msEsc(sSide.label)}</span><span class="ms-mut">· Regular wallets: ${rPct}% on ${msEsc(rSide.label)}</span></div>
+  <div class="ms-bar">
+   <div title="Smart ${msEsc(Y.label)} ${msMoney(Y.smart)}" style="width:${w(Y.smart)};background:#166534">${lab(Y.smart,'Smart '+msEsc(Y.label),'#dcfce7')}</div>
+   <div title="Regular ${msEsc(Y.label)} ${msMoney(Y.reg)}" style="width:${w(Y.reg)};background:#86efac">${lab(Y.reg,msEsc(Y.label),'#052e16')}</div>
+   <div title="Regular ${msEsc(N.label)} ${msMoney(N.reg)}" style="width:${w(N.reg)};background:#fca5a5">${lab(N.reg,msEsc(N.label),'#450a0a')}</div>
+   <div title="Smart ${msEsc(N.label)} ${msMoney(N.smart)}" style="width:${w(N.smart)};background:#991b1b">${lab(N.smart,'Smart '+msEsc(N.label)+' · '+Math.round(N.smart/all*100)+'% of all money','#fff')}</div></div>
+  <div class="ms-lg"><span><span class="ms-sq" style="background:#166534"></span>Smart ${msEsc(Y.label)}</span><span><span class="ms-sq" style="background:#86efac"></span>Regular ${msEsc(Y.label)}</span><span><span class="ms-sq" style="background:#fca5a5"></span>Regular ${msEsc(N.label)}</span><span><span class="ms-sq" style="background:#991b1b"></span>Smart ${msEsc(N.label)}</span></div>
+  <div class="ms-note">Smart = tracked traders (★), plus other wallets with ${msMoney(MS_RULES.minPnl)}+ all-time profit, ${MS_RULES.minMarkets}+ markets, and not from one lucky bet</div>
+  <div class="ms-cols">${card(Y,0)}${card(N,1)}</div>
+  <div class="ms-ch">Share on ${msEsc(N.label)} over time</div>
+  <div class="ms-lg" style="margin-top:2px"><span><span class="ms-sq" style="background:#dc2626"></span>Smart money</span><span><span class="ms-sq" style="background:#8a8a8a"></span>Regular wallets (dashed)</span></div>
+  <div class="ms-chart">${msSvg(series,N.label)}</div></div>`;
+ document.querySelectorAll('#v-strength .ms-tk').forEach(b=>b.onclick=()=>{const el=ms$('#mswl'+b.dataset.i);el.classList.toggle('ms-hide');b.textContent=b.textContent.replace(/[▾▴]/,el.classList.contains('ms-hide')?'▾':'▴')});
+ const sel=ms$('#mssel');if(sel)sel.onchange=()=>msRun(markets[+sel.value],markets)}
+async function msRun(m,markets){
+ const tok=++msTok;msErr('');ms$('#msout').innerHTML='<div class="ms-card ms-load">Checking holders and wallet track records…</div>';
+ try{const d=msDemoOn?msDemo():await msAnalyze(m);if(tok===msTok)msRender(m,d,markets)}catch(e){if(tok===msTok){ms$('#msout').innerHTML='';msErr(e.message)}}}
+function msDemo(){
+ const TK=msTracked(),tk=Object.keys(TK).slice(0,3);
+ const H=(name,side,value,smart,pnl,mpnl,i)=>{const w=(smart&&i!=null&&tk[i])||('0x'+name.toLowerCase().replace(/[^a-z0-9]/g,'').padEnd(40,'0').slice(0,40));return{w,name,side,value,smart,tracked:w in TK,tname:TK[w],pnl,mpnl}};
+ const hs=[H('bbbbbbbbbzzz',0,5200,true,41000,6102),H('KKK1919',0,2800,true,18000,2818),
+  ...['0xEC1Fe51724','jsdk3k21k','Winwinwin008','tsihkodiives','pmrev','yesguy','lotto77','newb2026'].map((n,i)=>H(n,0,[20000,15000,9000,8000,30000,12000,6800,5000][i],false,-500,300)),
+  H('aenews2',1,96000,true,2400000,-3935,0),H('betwick',1,92700,true,880000,-3172,1),H('Tenebrus7',1,91500,true,610000,-5128,2),
+  H('DonaldinhoTr..',1,71700,true,520000,-5735),H('0x9112edc7d8..',1,71300,true,300000,-5201),H('Vespuccii',1,39400,true,140000,-800),H('Unfinished-J..',1,49400,true,80000,-893),
+  H('nohodler',1,40000,false,2000,0),H('fadeitall',1,28500,false,-9000,0)];
+ let s=9;const r=()=>(s=(s*16807)%2147483647)/2147483647;let a=75,b=55;
+ const series=[...Array(30)].map((_,i)=>{a=i==29?98:Math.min(98,a+(r()-.25)*1.8);b=i==29?39:Math.max(35,b-(r()-.3)*1.4);return[new Date(Date.now()-(29-i)*864e5).toISOString().slice(0,10),{s:a,r:b}]});
+ return{outs:['Yes','No'],holders:hs,series}}
+function msInit(){if(msInit.done)return;msInit.done=1;
+ ms$('#msf').onsubmit=async e=>{e.preventDefault();msDemoOn=false;const v=ms$('#msq').value.trim();if(!v)return msErr('Paste a Polymarket market link first.');
+  try{const {markets,chosen}=await msFind(v);msRun(chosen,markets)}catch(er){msErr(er.message)}};
+ ms$('#msdemo').onclick=()=>{msDemoOn=true;const m={question:'Demo · Will the U.S. invade Iran before 2027?',slug:'demo'};msRun(m,[m])}}
 </script></body></html>
