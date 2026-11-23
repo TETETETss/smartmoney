@@ -581,6 +581,7 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
 #v-strength .ms-bar div{display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;min-width:0}
 #v-strength .ms-lg{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:#8a8a8a;margin-top:9px}
 #v-strength .ms-sq{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+#v-strength .ms-row{margin:12px 0 4px}#v-strength .ms-rl{display:flex;gap:10px;align-items:baseline;margin-bottom:6px;font-size:13.5px}#v-strength .ms-rl b{font-weight:600}
 #v-strength .ms-note{font-size:12px;color:#666;margin-top:6px}
 #v-strength .ms-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;margin-top:18px}@media(max-width:760px){#v-strength .ms-cols{grid-template-columns:1fr}}
 #v-strength .ms-side{border:1px solid #262626;border-radius:14px;padding:16px 18px;background:#0c0c0c}
@@ -1953,6 +1954,8 @@ const ms$=s=>document.querySelector(s);
 const msEsc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const msNum=v=>(v==null||isNaN(+v))?0:+v;
 const msPick=(o,...k)=>{for(const x of k)if(o&&o[x]!=null)return o[x]};
+const msVal=v=>{if(v==null)return null;if(typeof v=='object'){for(const k of ['economic_pnl','position_pnl','total_pnl','realized_pnl','pnl','amount','value','usdc'])if(v[k]!=null&&!isNaN(+v[k]))return +v[k];return null}return isNaN(+v)?null:+v};
+const msPl=(n,w)=>n+' '+w+(n==1?'':'s');
 function msMoney(v,sign){v=msNum(v);const a=Math.abs(v),s=v<0?'-':(sign&&v>0?'+':'');return s+'$'+(a>=1e6?(a/1e6).toFixed(2)+'M':a>=1e3?(a/1e3).toFixed(1)+'K':a.toFixed(0))}
 function msErr(m){const e=ms$('#mserr');e.textContent=m||'';e.classList.toggle('ms-hide',!m)}
 async function msGet(base,path,p={}){const u=new URL(base+path);Object.entries(p).forEach(([k,v])=>v!=null&&v!==''&&u.searchParams.set(k,v));const r=await fetch(u);if(!r.ok)throw new Error(path+' → HTTP '+r.status);return r.json()}
@@ -1967,17 +1970,20 @@ async function msFind(input){
 const msJ=(s,d)=>{try{return JSON.parse(s)}catch(e){return d}};
 async function msClassify(ws){
  const TK=msTracked(),need=ws.filter(w=>!(w in MS_STATS));
- const got=await msPool(need,8,w=>msGet(MS_DATA,'/v2/user-stats',{user:w}).then(j=>j.data||{}));
+ const got=await msPool(need,8,async w=>{const st=await msGet(MS_DATA,'/v2/user-stats',{user:w}).then(j=>j.data||{}).catch(()=>({}));
+  if(msVal(st.all_time_pnl)==null){const lb=await msGet(MS_DATA,'/v2/leaderboard',{user:w,time_period:'all'}).then(j=>j.data||{}).catch(()=>({}));if(msVal(lb.pnl)!=null)st.all_time_pnl=lb.pnl}
+  return st});
  need.forEach((w,i)=>MS_STATS[w]=got[i]||{});
- const res={};ws.forEach(w=>{const s=MS_STATS[w]||{},pnl=msNum(s.all_time_pnl),big=msNum(s.biggest_win),mk=msNum(s.trades),tracked=w in TK;
-  res[w]={tracked,tname:TK[w],pnl,smart:tracked||(pnl>=MS_RULES.minPnl&&mk>=MS_RULES.minMarkets&&big<pnl*MS_RULES.maxLuck)}});
+ const res={};ws.forEach(w=>{const s=MS_STATS[w]||{},pnl=msVal(s.all_time_pnl),big=msVal(s.biggest_win),mk=msVal(s.trades),tracked=w in TK;
+  const pass=pnl!=null&&pnl>=MS_RULES.minPnl&&(mk==null||mk>=MS_RULES.minMarkets)&&(big==null||big<pnl*MS_RULES.maxLuck);
+  res[w]={tracked,tname:TK[w],pnl,smart:tracked||pass}});
  return res}
 async function msAnalyze(m){
  const cond=m.conditionId,outs=msJ(m.outcomes,['Yes','No']),px=msJ(m.outcomePrices,[.5,.5]).map(Number);
  const h=await msGet(MS_DATA,'/v2/holders',{condition:cond,include_pnl:true,limit:100});
  const holders=[];
  (h.data||[]).forEach(tok=>(tok.holders||[]).forEach(x=>{const side=msNum(msPick(x,'outcome_index','outcomeIndex')),size=msNum(msPick(x,'amount','size','shares'));
-  holders.push({w:String(msPick(x,'proxy_wallet','proxyWallet')).toLowerCase(),name:msPick(x,'name','pseudonym'),side,value:size*(px[side]||0),mpnl:msPick(x,'pnl','total_pnl','cash_pnl')})}));
+  holders.push({w:String(msPick(x,'proxy_wallet','proxyWallet')).toLowerCase(),name:msPick(x,'name','pseudonym'),side,value:size*(px[side]||0),mpnl:msVal(msPick(x,'pnl','total_pnl','cash_pnl'))})}));
  let trades=[],cur=null;
  do{const j=await msGet(MS_DATA,'/v2/trades',{condition:cond,limit:1000,cursor:cur}).catch(()=>null);if(!j)break;trades=trades.concat(j.data||[]);cur=j.pagination&&j.pagination.next_cursor}while(cur&&trades.length<10000);
  const usd=t=>msNum(msPick(t,'usdc_size'))||msNum(t.size)*msNum(t.price),who=t=>String(msPick(t,'proxy_wallet','proxyWallet')).toLowerCase();
@@ -1999,6 +2005,9 @@ function msSvg(series,label){
   <path d="${path('r')}" fill="none" stroke="#8a8a8a" stroke-width="2" stroke-dasharray="6 5" vector-effect="non-scaling-stroke"/>
   <path d="${path('s')}" fill="none" stroke="#dc2626" stroke-width="2.5" vector-effect="non-scaling-stroke"/>
   <text x="${P}" y="${H-4}" fill="#666" font-size="11">${d(series[0][0])}</text><text x="${W}" y="${H-4}" fill="#666" font-size="11" text-anchor="end">${d(series[series.length-1][0])}</text></svg>`}
+function msBar(title,y,n,yl,nl,yc,nc,yt,nt,h,cnt){const t=y+n,yp=t?Math.round(y/t*100):0,np=t?100-yp:0;
+ const seg=(v,p,c,tc,l)=>v>0?`<div title="${msEsc(l)} ${msMoney(v)}" style="width:${p}%;background:${c};color:${tc}">${p>=12?msEsc(l)+' '+p+'% · '+msMoney(v):''}</div>`:'';
+ return`<div class="ms-row"><div class="ms-rl"><b>${title}</b><span class="ms-mut">${cnt} · ${msMoney(t)}</span></div><div class="ms-bar" style="height:${h}px;font-size:${h>26?13:12}px">${t?seg(y,yp,yc,yt,yl)+seg(n,np,nc,nt,nl):'<div style="width:100%;color:#666">—</div>'}</div></div>`}
 function msRender(m,data,markets){
  const {outs,holders,series}=data;
  const sides=[0,1].map(i=>{const hs=holders.filter(h=>h.side===i),sm=hs.filter(h=>h.smart),rg=hs.filter(h=>!h.smart),sum=a=>a.reduce((s,h)=>s+h.value,0),mp=sm.filter(h=>h.mpnl!=null);
@@ -2009,21 +2018,17 @@ function msRender(m,data,markets){
  const sPct=sA?Math.round(sSide.smart/sA*100):0,rPct=rA?Math.round(rSide.reg/rA*100):0;
  const w=v=>(v/all*100).toFixed(2)+'%',lab=(v,t,c)=>v/all>.12?`<span style="color:${c}">${t}</span>`:'';
  const card=(s,i)=>`<div class="ms-side"><h4 class="${i?'ms-r':'ms-g'}">${msEsc(s.label)} · ${msMoney(s.total)}</h4>
-   <div class="ms-ln"><span><span class="ms-sq" style="background:${i?'#991b1b':'#166534'}"></span>Smart (${s.sN} wallets)</span><b>${msMoney(s.smart)} · ${s.total?Math.round(s.smart/s.total*100):0}%</b></div>
-   ${s.sN?`<button class="ms-tk" data-i="${i}">${s.tk?'★ ':''}${s.tk} on your list ▾</button><div class="ms-wl ms-hide" id="mswl${i}">${s.list.map(h=>`<a href="https://polymarket.com/profile/${h.w}?${MS_REF}" target="_blank" rel="noopener"><span>${h.tracked?'<span class="ms-st">★</span> ':''}${msEsc(h.tname||h.name||(h.w.slice(0,6)+'…'+h.w.slice(-4)))}</span><span>${msMoney(h.value)} · ${msMoney(h.pnl,true)} all-time</span></a>`).join('')}</div>`:''}
-   <div class="ms-ln"><span><span class="ms-sq" style="background:${i?'#fca5a5':'#86efac'}"></span>Regular (${s.rN} wallets)</span><b>${msMoney(s.reg)} · ${s.total?Math.round(s.reg/s.total*100):0}%</b></div>
+   <div class="ms-ln"><span><span class="ms-sq" style="background:${i?'#991b1b':'#166534'}"></span>Smart (${msPl(s.sN,'wallet')})</span><b>${msMoney(s.smart)} · ${s.total?Math.round(s.smart/s.total*100):0}%</b></div>
+   ${s.sN?`<button class="ms-tk" data-i="${i}">${s.tk?'★ ':''}${s.tk} on your list ▾</button><div class="ms-wl ms-hide" id="mswl${i}">${s.list.map(h=>`<a href="https://polymarket.com/profile/${h.w}?${MS_REF}" target="_blank" rel="noopener"><span>${h.tracked?'<span class="ms-st">★</span> ':''}${msEsc(h.tname||h.name||(h.w.slice(0,6)+'…'+h.w.slice(-4)))}</span><span>${msMoney(h.value)} · ${h.pnl==null?'—':msMoney(h.pnl,true)} all-time</span></a>`).join('')}</div>`:''}
+   <div class="ms-ln"><span><span class="ms-sq" style="background:${i?'#fca5a5':'#86efac'}"></span>Regular (${msPl(s.rN,'wallet')})</span><b>${msMoney(s.reg)} · ${s.total?Math.round(s.reg/s.total*100):0}%</b></div>
    <div class="ms-ln ms-sep"><span>Smart PnL on this market</span><b class="${msNum(s.sp)>=0?'ms-g':'ms-r'}">${s.sp==null?'—':msMoney(s.sp,true)}</b></div></div>`;
  ms$('#msout').innerHTML=`<div class="ms-card">
   <div class="ms-mk">${m.image||m.icon?`<img src="${msEsc(m.image||m.icon)}" alt="" onerror="this.remove()">`:''}<div>
    <h3>${m.slug&&m.slug!='demo'?`<a href="https://polymarket.com/market/${msEsc(m.slug)}?${MS_REF}" target="_blank" rel="noopener">${msEsc(m.question)}</a>`:msEsc(m.question)}</h3>
    ${markets.length>1?`<select id="mssel">${markets.map((x,i)=>`<option value="${i}" ${x===m?'selected':''}>${msEsc(x.groupItemTitle||x.question)}</option>`).join('')}</select>`:''}</div></div>
-  <div class="ms-ttl"><b>Market strength</b><span class="${sSide===N?'ms-r':'ms-g'}">Smart money: ${sPct}% on ${msEsc(sSide.label)}</span><span class="ms-mut">· Regular wallets: ${rPct}% on ${msEsc(rSide.label)}</span></div>
-  <div class="ms-bar">
-   <div title="Smart ${msEsc(Y.label)} ${msMoney(Y.smart)}" style="width:${w(Y.smart)};background:#166534">${lab(Y.smart,'Smart '+msEsc(Y.label),'#dcfce7')}</div>
-   <div title="Regular ${msEsc(Y.label)} ${msMoney(Y.reg)}" style="width:${w(Y.reg)};background:#86efac">${lab(Y.reg,msEsc(Y.label),'#052e16')}</div>
-   <div title="Regular ${msEsc(N.label)} ${msMoney(N.reg)}" style="width:${w(N.reg)};background:#fca5a5">${lab(N.reg,msEsc(N.label),'#450a0a')}</div>
-   <div title="Smart ${msEsc(N.label)} ${msMoney(N.smart)}" style="width:${w(N.smart)};background:#991b1b">${lab(N.smart,'Smart '+msEsc(N.label)+' · '+Math.round(N.smart/all*100)+'% of all money','#fff')}</div></div>
-  <div class="ms-lg"><span><span class="ms-sq" style="background:#166534"></span>Smart ${msEsc(Y.label)}</span><span><span class="ms-sq" style="background:#86efac"></span>Regular ${msEsc(Y.label)}</span><span><span class="ms-sq" style="background:#fca5a5"></span>Regular ${msEsc(N.label)}</span><span><span class="ms-sq" style="background:#991b1b"></span>Smart ${msEsc(N.label)}</span></div>
+  <div class="ms-ttl"><b>Market strength</b>${sA?`<span class="${sSide===N?'ms-r':'ms-g'}">Smart money backs ${msEsc(sSide.label)} · ${sPct}%</span>`:'<span class="ms-mut">No smart money in this market yet</span>'}</div>
+  ${msBar('Smart money',Y.smart,N.smart,Y.label,N.label,'#166534','#991b1b','#dcfce7','#fff',34,msPl(Y.sN+N.sN,'wallet'))}
+  ${msBar('Regular wallets',Y.reg,N.reg,Y.label,N.label,'#86efac','#fca5a5','#052e16','#450a0a',22,msPl(Y.rN+N.rN,'wallet'))}
   <div class="ms-note">Smart = tracked traders (★), plus other wallets with ${msMoney(MS_RULES.minPnl)}+ all-time profit, ${MS_RULES.minMarkets}+ markets, and not from one lucky bet</div>
   <div class="ms-cols">${card(Y,0)}${card(N,1)}</div>
   <div class="ms-ch">Share on ${msEsc(N.label)} over time</div>
