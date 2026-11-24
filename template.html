@@ -1712,16 +1712,14 @@ function render() {
 function renderOverview() {
   const openV = S.open.reduce((s,p)=>s+num(p.current_value),0);
   wa$('#wabody').innerHTML = `
-    <div class="grid2 wag">
-    <div class="pnlc" ><div class="xh"><div class="xi">${XIC.chart}</div><span class="xt">Profit</span><span class="xs">${S.pnlR==='30'?'Last 30 days':'All time'}</span><div class="xa rng xseg2"><button type="button" data-r="all" class="${S.pnlR!=='30'?'on':''}">All time</button><button type="button" data-r="30" class="${S.pnlR==='30'?'on':''}">30D</button></div></div><div id="pnlcard"></div></div>
-      <div class="xc"><div class="xh"><div class="xi">${XIC.stack}</div><span class="xt">Positions</span><span class="xs">${moneyFull(openV)} open</span></div><div class="xcb scroll" id="curpos" style="max-height:318px"></div></div>
-    </div>
+    <div class="pnlc" style="margin-bottom:16px"><div class="xh"><div class="xi">${XIC.chart}</div><span class="xt">Profit</span><span class="xs">${S.pnlR==='30'?'Last 30 days':'All time'}</span><div class="xa rng xseg2"><button type="button" data-r="all" class="${S.pnlR!=='30'?'on':''}">All time</button><button type="button" data-r="30" class="${S.pnlR==='30'?'on':''}">30D</button></div></div><div id="pnlcard"></div></div>
+    <div class="xc" style="margin-bottom:16px;padding:0"><div class="xh" style="padding:16px 18px 0;margin:0"><div class="xi">${XIC.cal}</div><span class="xt">Calendar</span><span class="xs">Daily PnL</span></div><div class="cal" id="cal"></div></div>
     <div class="xc wares"><div class="xh"><div class="xi">${XIC.trophy}</div><span class="xt">Results</span><span class="xs">Closed positions, grouped by event</span></div><div class="cols" id="wl"></div></div>
     <div class="grid2 wag">
-      <div class="xc"><div class="xh"><div class="xi">${XIC.log}</div><span class="xt">Trade log</span><span class="xs">Newest first</span></div><div class="scroll tl" id="rtrades" style="max-height:360px"></div></div>
-      <div class="card" id="lb"></div>
+      <div class="xc"><div class="xh"><div class="xi">${XIC.stack}</div><span class="xt">Positions</span><span class="xs">${moneyFull(openV)} open</span></div><div class="xcb scroll" id="curpos" style="max-height:420px"></div></div>
+      <div class="xc"><div class="xh"><div class="xi">${XIC.log}</div><span class="xt">Trade log</span><span class="xs">Newest first</span></div><div class="scroll tl" id="rtrades" style="max-height:420px"></div></div>
     </div>
-    <div class="xc" style="margin-bottom:22px;padding:0"><div class="xh" style="padding:22px 24px 0;margin:0"><div class="xi">${XIC.cal}</div><span class="xt">Calendar</span><span class="xs">Daily PnL</span></div><div class="cal" id="cal"></div></div>`;
+    <div class="card" id="lb"></div>`;
   wa$('.pnlc .rng').onclick = e => { const r = e.target.closest('button'); if (!r) return; S.pnlR = r.dataset.r; wa$('.pnlc .rng').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === r)); const xs = wa$('.pnlc .xs'); if (xs) xs.textContent = S.pnlR === '30' ? 'Last 30 days' : 'All time'; drawPnlCard(); };
   drawPnlCard();
   renderCalendar();
