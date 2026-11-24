@@ -722,6 +722,33 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
 @media(max-width:900px){#v-wallet .wares .cols{grid-template-columns:1fr}#v-wallet .wares .col{padding:14px 0 0;border-left:0;border-top:1px solid var(--xln)}#v-wallet .wares .col:first-child{border-top:0;padding-top:0}
 #v-wallet .xrow,#v-portfolio .xrow{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:16px}#v-wallet .xrow>div:nth-child(odd),#v-portfolio .xrow>div:nth-child(odd){padding-left:0;border-left:0}
 #v-wallet .xbig,#v-portfolio .xbig{font-size:40px}#v-wallet .xc,#v-portfolio .xc,#v-wallet .pnlc{padding:18px;border-radius:20px}#v-wallet .tli{grid-template-columns:1fr}#v-wallet .tlm:before{display:none}#v-wallet .xs{display:none}}
+
+/* compact sizing for Wallet Lookup */
+#v-wallet .wag{margin-bottom:16px;align-items:start}
+#v-wallet .xc,#v-wallet .pnlc{padding:16px 18px;border-radius:18px}
+#v-wallet .card{border-radius:18px}
+#v-wallet .xh{gap:10px;margin-bottom:12px}
+#v-wallet .xi{width:32px;height:32px;font-size:13px}
+#v-wallet .xi svg{width:15px!important;height:15px!important}
+#v-wallet .xt{font-size:14px}#v-wallet .xs{font-size:13px;padding-left:10px}
+#v-wallet .xb{width:28px;height:28px}
+#v-wallet .wahero{margin-bottom:16px}#v-wallet .wahero .xi{width:38px;height:38px}#v-wallet .wahero .xt{font-size:16px}#v-wallet .wahero .xs{font-size:12px}
+#v-wallet .xbig{font-size:34px;letter-spacing:-.8px;margin-top:4px}
+#v-wallet .xd{font-size:12px;vertical-align:14px}
+#v-wallet .xrow{margin-top:14px;padding-top:14px}#v-wallet .xrow b{font-size:18px;margin-top:5px}
+#v-wallet .xl{font-size:10px;letter-spacing:1px}
+#v-wallet .xseg{margin-top:14px;padding:3px}#v-wallet .xseg .tab{padding:7px 6px;font-size:11px}
+#v-wallet .pnlc .xh{margin-bottom:10px}#v-wallet .pnlc svg{border-radius:12px}
+#v-wallet .wares{margin-bottom:16px}
+#v-wallet .wares .row{padding:7px 0}#v-wallet .wares .ico{width:20px;height:20px}#v-wallet .wares .ttl,#v-wallet .wares .amt{font-size:12.5px}#v-wallet .wares .scroll{max-height:220px}
+#v-wallet .xcb .row{padding:9px 0}#v-wallet .xcb .ttl{font-size:13px}#v-wallet .xcb .ico{width:24px;height:24px}
+#v-wallet .tli{grid-template-columns:110px minmax(0,1fr);gap:10px;padding-bottom:10px}
+#v-wallet .tld{width:22px;height:22px;font-size:10px}#v-wallet .tlm:before{left:11px;top:26px;bottom:-10px}
+#v-wallet .tlm b{font-size:13px}#v-wallet .tlm small{font-size:11px}
+#v-wallet .tlp{padding:9px 12px;border-radius:12px}#v-wallet .tlp .ttl{font-size:12.5px;margin-bottom:5px}#v-wallet .tlg{font-size:12px}
+#v-wallet #lb{max-height:420px;overflow-y:auto}
+#v-wallet .cal{padding:12px 18px 16px}#v-wallet .cal-title{font-size:20px}#v-wallet .cal-total{font-size:17px}#v-wallet .cell{height:50px;font-size:12px}#v-wallet .cell .p{font-size:11px}#v-wallet .cgrid{gap:6px;margin-top:10px}#v-wallet .mgrid .cell{height:64px}
+@media(max-width:980px){#v-wallet .wag{grid-template-columns:1fr}}
 </style></head><body class="indash">
 <canvas id="orb"></canvas>
 
@@ -1668,14 +1695,16 @@ function render() {
 function renderOverview() {
   const openV = S.open.reduce((s,p)=>s+num(p.current_value),0);
   wa$('#wabody').innerHTML = `
-    <div class="pnlc" style="margin-bottom:22px"><div class="xh"><div class="xi">${XIC.chart}</div><span class="xt">Profit</span><span class="xs">${S.pnlR==='30'?'Last 30 days':'All time'}</span><div class="xa rng xseg2"><button type="button" data-r="all" class="${S.pnlR!=='30'?'on':''}">All time</button><button type="button" data-r="30" class="${S.pnlR==='30'?'on':''}">30D</button></div></div><div id="pnlcard"></div></div>
-    <div class="xc wares"><div class="xh"><div class="xi">${XIC.trophy}</div><span class="xt">Results</span><span class="xs">Closed positions, grouped by event</span></div><div class="cols" id="wl"></div></div>
-    <div class="grid2" style="margin-bottom:22px">
-      <div class="xc"><div class="xh"><div class="xi">${XIC.stack}</div><span class="xt">Positions</span><span class="xs">${moneyFull(openV)} open</span></div><div class="xcb scroll" id="curpos" style="max-height:520px"></div></div>
-      <div class="xc"><div class="xh"><div class="xi">${XIC.log}</div><span class="xt">Trade log</span><span class="xs">Newest first</span></div><div class="scroll tl" id="rtrades" style="max-height:520px"></div></div>
+    <div class="grid2 wag">
+    <div class="pnlc" ><div class="xh"><div class="xi">${XIC.chart}</div><span class="xt">Profit</span><span class="xs">${S.pnlR==='30'?'Last 30 days':'All time'}</span><div class="xa rng xseg2"><button type="button" data-r="all" class="${S.pnlR!=='30'?'on':''}">All time</button><button type="button" data-r="30" class="${S.pnlR==='30'?'on':''}">30D</button></div></div><div id="pnlcard"></div></div>
+      <div class="xc"><div class="xh"><div class="xi">${XIC.stack}</div><span class="xt">Positions</span><span class="xs">${moneyFull(openV)} open</span></div><div class="xcb scroll" id="curpos" style="max-height:318px"></div></div>
     </div>
-    <div class="xc" style="margin-bottom:22px;padding:0"><div class="xh" style="padding:22px 24px 0;margin:0"><div class="xi">${XIC.cal}</div><span class="xt">Calendar</span><span class="xs">Daily PnL</span></div><div class="cal" id="cal"></div></div>
-    <div class="card" id="lb"></div>`;
+    <div class="xc wares"><div class="xh"><div class="xi">${XIC.trophy}</div><span class="xt">Results</span><span class="xs">Closed positions, grouped by event</span></div><div class="cols" id="wl"></div></div>
+    <div class="grid2 wag">
+      <div class="xc"><div class="xh"><div class="xi">${XIC.log}</div><span class="xt">Trade log</span><span class="xs">Newest first</span></div><div class="scroll tl" id="rtrades" style="max-height:360px"></div></div>
+      <div class="card" id="lb"></div>
+    </div>
+    <div class="xc" style="margin-bottom:22px;padding:0"><div class="xh" style="padding:22px 24px 0;margin:0"><div class="xi">${XIC.cal}</div><span class="xt">Calendar</span><span class="xs">Daily PnL</span></div><div class="cal" id="cal"></div></div>`;
   wa$('.pnlc .rng').onclick = e => { const r = e.target.closest('button'); if (!r) return; S.pnlR = r.dataset.r; wa$('.pnlc .rng').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === r)); const xs = wa$('.pnlc .xs'); if (xs) xs.textContent = S.pnlR === '30' ? 'Last 30 days' : 'All time'; drawPnlCard(); };
   drawPnlCard();
   renderCalendar();
