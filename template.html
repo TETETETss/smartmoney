@@ -634,6 +634,94 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
 #v-strength .ms-chart svg{width:100%;height:200px;display:block}
 #v-strength .ms-load{padding:50px;text-align:center;color:#8a8a8a}
 #v-strength .ms-hide{display:none!important}
+/* ===== Card style v2 (wallet lookup + wallet analysis): dark cards, icon headers, mono labels, big light numbers ===== */
+#v-wallet,#v-portfolio{--xbg:#0b0b0b;--xln:#1d1d1d;--xin:#151515;--xmu:#7c7c7c}
+#v-wallet .xc,#v-portfolio .xc{background:var(--xbg);border:1px solid var(--xln);border-radius:24px;padding:22px 24px;box-shadow:none}
+#v-wallet .xc:hover,#v-portfolio .xc:hover{border-color:#2c2c2c}
+#v-wallet .xh,#v-portfolio .xh{display:flex;align-items:center;gap:14px;margin-bottom:18px;min-width:0}
+#v-wallet .xi,#v-portfolio .xi{width:40px;height:40px;border-radius:50%;background:#1a1a1a center/cover;display:flex;align-items:center;justify-content:center;flex:none;color:#cfcfcf;font-weight:500;font-size:15px;overflow:hidden}
+#v-wallet .xi img,#v-portfolio .xi img{width:100%;height:100%;object-fit:cover}
+#v-wallet .xi svg,#v-wallet .xb svg,#v-portfolio .xi svg,#v-portfolio .xb svg{width:17px!important;height:17px!important;border:0!important;border-radius:0!important;display:block}
+#v-wallet .xt,#v-portfolio .xt{font-size:16px;font-weight:500;color:#f2f2f2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:none;letter-spacing:0}
+#v-wallet .xs,#v-portfolio .xs{color:#8a8a8a;font-size:15px;border-left:1px solid #333;padding-left:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+#v-wallet .xa,#v-portfolio .xa{margin-left:auto;display:flex;gap:8px;align-items:center;flex:none}
+#v-wallet .xb,#v-portfolio .xb{width:32px;height:32px;border-radius:50%;border:1px solid #2a2a2a;background:none;color:#aaa;display:inline-flex;align-items:center;justify-content:center;padding:0;cursor:pointer;font-size:11px}
+#v-wallet .xb:hover,#v-portfolio .xb:hover{color:#fff;border-color:#555}
+#v-wallet .xl,#v-portfolio .xl{display:block;font:11px ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:1.2px;text-transform:uppercase;color:var(--xmu)}
+#v-wallet .xbig,#v-portfolio .xbig{font-size:52px;font-weight:400;letter-spacing:-1.5px;line-height:1.1;margin-top:8px;font-variant-numeric:tabular-nums;display:inline-block}
+#v-wallet .xd,#v-portfolio .xd{font:13px ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:#8a8a8a;margin-left:12px;vertical-align:28px}
+#v-portfolio .xd .pp{font-size:13px}
+#v-wallet .xrow,#v-portfolio .xrow{display:grid;grid-template-columns:repeat(var(--n,4),minmax(0,1fr));margin-top:22px;padding-top:20px;border-top:1px solid var(--xln)}
+#v-wallet .xrow>div,#v-portfolio .xrow>div{padding:0 18px;border-left:1px solid var(--xln);min-width:0}
+#v-wallet .xrow>div:first-child,#v-portfolio .xrow>div:first-child{padding-left:0;border-left:0}
+#v-wallet .xrow b,#v-portfolio .xrow b{display:block;font-size:24px;font-weight:400;margin-top:8px;font-variant-numeric:tabular-nums;white-space:nowrap}
+#v-portfolio .xrow b .pp{font-size:24px}
+#v-wallet .xrow small,#v-portfolio .xrow small{display:block;font-size:11px;color:#666;margin-top:3px}
+#v-wallet .xseg{display:flex;background:#141414;border:1px solid var(--xln);border-radius:12px;padding:4px;margin-top:22px;gap:0;flex-wrap:wrap}
+#v-wallet .xseg .tab{flex:1;top:0;border:1px solid transparent;border-radius:8px;padding:10px 8px;font:12px ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:1px;text-transform:uppercase;color:#8a8a8a;background:none}
+#v-wallet .xseg .tab.on{background:var(--xbg);border-color:#3a3a3a;color:#fff}
+#v-wallet .xseg .tab.on::after{display:none}
+#v-wallet .xseg .tab .pill{background:#222;font-size:10px;padding:1px 6px}
+#v-wallet .xseg2{display:flex;background:#141414;border:1px solid var(--xln);border-radius:10px;padding:3px}
+#v-wallet .xseg2 button{border:1px solid transparent;border-radius:7px;padding:6px 12px;font:11px ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.8px;text-transform:uppercase;color:#8a8a8a;background:none}
+#v-wallet .xseg2 button.on{background:var(--xbg);border-color:#3a3a3a;color:#fff}
+#v-wallet .pnlc .rng.xseg2{gap:0}#v-wallet .pnlc .rng.xseg2 button{border:1px solid transparent;border-radius:7px;padding:6px 12px;font:11px ui-monospace,"SF Mono",Menlo,Consolas,monospace;background:none;color:#8a8a8a}#v-wallet .pnlc .rng.xseg2 button.on{background:var(--xbg);border-color:#3a3a3a;color:#fff}
+#v-wallet .wahero{margin-bottom:22px}
+#v-wallet .wahero .xi{width:48px;height:48px}
+#v-wallet .wahero .xt{font-size:20px}
+#v-wallet .wahero .xs{font:13px ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+#v-wallet .card{background:var(--xbg);border:1px solid var(--xln);border-radius:24px}
+#v-wallet .card:hover{border-color:#2c2c2c}
+#v-wallet .card-h{background:transparent;padding:20px 22px 8px}
+#v-wallet .card-h h3{font-size:16px;font-weight:500}
+#v-wallet .pnlc{background:var(--xbg);border:1px solid var(--xln);border-radius:24px;padding:22px 24px}
+#v-wallet .pnlc .xh{margin-bottom:14px}
+#v-wallet .pnlc svg{border-color:var(--xln)}
+#v-wallet .wares{margin-bottom:22px}
+#v-wallet .wares .cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+#v-wallet .wares .col{padding:0 18px;border-left:1px solid var(--xln);min-width:0}
+#v-wallet .wares .col:first-child{padding-left:0;border-left:0}#v-wallet .wares .col:last-child{padding-right:0}
+#v-wallet .wares .col .xl{margin-bottom:6px;display:flex;justify-content:space-between}
+#v-wallet .wares .xl.g{color:var(--g)}#v-wallet .wares .xl.r{color:var(--r)}
+#v-wallet .wares .row{padding:10px 0;gap:10px}
+#v-wallet .wares .ico{width:24px;height:24px}
+#v-wallet .wares .rank{width:20px;font:11px ui-monospace,Menlo,Consolas,monospace}
+#v-wallet .wares .ttl{font-size:13px}
+#v-wallet .wares .amt{font-size:13px;font-weight:500}
+#v-wallet .wares .scroll{max-height:300px}
+#v-wallet .xcb{padding:0}
+#v-wallet .xcb .row{padding:12px 0}
+#v-wallet .chip{border-color:#262626;background:#121212;border-radius:8px}
+#v-wallet .tl{position:relative}
+#v-wallet .tli{display:grid;grid-template-columns:140px minmax(0,1fr);gap:14px;position:relative;padding-bottom:14px}
+#v-wallet .tli:last-child{padding-bottom:0}
+#v-wallet .tlm{display:flex;gap:10px;position:relative}
+#v-wallet .tlm:before{content:"";position:absolute;left:12px;top:30px;bottom:-14px;width:1px;background:#2a2a2a}
+#v-wallet .tli:last-child .tlm:before{display:none}
+#v-wallet .tld{width:25px;height:25px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font:600 11px ui-monospace,Menlo,Consolas,monospace;background:#e8e8e8;color:#000}
+#v-wallet .tld.s{background:#f87171;color:#2a0b0b}
+#v-wallet .tlm b{display:block;font-size:14px;font-weight:500}
+#v-wallet .tlm small{display:block;font-size:12px;color:#777;margin-top:2px}
+#v-wallet .tlp{background:var(--xin);border-radius:16px;padding:12px 16px;min-width:0}
+#v-wallet .tlp .ttl{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:8px}
+#v-wallet .tlg{display:grid;grid-template-columns:auto 1fr auto 1fr auto 1fr;gap:4px 10px;font-size:13px}
+#v-wallet .tlg label{color:#777}
+#v-wallet .tlg span{font-variant-numeric:tabular-nums}
+#v-portfolio .pfsearch input,#v-portfolio .pfpick,#v-wallet .search input,#v-wallet .wasel{background:var(--xbg);border-color:#262626;border-radius:14px}
+#v-portfolio .pfsearch button,#v-wallet .btn{border-radius:14px}
+#v-portfolio .xc .pfsrc{margin-left:0;flex:none}
+#v-portfolio .topics{gap:0;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));border-top:1px solid var(--xln)}
+#v-portfolio .topic{border:0;border-left:1px solid var(--xln);border-radius:0;padding:16px 18px 6px}
+#v-portfolio .topic:first-child{border-left:0;padding-left:0}
+#v-portfolio .topic:hover,#v-portfolio .topic.on{border-color:var(--xln);background:#111}
+#v-portfolio .topic.on span{color:#fff}
+#v-portfolio .topic b{font-size:24px;font-weight:400}
+#v-portfolio .xc .prow{border-top:1px solid #171717}
+#v-portfolio .xc .prow:first-of-type{border-top:0}
+#v-portfolio .xc .pmk img,#v-portfolio .xc .pmk .mph{border-radius:50%}
+@media(max-width:900px){#v-wallet .wares .cols{grid-template-columns:1fr}#v-wallet .wares .col{padding:14px 0 0;border-left:0;border-top:1px solid var(--xln)}#v-wallet .wares .col:first-child{border-top:0;padding-top:0}
+#v-wallet .xrow,#v-portfolio .xrow{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:16px}#v-wallet .xrow>div:nth-child(odd),#v-portfolio .xrow>div:nth-child(odd){padding-left:0;border-left:0}
+#v-wallet .xbig,#v-portfolio .xbig{font-size:40px}#v-wallet .xc,#v-portfolio .xc,#v-wallet .pnlc{padding:18px;border-radius:20px}#v-wallet .tli{grid-template-columns:1fr}#v-wallet .tlm:before{display:none}#v-wallet .xs{display:none}}
 </style></head><body class="indash">
 <canvas id="orb"></canvas>
 
@@ -909,6 +997,7 @@ function view(v){if(!view.hold)REVEAL='';const r=(v=='saved'||v=='markets')?'mar
 
 /* Signals + Wallet Analysis. Built from the same open positions as Markets (DS) and traders (TRS).
    A picked wallet is then loaded live from the data API, same as the prototype. */
+var XIC={chart:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 6-6"/></svg>',trophy:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M17 6h3v2a3 3 0 0 1-3 3M7 6H4v2a3 3 0 0 0 3 3"/></svg>',stack:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="6" rx="2"/><rect x="4" y="14" width="16" height="6" rx="2"/></svg>',log:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2"/><circle cx="6" cy="18" r="2"/><path d="M6 8v8M11 6h9M11 18h9"/></svg>',grid:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>',copy:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></svg>',out:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>',cal:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>'};
 let SGTAB='strong';
 let PFTOP=null,PFCUR=null,PFLIVE0=false,pfTok=0,pfInitBuilt=-1;
 const TOPIC_RULES=[['Iran/Israel',/\b(iran|israel|gaza|hezbollah|netanyahu|khamenei|hormuz|tehran|houthi|kharg|pahlavi)\b/i],['Crypto',/\b(bitcoin|btc|ethereum|eth|solana|crypto|token|airdrop|coinbase|xrp|doge)\b/i],
@@ -1067,17 +1156,19 @@ function pfRender(){
  const shown=PFTOP?G.filter(g=>g.c==PFTOP):G;
  const at='<span class="mu">—</span>';
  box.innerHTML=
-  '<div class="card sgcard"><div class="pfhead">'+pic+'<div class="pfname"><b>'+esc(name)+'<span class="pfsrc">'+esc(P.src||'')+'</span></b>'+link+'</div></div>'+
-  '<div class="pfk" style="margin-top:14px">'+
-   '<div><label>Open value</label><b>'+usdK(tv)+'</b><small>'+pos.length+' positions</small></div>'+
-   '<div><label>Open PnL</label><b>'+pnlPct(tv,cost)+'</b><small>vs what they paid</small></div>'+
-   '<div><label>Winning</label><b>'+win+'/'+pos.length+'</b><small>positions in profit</small></div>'+
-   '<div><label>All-time PnL</label><b>'+at+'</b><small>lifetime has no cost for %</small></div>'+
+  '<div class="xc"><div class="xh"><div class="xi">'+(P.pic?'<img src="'+esc(P.pic)+'" alt="" referrerpolicy="no-referrer" onerror="this.remove()">':L1)+'</div><span class="xt">'+esc(name)+'</span><span class="xs">'+esc(P.src||'')+'</span>'+
+   (P.addr?'<div class="xa"><span class="xl" style="text-transform:none">'+P.addr.slice(0,6)+'…'+P.addr.slice(-4)+'</span><a class="xb" title="Open on Polymarket" href="https://polymarket.com/profile/'+P.addr+'" target="_blank" rel="noopener">'+XIC.out+'</a></div>':'')+'</div>'+
+  '<span class="xl">Open value</span><div><span class="xbig">'+usdK(tv)+'</span><span class="xd">'+pnlPct(tv,cost)+' vs cost</span></div>'+
+  '<div class="xrow" style="--n:4">'+
+   '<div><span class="xl">Positions</span><b>'+pos.length+'</b><small>open right now</small></div>'+
+   '<div><span class="xl">Open PnL</span><b>'+pnlPct(tv,cost)+'</b><small>vs what they paid</small></div>'+
+   '<div><span class="xl">Winning</span><b>'+win+'/'+pos.length+'</b><small>positions in profit</small></div>'+
+   '<div><span class="xl">All-time PnL</span><b>'+(P.allPnl!=null&&isFinite(+P.allPnl)?'<span class="'+(+P.allPnl>=0?'up':'dn')+'" style="color:'+(+P.allPnl>=0?'#4ade80':'#f87171')+'">'+(+P.allPnl<0?'-':'')+usdK(Math.abs(+P.allPnl))+'</span>':at)+'</b><small>realized + open</small></div>'+
   '</div></div>'+
-  '<div class="card sgcard"><div class="sghead" style="margin-bottom:12px"><div><b>Topics</b><span class="muted">Where their money is. Click a topic to show only that one.</span></div>'+(PFTOP?'<button type="button" class="chip" data-pfall>Show all</button>':'')+'</div>'+
+  '<div class="xc"><div class="xh"><div class="xi">'+XIC.grid+'</div><span class="xt">Topics</span><span class="xs">Where their money is · click one to filter</span>'+(PFTOP?'<div class="xa"><button type="button" class="chip" data-pfall>Show all</button></div>':'')+'</div>'+
   '<div class="topics">'+G.map(g=>'<button type="button" class="topic'+(g.c==PFTOP?' on':'')+'" data-topic="'+esc(g.c)+'"><span>'+esc(g.c)+'</span><b>'+usdK(g.v)+'</b><small>'+g.a.length+' pos · '+pnlPct(g.v,g.cost)+'</small><div class="tb"><i style="width:'+Math.max(2,tv?g.v/tv*100:0)+'%"></i></div></button>').join('')+'</div></div>'+
   '<div class="pfleg"><span><i class="o"></i>Price they paid</span><span><i class="f"></i>Price now (going their way)</span><span><i class="f r"></i>Price now (going against them)</span><span>Line = 0¢ to 100¢</span></div>'+
-  shown.map(g=>'<div class="card sgcard"><div class="grph"><b>'+esc(g.c)+'</b><span>'+g.a.length+' positions · '+usdK(g.v)+' · '+pnlPct(g.v,g.cost)+'</span></div>'+
+  shown.map(g=>'<div class="xc"><div class="xh" style="margin-bottom:8px"><div class="xi">'+esc((String(g.c).match(/[A-Za-z0-9]/)||['?'])[0].toUpperCase())+'</div><span class="xt">'+esc(g.c)+'</span><span class="xs">'+g.a.length+' position'+(g.a.length==1?'':'s')+'</span><div class="xa"><span class="xl" style="font-size:13px;color:#ddd">'+usdK(g.v)+'</span><span class="xl">'+pnlPct(g.v,g.cost)+'</span></div></div>'+
    g.a.map(x=>{const img=x.img?'<img src="'+esc(x.img)+'" alt="" loading="lazy" referrerpolicy="no-referrer">':'<span class="mph">'+esc((String(x.t).match(/[A-Za-z0-9]/)||['?'])[0].toUpperCase())+'</span>';
     return '<div class="prow"><div class="pmk">'+img+'<div><a class="tlk" data-cid="'+esc(x.cid||'')+'" href="'+esc(x.u)+'" target="_blank" rel="noopener">'+esc(x.t)+'</a><small><span class="side '+(x.side=='YES'?'sy':'sn')+'">'+esc(x.side)+'</span> · ends '+d(x.end)+'</small></div></div>'+
      track(x)+'<div class="psz"><b>'+usdK(x.val)+'</b><small>'+K(x.sh)+' shares</small><div class="sb"><i style="width:'+Math.max(3,maxV?x.val/maxV*100:0)+'%"></i></div></div>'+
@@ -1542,29 +1633,31 @@ function render() {
   const st = S.stats;
   const rawPnl = st.all_time_pnl;
   const allPnl = rawPnl && typeof rawPnl === 'object' ? (rawPnl.economic_pnl ?? rawPnl.position_pnl) : (rawPnl ?? S.lbUser.pnl);
+  const jd = st.join_date ? new Date(st.join_date*1000).toLocaleDateString('en-US',{month:'short',year:'numeric'}) : '';
   wa$('#waapp').innerHTML = `
-    <div class="head">
-      <div class="avatar" style="background-image:url('${esc(S.img)}')"></div>
-      <div class="who">
-        <h1>${esc(S.name)}${S.lbUser.verified ? ' <span title="verified" style="color:var(--acc)">✔</span>' : ''}</h1>
-        <div class="addr"><span class="mono">${S.addr.slice(0,8)}…${S.addr.slice(-6)}</span>
-          <button onclick="navigator.clipboard.writeText('${S.addr}');this.textContent='copied'">copy</button>
-          <a href="https://polymarket.com/profile/${S.addr}" target="_blank">polymarket ↗</a>
-          ${S.lbUser.x_username ? `<a href="https://x.com/${esc(S.lbUser.x_username)}" target="_blank">@${esc(S.lbUser.x_username)}</a>` : ''}
-          ${st.join_date ? `<span>joined ${new Date(st.join_date*1000).toLocaleDateString('en-US',{month:'short',year:'numeric'})}</span>` : ''}
+    <div class="xc wahero">
+      <div class="xh">
+        <div class="xi" style="background-image:url('${esc(S.img)}')">${S.img ? '' : esc((S.name.match(/[A-Za-z0-9]/)||['?'])[0].toUpperCase())}</div>
+        <span class="xt">${esc(S.name)}${S.lbUser.verified ? ' <span title="verified" style="color:var(--acc)">✔</span>' : ''}</span>
+        <span class="xs">${S.addr.slice(0,8)}…${S.addr.slice(-6)}${jd ? ' · joined ' + jd : ''}</span>
+        <div class="xa">
+          <button class="xb" title="Copy address" onclick="navigator.clipboard.writeText('${S.addr}');this.style.color='#4ade80'">${XIC.copy}</button>
+          ${S.lbUser.x_username ? `<a class="xb" title="@${esc(S.lbUser.x_username)} on X" href="https://x.com/${esc(S.lbUser.x_username)}" target="_blank" rel="noopener">𝕏</a>` : ''}
+          <a class="xb" title="Open on Polymarket" href="https://polymarket.com/profile/${S.addr}" target="_blank" rel="noopener">${XIC.out}</a>
         </div>
       </div>
-      <div class="kpis">
-        <div class="kpi"><div class="l">Portfolio</div><div class="v mono">${moneyFull(S.value)}</div></div>
-        <div class="kpi"><div class="l">All-time PnL</div><div class="v mono ${cls(allPnl)}">${allPnl == null ? '—' : money(allPnl)}</div></div>
-        <div class="kpi"><div class="l">Volume</div><div class="v mono">${S.lbUser.volume != null ? moneyFull(S.lbUser.volume) : '—'}</div></div>
-        <div class="kpi"><div class="l">Markets</div><div class="v mono">${st.trades != null ? num(st.trades).toLocaleString() : '—'}</div></div>
-        <div class="kpi"><div class="l">Biggest win</div><div class="v mono g">${st.biggest_win != null ? money(st.biggest_win) : '—'}</div></div>
+      <span class="xl">All-time PnL</span>
+      <div><span class="xbig ${cls(allPnl)}">${allPnl == null ? '—' : money(allPnl)}</span>${st.biggest_win != null ? `<span class="xd">best win <span class="g">${money(st.biggest_win)}</span></span>` : ''}</div>
+      <div class="xrow" style="--n:4">
+        <div><span class="xl">Portfolio</span><b>${moneyFull(S.value)}</b></div>
+        <div><span class="xl">Volume</span><b>${S.lbUser.volume != null ? moneyFull(S.lbUser.volume) : '—'}</b></div>
+        <div><span class="xl">Markets</span><b>${st.trades != null ? num(st.trades).toLocaleString() : '—'}</b></div>
+        <div><span class="xl">Open positions</span><b>${S.open.length}</b></div>
       </div>
-    </div>
-    <div class="tabs">
-      ${[['overview','Overview'],['positions',`Positions <span class="pill">${S.open.length}</span>`],['activity','Activity'],['history','History'],['report','Report']]
-        .map(([k, l]) => `<button class="tab ${S.tab===k?'on':''}" data-tab="${k}">${l}</button>`).join('')}
+      <div class="xseg">
+        ${[['overview','Overview'],['positions',`Positions <span class="pill">${S.open.length}</span>`],['activity','Activity'],['history','History'],['report','Report']]
+          .map(([k, l]) => `<button class="tab ${S.tab===k?'on':''}" data-tab="${k}">${l}</button>`).join('')}
+      </div>
     </div>
     <div id="wabody"></div>`;
   document.querySelectorAll('.tab').forEach(b => b.onclick = () => { S.tab = b.dataset.tab; render(); });
@@ -1573,24 +1666,17 @@ function render() {
 
 // ---------- overview ----------
 function renderOverview() {
+  const openV = S.open.reduce((s,p)=>s+num(p.current_value),0);
   wa$('#wabody').innerHTML = `
-    <div class="pnlc"><div class="pnlbar"><h3>Profit chart</h3><div class="rng"><button type="button" data-r="all" class="${S.pnlR!=='30'?'on':''}">All time</button><button type="button" data-r="30" class="${S.pnlR==='30'?'on':''}">30 days</button></div></div><div id="pnlcard"></div></div>
-    <div class="card" style="margin-bottom:22px"><div class="cal" id="cal"></div></div>
+    <div class="pnlc" style="margin-bottom:22px"><div class="xh"><div class="xi">${XIC.chart}</div><span class="xt">Profit</span><span class="xs">${S.pnlR==='30'?'Last 30 days':'All time'}</span><div class="xa rng xseg2"><button type="button" data-r="all" class="${S.pnlR!=='30'?'on':''}">All time</button><button type="button" data-r="30" class="${S.pnlR==='30'?'on':''}">30D</button></div></div><div id="pnlcard"></div></div>
+    <div class="xc wares"><div class="xh"><div class="xi">${XIC.trophy}</div><span class="xt">Results</span><span class="xs">Closed positions, grouped by event</span></div><div class="cols" id="wl"></div></div>
     <div class="grid2" style="margin-bottom:22px">
-      <div>
-        <div class="card" style="margin-bottom:22px">
-          <div class="card-h"><h3>Current Positions</h3><span class="sub">${moneyFull(S.open.reduce((s,p)=>s+num(p.current_value),0))} open</span></div>
-          <div class="card-b scroll" id="curpos"></div>
-        </div>
-        <div class="card">
-          <div class="card-h"><h3>Recent Trades</h3><span class="sub">Newest first</span></div>
-          <div class="card-b scroll" id="rtrades"></div>
-        </div>
-      </div>
-      <div class="card"><div class="card-b" id="wl" style="padding-top:0"></div></div>
+      <div class="xc"><div class="xh"><div class="xi">${XIC.stack}</div><span class="xt">Positions</span><span class="xs">${moneyFull(openV)} open</span></div><div class="xcb scroll" id="curpos" style="max-height:520px"></div></div>
+      <div class="xc"><div class="xh"><div class="xi">${XIC.log}</div><span class="xt">Trade log</span><span class="xs">Newest first</span></div><div class="scroll tl" id="rtrades" style="max-height:520px"></div></div>
     </div>
+    <div class="xc" style="margin-bottom:22px;padding:0"><div class="xh" style="padding:22px 24px 0;margin:0"><div class="xi">${XIC.cal}</div><span class="xt">Calendar</span><span class="xs">Daily PnL</span></div><div class="cal" id="cal"></div></div>
     <div class="card" id="lb"></div>`;
-  wa$('.pnlc .rng').onclick = e => { const r = e.target.closest('button'); if (!r) return; S.pnlR = r.dataset.r; wa$('.pnlc .rng').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === r)); drawPnlCard(); };
+  wa$('.pnlc .rng').onclick = e => { const r = e.target.closest('button'); if (!r) return; S.pnlR = r.dataset.r; wa$('.pnlc .rng').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === r)); const xs = wa$('.pnlc .xs'); if (xs) xs.textContent = S.pnlR === '30' ? 'Last 30 days' : 'All time'; drawPnlCard(); };
   drawPnlCard();
   renderCalendar();
   // current positions grouped by event
@@ -1608,8 +1694,14 @@ function renderOverview() {
         mjump(p, `${esc(partOf.get(p))} ${outc(p.outcome)} ${money(p.current_value,false)}`, 'class="chip"')).join('')}</div>`}`;
   }).join('') : '<div class="empty">No open positions</div>';
   // fix chip labels after sort (recompute map title→part)
-  wa$('#rtrades').innerHTML = tradeRows(S.trades.slice(0, 40));
+  wa$('#rtrades').innerHTML = tradeLog(S.trades.slice(0, 30));
   renderWL();
+}
+function tradeLog(list) {
+  if (!list.length) return '<div class="empty">No trades</div>';
+  return list.map(t => { const sell = t.side === 'SELL', sh = num(t.size), pr = num(t.price);
+    return `<div class="tli"><div class="tlm"><span class="tld ${sell?'s':''}">${sell?'S':'B'}</span><div><b>${sell?'Sold':'Bought'} ${outc(t.outcome)}</b><small>${ago(t.timestamp)} ago</small></div></div>
+    <div class="tlp"><span class="ttl">${mjump(t, esc(t.title), `title="${esc(t.title)}"`)}</span><div class="tlg"><label>Shares</label><span>${Math.round(sh).toLocaleString()}</span><label>Price</label><span>${cents(pr)}</span><label>Value</label><span>${moneyFull(sh*pr)}</span></div></div></div>`; }).join('');
 }
 function tradeRows(list) {
   if (!list.length) return '<div class="empty">No trades</div>';
@@ -1640,9 +1732,9 @@ function renderWL() {
       <span class="amt mono ${cls(x.total)}">${money(x.total)}</span></div>`;
   }).join('') : `<div class="empty">${emptyTxt}</div>`;
   wa$('#wl').innerHTML = `
-    <div class="sect g">📈 BIGGEST WINS</div><div class="scroll" style="max-height:200px">${block(wins, 'No closed wins yet')}</div>
-    <div class="sect r">📉 BIGGEST LOSSES</div><div class="scroll" style="max-height:200px">${block(losses, 'No closed losses')}</div>
-    <div class="sect mut">🕘 RECENT</div><div class="scroll" style="max-height:200px">${block(recentG, 'Nothing closed recently')}</div>`;
+    <div class="col"><span class="xl g">Biggest wins <span>${wins.length}</span></span><div class="scroll">${block(wins, 'No closed wins yet')}</div></div>
+    <div class="col"><span class="xl r">Biggest losses <span>${losses.length}</span></span><div class="scroll">${block(losses, 'No closed losses')}</div></div>
+    <div class="col"><span class="xl">Recently closed <span>${recentG.length}</span></span><div class="scroll">${block(recentG, 'Nothing closed recently')}</div></div>`;
 }
 
 // ---------- calendar ----------
