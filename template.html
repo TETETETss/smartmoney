@@ -310,6 +310,42 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
 #v-live .lt-un:hover{border-color:#fff;color:#fff}
 @media(max-width:900px){#v-live .lt-hbox{padding:8px 14px 12px}}
 #v-live .ltscroll{overflow-x:auto}
+/* grouped live trades */
+#v-live .ltfil{display:flex;align-items:center;gap:12px;padding:12px 22px;border-bottom:1px solid #1f1f24;flex-wrap:wrap}
+#v-live .ltseg{display:flex;border:1px solid #333;border-radius:99px;overflow:hidden;flex:none}
+#v-live .ltseg button{background:none;border:0;color:#aaa;font:inherit;font-size:12px;padding:7px 14px;cursor:pointer}
+#v-live .ltseg button.on{background:#fff;color:#000}
+#v-live .ltchips{display:flex;gap:6px;flex-wrap:wrap}
+#v-live .ltchips button{border:1px solid #333;background:none;color:#bbb;border-radius:99px;padding:6px 12px;font:inherit;font-size:12px;cursor:pointer}
+#v-live .ltchips button:hover{border-color:#888;color:#fff}#v-live .ltchips button.on{background:#e8e8e8;color:#000;border-color:#e8e8e8}
+#v-live.mode-g .ltscroll{display:none}#v-live.mode-l .ltgroups{display:none}
+#v-live .ltgroups{padding:6px 22px 18px}
+#v-live .ltbk{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:18px 0 10px;font:11px ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:1px;color:#8a8a96;text-transform:uppercase}
+#v-live .ltbk b{color:#ddd;font-weight:500}
+#v-live .ltg{background:#0f0f12;border:1px solid #1f1f24;border-radius:14px;padding:14px 16px;margin-bottom:10px}
+#v-live .ltg:hover{border-color:#34343c}
+#v-live .ltgh{display:flex;gap:12px;align-items:center}
+#v-live .ltgh .market{flex:1;min-width:0;align-items:center}
+#v-live .ltgh .market a{font-size:14px}
+#v-live .ltgs{font-size:12px;color:#8a8a96;margin-top:3px}
+#v-live .ltgs .yes{color:#86c99c}#v-live .ltgs .no{color:#d79a9a}
+#v-live .ltgn{text-align:right;flex:none}
+#v-live .ltgn b{display:block;font-size:17px;font-weight:600;font-variant-numeric:tabular-nums}
+#v-live .ltgn small{font-size:11px;color:#777}
+#v-live .ltgbar{display:flex;height:5px;border-radius:3px;overflow:hidden;background:#1c1c22;margin:12px 0 4px;gap:2px}
+#v-live .ltgbar i{display:block;height:100%}#v-live .ltgbar .b{background:#4ade80}#v-live .ltgbar .s{background:#f87171}
+#v-live .ltt{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid #1c1c22;font-size:13px}
+#v-live .ltt:first-of-type{border-top:0}
+#v-live .ltt .avatar{width:24px;height:24px;font-size:9px}
+#v-live .ltt .nm{min-width:0;flex:0 1 150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#ddd}
+#v-live .ltt .act{flex:1;min-width:0;color:#91d8af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#v-live .ltt .act.sell{color:#e7a1a6}#v-live .ltt .act small{color:#888;font-size:11px;margin-left:4px}
+#v-live .ltt .consensus{margin:0;padding:3px 8px;font-size:10px;flex:none}
+#v-live .ltt .amt{min-width:76px;text-align:right;font-weight:600;font-variant-numeric:tabular-nums;flex:none}
+#v-live .ltt .amt.b{color:#4ade80}#v-live .ltt .amt.s{color:#f87171}
+#v-live .ltt .tm{min-width:34px;text-align:right;color:#777;font-size:11px;flex:none}
+#v-live .ltgempty{padding:30px;text-align:center;color:#777}
+@media(max-width:700px){#v-live .ltgroups{padding:4px 12px 14px}#v-live .ltfil{padding:10px 14px}#v-live .ltt{flex-wrap:wrap;row-gap:4px}#v-live .ltt .nm{flex:1 1 auto}#v-live .ltt .tm{display:none}#v-live .ltt .act{flex:0 1 auto;order:5;padding-left:34px}#v-live .ltt .consensus{order:6}#v-live .ltt .act+.consensus,#v-live .ltt .consensus{margin-left:0}#v-live .ltt::after{content:'';order:4;flex-basis:100%}#v-live .ltgh .market .icon{width:32px;height:32px}}
 #v-live table{width:100%;border-collapse:collapse;table-layout:fixed;min-width:930px;font-size:13px}
 #v-live th{text-align:left;font-weight:400;color:#777;font-size:11px;text-transform:uppercase;letter-spacing:.6px;padding:16px 22px;border-bottom:1px solid #1f1f24}#v-live th#ltamt{cursor:pointer}#v-live th#ltamt:hover{color:#ddd}
 #v-live td{padding:20px 22px;border-bottom:1px solid #1f1f24;vertical-align:middle;font-size:13px}
@@ -802,6 +838,8 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
    <div class="ltshell">
     <div class="ltbar"><input id="liveq" type="search" aria-label="Search markets or traders" placeholder="Search markets or traders…" autocomplete="off" spellcheck="false" oninput="liveRender()"><button type="button" id="lthide" class="lt-hchip" hidden>Hidden (0)</button><span id="livecount"></span></div>
     <div id="lthidebox" class="lt-hbox" hidden></div>
+    <div class="ltfil"><div class="ltseg" id="ltmode"><button type="button" data-m="g">Grouped</button><button type="button" data-m="l">List</button></div><div class="ltchips" id="ltchips"><button type="button" data-f="all">All</button><button type="button" data-f="buy">Buys</button><button type="button" data-f="sell">Sells</button><button type="button" data-f="big">$1K+</button><button type="button" data-f="new">New entries</button><button type="button" data-f="against">Against the crowd</button></div></div>
+    <div id="ltgroups" class="ltgroups"></div>
     <div class="ltscroll"><table id="lttbl"><thead><tr><th>Market</th><th>Trader</th><th>Side</th><th id="ltamt" title="Sort by amount">Amount<span id="ltamtarr"></span></th><th>Time</th></tr></thead><tbody id="ltbody"></tbody></table></div>
     <div class="ltfoot"><span>Held bar = shares currently held in that market. Empty = fully exited.</span><span id="liveasof"></span></div>
    </div>
@@ -1316,7 +1354,8 @@ function liveHideChip(){const b=document.getElementById('lthide'),box=document.g
  box.innerHTML=LIVEHIDE.map(h=>{const ini=(h.n||'?').replace(/[^a-z0-9]/gi,'').slice(0,2).toUpperCase()||'?';const av=h.avatar?`<img class="avatar" src="${esc(h.avatar)}" alt="" width="28" height="28" referrerpolicy="no-referrer">`:`<span class="avatar">${esc(ini)}</span>`;return `<div class="lt-hrow">${av}<span class="name">${esc(h.n||h.a)}</span><button type="button" class="lt-un" data-unhide="${encodeURIComponent(h.a)}">Unhide</button></div>`}).join('')+'<button type="button" class="lt-un" data-unhide-all>Unhide all</button>'}
 function hideLiveTrader(a,n,av){a=String(a||'').toLowerCase();if(!a)return;if(!LIVEHIDE.some(h=>h.a===a))LIVEHIDE.push({a,n:n||a,avatar:av||''});saveLiveHide();liveRender()}
 function unhideLive(a){a=String(a||'').toLowerCase();LIVEHIDE=LIVEHIDE.filter(h=>h.a!==a);if(!LIVEHIDE.length)liveHideOpen=false;saveLiveHide();liveRender()}
-function liveRender(){const q=(document.getElementById('liveq').value||'').trim().toLowerCase();let data=LIVE.filter(r=>!LIVEHIDE.some(h=>h.a===String(r.a||'').toLowerCase())&&(!q||(r.n+' '+r.t+' '+r.out).toLowerCase().includes(q)));if(liveAmt)data.sort((a,b)=>liveAmt*(b.usd-a.usd)||b.ts-a.ts);
+function liveRender(){const q=(document.getElementById('liveq').value||'').trim().toLowerCase();let data=LIVE.filter(r=>!LIVEHIDE.some(h=>h.a===String(r.a||'').toLowerCase())&&(!q||(r.n+' '+r.t+' '+r.out).toLowerCase().includes(q)));data=data.filter(ltFilter);if(liveAmt)data.sort((a,b)=>liveAmt*(b.usd-a.usd)||b.ts-a.ts);
+ if(typeof ltGroups==='function')ltGroups(data.slice().sort((a,b)=>b.ts-a.ts));
  document.getElementById('livecount').textContent=data.length+(data.length===1?' trade':' trades');
  const asof=document.getElementById('liveasof');if(asof)asof.textContent=BUILT?updatedLabel(BUILT):'';
  const arr=document.getElementById('ltamtarr');if(arr)arr.textContent=liveAmt===1?' ↓':liveAmt===-1?' ↑':'';
@@ -1331,6 +1370,44 @@ function liveRender(){const q=(document.getElementById('liveq').value||'').trim(
   const fills=(r.fills&&r.fills.length>1)?`<button class="fills" type="button" data-fill="${r.id}" aria-expanded="${liveOpen.has(r.id)}">${liveOpen.has(r.id)?'⌄':'›'} ${r.fills.length} fills</button>`:'';
   const fillrow=liveOpen.has(r.id)&&r.fills&&r.fills.length?`<tr class="fillrow"><td colspan="5"><div class="fill-list">${r.fills.map((f,i)=>`<span>Fill ${i+1} · <b>${dollars(f.usd)}</b><br>${shn(f.shares)} shares @ ${cents(f.price)} · <span data-ts="${f.ts}">${ago(f.ts)}</span></span>`).join('')}</div></td></tr>`:'';
   return `<tr class="trade-row"><td><div class="market" data-url="${esc(r.url)}" data-cid="${esc(r.cid||'')}"><span class="mhit">${icon}</span><a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">${esc(r.t)}</a></div></td><td><div class="trader-top">${av}<span class="name">${esc(r.n)}</span>${waBtn(r.n)}${hideBtn}</div><div class="holding" title="${r.held>0?shn(r.held)+' '+esc(r.out)+' shares, '+holdUsd(r.hval):'Fully exited'}"><div class="track" role="meter" aria-label="Current shares held" aria-valuemin="0" aria-valuemax="${peak}" aria-valuenow="${r.held||0}"><i style="width:${width}%"></i></div><div class="held ${r.held>0?'':'exited'}">${held}</div></div></td><td><div class="side ${sell?'sell':''}">${sell?'Sell':'Buy'} ${esc(r.out)}<span class="price">${cents(r.price)}</span></div>${tag?`<span class="consensus ${r.chip==='Against'?'against':''}">${esc(tag)}</span>`:''}${fills}</td><td><div class="amount">${money(r.usd)}</div><div class="shares">${shn(r.shares)} shares</div></td><td class="time" data-ts="${r.ts}">${ago(r.ts)}</td></tr>${fillrow}`}).join('')||'<tr><td colspan="5" class="empty">No tracked-wallet trades match.</td></tr>'}
+// ---------- Live trades: grouped view (by time bucket -> market -> trader) ----------
+var LTMODE=LS.get('sm_ltmode','g'), LTF='all';
+function ltFilter(r){if(LTF==='buy')return r.side!=='SELL';if(LTF==='sell')return r.side==='SELL';if(LTF==='big')return (+r.usd||0)>=1000;
+ if(LTF==='new')return r.side!=='SELL'&&(r.chip==='First smart wallet'||(+r.held||0)<=(+r.shares||0)*1.05+0.01);if(LTF==='against')return r.chip==='Against';return true}
+function ltUi(){const v=document.getElementById('v-live');v.classList.toggle('mode-g',LTMODE==='g');v.classList.toggle('mode-l',LTMODE!=='g');
+ document.querySelectorAll('#ltmode button').forEach(b=>b.classList.toggle('on',b.dataset.m===LTMODE));document.querySelectorAll('#ltchips button').forEach(b=>b.classList.toggle('on',b.dataset.f===LTF))}
+function ltGroups(data){
+ const box=document.getElementById('ltgroups');if(!box)return;ltUi();
+ const now=Date.now()/1000,usd=n=>{const a=Math.abs(+n||0);return '$'+(a>=1e6?(a/1e6).toFixed(2)+'M':a>=1e4?Math.round(a/1e3)+'K':a>=1e3?(a/1e3).toFixed(1)+'K':a>=100?Math.round(a):a.toFixed(2))};
+ const B=[['Last 15 min',900],['Last hour',3600],['Last 6 hours',21600],['Earlier',Infinity]];
+ const bk={};data.forEach(r=>{const age=now-(+r.ts||0);const i=B.findIndex(b=>age<=b[1]);(bk[i]=bk[i]||[]).push(r)});
+ let html='';
+ B.forEach((b,i)=>{const rows=bk[i];if(!rows||!rows.length)return;
+  const mk=new Map();rows.forEach(r=>{const k=r.cid||r.url;if(!mk.has(k))mk.set(k,[]);mk.get(k).push(r)});
+  const groups=[...mk.values()].map(g=>{const buy=g.filter(r=>r.side!=='SELL').reduce((a,r)=>a+(+r.usd||0),0),sell=g.filter(r=>r.side==='SELL').reduce((a,r)=>a+(+r.usd||0),0);return {g,buy,sell,net:buy-sell,last:Math.max(...g.map(r=>+r.ts||0))}}).sort((a,b)=>b.last-a.last);
+  const net=groups.reduce((a,x)=>a+x.net,0);
+  html+=`<div class="ltbk"><span><b>${b[0]}</b> · ${groups.length} market${groups.length>1?'s':''} · ${rows.length} trade${rows.length>1?'s':''}</span><span class="${net>=0?'g':'rd'}">${net>=0?'+':'−'}${usd(net)} net</span></div>`;
+  html+=groups.map(x=>{const r0=x.g[0],initials=(r0.t||'?').replace(/[^a-z0-9]/gi,'').slice(0,2).toUpperCase();
+   const icon=r0.img?`<img class="icon" alt="" src="${esc(r0.img)}" width="40" height="40" loading="lazy" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'icon ph',textContent:'${initials}'}))">`:`<span class="icon ph">${initials}</span>`;
+   const m=findLiveMarket(r0.url,r0.cid);
+   const cons=m?`Smart money <span class="${m.top==='Yes'?'yes':'no'}">${m.cnt}/${m.n} ${String(m.top).toUpperCase()}</span> · now ${String(m.top).toUpperCase()} ${Math.round((m.top==='Yes'?m.ask:1-m.ask)*100)}¢`:(r0.split?`Smart money ${esc(r0.split)}`:'Not a tracked consensus market yet');
+   // bundle each trader's trades on the same side+outcome
+   const tm=new Map();x.g.forEach(r=>{const k=(r.a||r.n)+'|'+r.side+'|'+r.out;if(!tm.has(k))tm.set(k,[]);tm.get(k).push(r)});
+   const lines=[...tm.values()].map(t=>{const r=t.slice().sort((a,b)=>b.ts-a.ts)[0],sell=r.side==='SELL',tot=t.reduce((a,q)=>a+(+q.usd||0),0),sh=t.reduce((a,q)=>a+(+q.shares||0),0),fills=t.reduce((a,q)=>a+Math.max(1,(q.fills||[]).length),0);
+     const ini=(r.n||'?').replace(/[^a-z0-9]/gi,'').slice(0,2).toUpperCase()||'?';
+     const av=r.avatar?`<img class="avatar" src="${esc(r.avatar)}" alt="" width="24" height="24" loading="lazy" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'avatar',textContent:'${ini}'}))">`:`<span class="avatar">${ini}</span>`;
+     const tag=(r.chip||'')+(r.split?' '+r.split:'');
+     const hold=r.held>0?`Now holding ${shn(r.held)} ${r.out} shares (${'$'+Math.round(+r.hval||0).toLocaleString('en-US')})`:'Fully exited';
+     return {last:+r.ts||0,tot,html:`<div class="ltt" title="${esc(hold)}">${av}<span class="nm">${esc(r.n)}</span>${waBtn(r.n)}<span class="act ${sell?'sell':''}">${sell?'Sold':'Bought'} ${esc(String(r.out).toUpperCase())}<small>${fills>1?fills+' fills · ':''}@${sh?cents(tot/sh):cents(r.price)}</small></span>${tag?`<span class="consensus ${r.chip==='Against'?'against':''}">${esc(tag)}</span>`:''}<span class="amt ${sell?'s':'b'}">${sell?'−':'+'}${usd(tot)}</span><span class="tm" data-ts="${r.ts}">${ago(r.ts)}</span></div>`}}).sort((a,b)=>b.tot-a.tot);
+   const tot=x.buy+x.sell||1;
+   return `<div class="ltg"><div class="ltgh"><div class="market" data-url="${esc(r0.url)}" data-cid="${esc(r0.cid||'')}"><span class="mhit">${icon}</span><div style="min-width:0"><a href="${esc(r0.url)}" target="_blank" rel="noopener noreferrer">${esc(r0.t)}</a><div class="ltgs">${cons}</div></div></div><div class="ltgn"><b class="${x.net>=0?'g':'rd'}">${x.net>=0?'+':'−'}${usd(x.net)} net</b><small>${x.g.length} trade${x.g.length>1?'s':''} · ${ago(x.last)} ago</small></div></div>
+    <div class="ltgbar" title="Bought ${usd(x.buy)} · Sold ${usd(x.sell)}">${x.buy?`<i class="b" style="width:${x.buy/tot*100}%"></i>`:''}${x.sell?`<i class="s" style="width:${x.sell/tot*100}%"></i>`:''}</div>
+    ${lines.map(l=>l.html).join('')}</div>`}).join('');
+ });
+ box.innerHTML=html||'<div class="ltgempty">No tracked-wallet trades match.</div>';
+}
+document.getElementById('ltmode').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;LTMODE=b.dataset.m;LS.set('sm_ltmode',LTMODE);liveRender()});
+document.getElementById('ltchips').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;LTF=b.dataset.f;liveRender()});
 function slugOf(url){const p=String(url||'').split('?')[0].replace(/\/+$/,'').split('/');try{return decodeURIComponent(p[p.length-1]||'').toLowerCase()}catch(e){return (p[p.length-1]||'').toLowerCase()}}
 function findLiveMarket(url, cid){const slug=slugOf(url);const id=String(cid||'').toLowerCase();let loose=null;for(const m of DS){const mc=String(m.cid||'').toLowerCase();if((id&&mc&&mc===id)||m.url===url)return m;if(!loose&&slug&&slugOf(m.url)===slug)loose=m}return loose}
 function openTrackedMarket(url, cid){const m=findLiveMarket(url, cid);if(!m)return false;if(HID.has(m.url))SHOWH=true;REVEAL=SAV[m.url]?m.url:'';const box=document.getElementById('q');if(box)box.value='';Q='';view.hold=true;view('markets');view.hold=false;const card=[...document.querySelectorAll('#grid .card')].find(el=>el.dataset.u===m.url);if(!card)return false;card.classList.add('flash');card.scrollIntoView({behavior:'smooth',block:'center'});clearTimeout(openTrackedMarket.t);openTrackedMarket.t=setTimeout(()=>card.classList.remove('flash'),2000);return true}
