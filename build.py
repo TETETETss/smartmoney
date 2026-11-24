@@ -202,6 +202,26 @@ def charts(D, W, T):
     print(f'charts: {sum(1 for v in CH.values() if v["p"])} price histories, {sum(len(v["t"]) for v in CH.values())} trades')
     return CH
 
+
+# ---- stablecoin cash on Polygon (pUSD = Polymarket's collateral since Apr 2026, plus any USDC.e / native USDC left in the wallet)
+STABLES = ['0xC011a7E12a19f7B1f670d46F03B03f3342E82DFB',   # pUSD (CollateralToken proxy)
+           '0x2791bca1f2de4661ed88a30c99a7a9449aa84174',   # USDC.e
+           '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359']   # USDC (native)
+RPCS = ['https://polygon-bor-rpc.publicnode.com', 'https://polygon-rpc.com', 'https://1rpc.io/matic']
+def stable_cash(addr):
+    data = '0x70a08231' + addr.lower().replace('0x', '').rjust(64, '0')
+    body = json.dumps([{'jsonrpc': '2.0', 'id': i, 'method': 'eth_call', 'params': [{'to': t, 'data': data}, 'latest']} for i, t in enumerate(STABLES)]).encode()
+    for rpc in RPCS:
+        try:
+            req = urllib.request.Request(rpc, data=body, headers={'content-type': 'application/json', 'User-Agent': 'Mozilla/5.0'})
+            with urllib.request.urlopen(req, timeout=20) as r:
+                res = json.loads(r.read().decode())
+            if isinstance(res, list) and all('result' in x for x in res):
+                return round(sum(int(x['result'], 16) for x in res if x['result'] not in (None, '0x')) / 1e6, 2)
+        except Exception as e:
+            print('  cash rpc failed', rpc, str(e)[:80])
+    return None
+
 def prefetch_positions(addrs):
     need = [a for a in addrs if a not in RAW]
     if not need: return
@@ -217,6 +237,8 @@ def build_group(W, min_value, label):
     markets, traders = {}, []
     with cf.ThreadPoolExecutor(8) as ex:
         pnl_by = dict(zip([w['address'] for w in W], ex.map(lambda w: pnl_series(w['address']), W)))
+    with cf.ThreadPoolExecutor(8) as ex:
+        cash_by = dict(zip([w['address'] for w in W], ex.map(lambda w: stable_cash(w['address']), W)))
     for w in W:
         a = w['address']
         P = RAW[a] if a in RAW else positions(a)
@@ -246,17 +268,19 @@ def build_group(W, min_value, label):
             prev = m['tr'].get(n)
             if prev and prev['val'] >= val: continue   # a trader holding both sides: keep the bigger one
             m['tr'][n] = {'n': n, 'side': side, 'sh': round(float(F(p,'current_size','size','shares',default=0)), 4), 'avg': round(float(F(p,'avgPrice','avg_price','average_price',default=0) or 0), 4), 'val': round(val, 4), 'ex': None, 'fe': int(float(F(p,'first_entry_at','firstEntryAt',default=0) or 0))}
-        # portfolio value = all open positions (any market), used for "Sizing %" on the site
-        pv = round(sum(float(F(q,'currentValue','current_value','value',default=0) or 0) for q in P
+        # portfolio value = all open positions (any market) + stablecoin cash, used for "Size %" on the site
+        pos_v = round(sum(float(F(q,'currentValue','current_value','value',default=0) or 0) for q in P
                        if F(q,'redeemable') not in (True, 'True', 'true') and float(F(q,'currentValue','current_value','value',default=0) or 0) > 0), 2)
+        cash = cash_by.get(a)
+        pv = round(pos_v + (cash or 0), 2)   # portfolio = all open positions + stablecoin cash
         s = pnl_by.get(a) or []
         if s:
             pts = [v for _, v in s]; step = max(1, len(pts) // 90); spark = pts[::step][-90:]
             if spark[-1] != pts[-1]: spark.append(pts[-1])
             month = next((v for t, v in s if t >= s[-1][0] - 30 * 86400), pts[0])
-            traders.append({'n': n, 'a': a, 'pv': pv, 'pnl': pts[-1], 'mpnl': pts[-1] - month, 'days': int((s[-1][0] - s[0][0]) / 86400), 's': [round(v, 2) for v in spark]})
+            traders.append({'n': n, 'a': a, 'pv': pv, 'pos': pos_v, 'cash': cash, 'pnl': pts[-1], 'mpnl': pts[-1] - month, 'days': int((s[-1][0] - s[0][0]) / 86400), 's': [round(v, 2) for v in spark]})
         else:
-            traders.append({'n': n, 'a': a, 'pv': pv, 'pnl': None, 'mpnl': None, 'days': 0, 's': []})
+            traders.append({'n': n, 'a': a, 'pv': pv, 'pos': pos_v, 'cash': cash, 'pnl': None, 'mpnl': None, 'days': 0, 's': []})
     D = []
     multi = sum(len(m['tr']) >= MIN_TRADERS for m in markets.values())
     solo_ok = SOLO_MIN > 0
