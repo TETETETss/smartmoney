@@ -246,14 +246,17 @@ def build_group(W, min_value, label):
             prev = m['tr'].get(n)
             if prev and prev['val'] >= val: continue   # a trader holding both sides: keep the bigger one
             m['tr'][n] = {'n': n, 'side': side, 'sh': round(float(F(p,'current_size','size','shares',default=0)), 4), 'avg': round(float(F(p,'avgPrice','avg_price','average_price',default=0) or 0), 4), 'val': round(val, 4), 'ex': None, 'fe': int(float(F(p,'first_entry_at','firstEntryAt',default=0) or 0))}
+        # portfolio value = all open positions (any market), used for "Sizing %" on the site
+        pv = round(sum(float(F(q,'currentValue','current_value','value',default=0) or 0) for q in P
+                       if F(q,'redeemable') not in (True, 'True', 'true') and float(F(q,'currentValue','current_value','value',default=0) or 0) > 0), 2)
         s = pnl_by.get(a) or []
         if s:
             pts = [v for _, v in s]; step = max(1, len(pts) // 90); spark = pts[::step][-90:]
             if spark[-1] != pts[-1]: spark.append(pts[-1])
             month = next((v for t, v in s if t >= s[-1][0] - 30 * 86400), pts[0])
-            traders.append({'n': n, 'a': a, 'pnl': pts[-1], 'mpnl': pts[-1] - month, 'days': int((s[-1][0] - s[0][0]) / 86400), 's': [round(v, 2) for v in spark]})
+            traders.append({'n': n, 'a': a, 'pv': pv, 'pnl': pts[-1], 'mpnl': pts[-1] - month, 'days': int((s[-1][0] - s[0][0]) / 86400), 's': [round(v, 2) for v in spark]})
         else:
-            traders.append({'n': n, 'a': a, 'pnl': None, 'mpnl': None, 'days': 0, 's': []})
+            traders.append({'n': n, 'a': a, 'pv': pv, 'pnl': None, 'mpnl': None, 'days': 0, 's': []})
     D = []
     multi = sum(len(m['tr']) >= MIN_TRADERS for m in markets.values())
     solo_ok = SOLO_MIN > 0
