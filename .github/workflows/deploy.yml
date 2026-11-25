@@ -138,10 +138,16 @@ jobs:
           print(f"embed ok: {len(rows)} rows; newest {r.get('n')} {r.get('side')} {r.get('out')} ${r.get('usd')} {r.get('chip')} {r.get('split')} {r.get('arrow')}")
           PY
 
+      - name: Find linked wallets (entities)
+        continue-on-error: true
+        timeout-minutes: 20
+        run: python -u entities.py
+
       - name: Stage dist
         run: |
           mkdir -p dist
           cp index.html dist/index.html
+          if [ -s entities.json ]; then cp entities.json dist/entities.json; fi
           test -s dist/index.html
           # Deploy this file only. raw.json, data.json, and debug.json stay on the runner.
           find dist -type f -print
