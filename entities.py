@@ -23,6 +23,7 @@ BS = 'https://polygon.blockscout.com'
 V2 = 'https://data-api.polymarket.com/v2/'
 STABLES = {'0xc011a7e12a19f7b1f670d46f03b03f3342e82dfb', '0x2791bca1f2de4661ed88a30c99a7a9449aa84174', '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359'}
 ZERO = '0x0000000000000000000000000000000000000000'
+PROBE = [1]
 UA = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/130 Safari/537.36', 'Accept': 'application/json'}
 
 def get(url, tries=6, timeout=40):
@@ -34,10 +35,12 @@ def get(url, tries=6, timeout=40):
                 time.sleep(3 * (i + 1)); continue
             return d
         except urllib.error.HTTPError as e:
+            if PROBE: print('   http', e.code, url[:90], e.read()[:160])
             if e.code == 429 or e.code >= 500:
                 time.sleep(3 * (i + 1)); continue
             return None
-        except Exception:
+        except Exception as e:
+            if PROBE: print('   err', url[:90], str(e)[:160])
             time.sleep(2 * (i + 1))
     return None
 
@@ -236,15 +239,19 @@ def main():
     force = os.environ.get('ENT_FORCE') == '1'
     if not force:
         old = get(SITE + '/entities.json', tries=2)
-        if isinstance(old, dict) and old.get('built') and time.time() - old['built'] < ENT_HOURS * 3600:
+        if isinstance(old, dict) and old.get('built') and old.get('n_tx') and time.time() - old['built'] < ENT_HOURS * 3600:
             json.dump(old, open(os.path.join(HERE, 'entities.json'), 'w'))
             print(f'entities: reused cached file from {int((time.time() - old["built"]) / 60)} min ago')
             return
     W = json.load(open(os.path.join(HERE, 'wallets.json'), encoding='utf-8'))
-    W = [w for w in W if w.get('address')]
+    W = [dict(w, name=w.get('name') or w['address'][:6] + '…' + w['address'][-4:]) for w in W if w.get('address')]
+    probe = get(BS + '/api?module=account&action=tokentx&address=' + W[0]['address'] + '&sort=desc&page=1&offset=5', tries=2)
+    print('blockscout probe:', str(probe)[:300])
+    PROBE.clear()
     t0 = time.time()
     ents, debug = analyse(W)
-    out = {'built': int(time.time()), 'secs': int(time.time() - t0), 'entities': ents, 'debug': debug}
+    n_tx = sum(debug['totals'].values())
+    out = {'built': int(time.time()), 'n_tx': n_tx, 'secs': int(time.time() - t0), 'entities': ents, 'debug': debug}
     json.dump(out, open(os.path.join(HERE, 'entities.json'), 'w'), default=list)
     n = sum(1 for e in ents.values() if e['accounts'])
     print(f'entities: done in {out["secs"]}s, {n} traders with linked accounts')
