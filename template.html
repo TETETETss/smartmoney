@@ -222,6 +222,12 @@ td.tn{width:34%;padding-right:8px;font-size:11.5px;font-weight:400;letter-spacin
 .if-empty{flex:1;padding:40px;text-align:center;color:#777;border:1px dashed #333;border-radius:16px;font-size:13px}
 .tw{display:flex;align-items:center;gap:10px;min-width:0}
 .tw>div{min-width:0;flex:1}
+/* name + lookup button always on ONE line (long names get "…"), bar underneath, so every trader row has the same height and the numbers line up */
+td.tn .tw>div{display:flex;flex-wrap:wrap;align-items:center;column-gap:5px;row-gap:5px}
+td.tn .tw>div>a.tlk{flex:0 1 auto;min-width:0;max-width:calc(100% - 26px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+td.tn .tw>div>.wa-go{flex:none;margin:0}
+td.tn .tw>div>.pbar,td.tn .tw>div>.since{flex:0 0 100%;margin-top:0}
+table:has(th.szh) td.r{font-variant-numeric:tabular-nums;vertical-align:middle}
 .tav{width:26px;height:26px;border-radius:50%;object-fit:cover;flex:none;background:#2a2a2a;border:1px solid #333;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#bbb}
 tr.ex .tav{opacity:.5}
 .sp.off{opacity:.45}
