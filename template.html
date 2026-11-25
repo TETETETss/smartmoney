@@ -187,6 +187,20 @@ details .nls a:hover{color:#e8e8e8;border-color:#e8e8e8;text-decoration:none}
 .tdisc{grid-column:1/-1;font-size:12px;color:#777;line-height:1.6;border-top:1px solid #222;padding-top:14px}
 @media(max-width:900px){.cg,.co{grid-template-columns:1fr 1fr}}
 .grp td{padding:14px 0 6px;border-bottom:0}.grp .gc{margin-left:10px;font-size:11px;color:#777;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.6px}
+/* searchable smart-money picker (wraps a <select>) */
+.spk{position:relative;flex:none;min-width:230px;max-width:280px}
+.spk select{display:none!important}
+.spk input{width:100%;height:100%;min-height:42px;background:#0e0e0e;border:1px solid #333;border-radius:12px;color:#fff;padding:0 34px 0 14px;font:inherit;font-size:13px;outline:none}
+.spk input:focus{border-color:#e8e8e8}
+.spk:after{content:"";position:absolute;right:14px;top:50%;width:7px;height:7px;border-right:1.5px solid #888;border-bottom:1.5px solid #888;transform:translateY(-70%) rotate(45deg);pointer-events:none}
+.spk ul{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:40;max-height:300px;overflow:auto;margin:0;padding:6px;list-style:none;background:#121212;border:1px solid #333;border-radius:12px;box-shadow:0 18px 40px #000c;display:none}
+.spk.open ul{display:block}
+.spk li{padding:8px 10px;border-radius:8px;font-size:13px;color:#ddd;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spk li.hi,.spk li:hover{background:#232323;color:#fff}
+.spk li.cur{color:#fff;font-weight:600}
+.spk li.none{color:#777;cursor:default;background:none}
+.spk mark{background:none;color:#fff;font-weight:700}
+@media(max-width:700px){.spk{flex:1 1 100%;max-width:none}}
 /* YES / NO group header = full-width coloured band so the two groups are easy to tell apart */
 tr.grp.gy td,tr.grp.gn td,tr.grp.gx td{padding:9px 12px;border-top:12px solid #121212;background-clip:padding-box}
 tr.grp.gy td{background:rgba(74,222,128,.09);box-shadow:inset 3px 0 0 #4ade80}
@@ -228,6 +242,7 @@ td.tn .tw>div>a.tlk{flex:0 1 auto;min-width:0;max-width:calc(100% - 26px);overfl
 td.tn .tw>div>.wa-go{flex:none;margin:0}
 td.tn .tw>div>.pbar,td.tn .tw>div>.since{flex:0 0 100%;margin-top:0}
 table:has(th.szh) td.r{font-variant-numeric:tabular-nums;vertical-align:middle}
+table:has(th.szh) td.r,table:has(th.szh) th.r{text-align:left;padding-left:10px}
 .tav{width:26px;height:26px;border-radius:50%;object-fit:cover;flex:none;background:#2a2a2a;border:1px solid #333;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#bbb}
 tr.ex .tav{opacity:.5}
 .sp.off{opacity:.45}
@@ -1414,6 +1429,40 @@ function ltGroups(data){
 }
 document.getElementById('ltmode').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;LTMODE=b.dataset.m;LS.set('sm_ltmode',LTMODE);liveRender()});
 document.getElementById('ltchips').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;LTF=b.dataset.f;liveRender()});
+
+// Make a <select> searchable by typing: wraps it with an input + filtered list. Picking sets the select and fires its change handler.
+function makeSearchable(sel,ph){
+ if(!sel||sel.dataset.spk)return;sel.dataset.spk=1;
+ const w=document.createElement('div');w.className='spk';sel.parentNode.insertBefore(w,sel);w.appendChild(sel);
+ const inp=document.createElement('input');inp.type='text';inp.placeholder=ph||'Search smart money wallets…';inp.autocomplete='off';inp.spellcheck=false;inp.setAttribute('aria-label',ph||'Search smart money wallets');
+ const ul=document.createElement('ul');ul.setAttribute('role','listbox');w.appendChild(inp);w.appendChild(ul);
+ let hi=-1,items=[];
+ const opts=()=>[...sel.options].filter(o=>o.value!==''&&!o.disabled);
+ const cur=()=>{const o=sel.options[sel.selectedIndex];return o&&o.value!==''?o.text:''};
+ const syncLabel=()=>{if(document.activeElement!==inp)inp.value=cur()};
+ const draw=()=>{const q=inp.value.trim().toLowerCase(),c=cur();const all=opts();
+  items=(q&&q!==c.toLowerCase()?all.filter(o=>o.text.toLowerCase().includes(q)):all);
+  if(hi>=items.length)hi=items.length-1;
+  const mk=t=>{if(!q||q===c.toLowerCase())return esc(t);const i=t.toLowerCase().indexOf(q);return i<0?esc(t):esc(t.slice(0,i))+'<mark>'+esc(t.slice(i,i+q.length))+'</mark>'+esc(t.slice(i+q.length))};
+  ul.innerHTML=items.length?items.map((o,i)=>`<li role="option" data-i="${i}" class="${i===hi?'hi':''} ${o.selected?'cur':''}">${mk(o.text)}</li>`).join(''):'<li class="none">No wallet matches</li>'};
+ const pick=o=>{if(!o)return;sel.value=o.value;w.classList.remove('open');inp.value=o.text;inp.blur();
+  if(typeof sel.onchange==='function')sel.onchange.call(sel,new Event('change'));else sel.dispatchEvent(new Event('change',{bubbles:true}))};
+ inp.addEventListener('focus',()=>{inp.select();hi=-1;draw();w.classList.add('open')});
+ inp.addEventListener('input',()=>{hi=0;draw();w.classList.add('open')});
+ inp.addEventListener('keydown',e=>{if(e.key==='ArrowDown'){e.preventDefault();hi=Math.min(items.length-1,hi+1);draw();w.classList.add('open')}
+  else if(e.key==='ArrowUp'){e.preventDefault();hi=Math.max(0,hi-1);draw()}
+  else if(e.key==='Enter'){e.preventDefault();pick(items[hi<0?0:hi])}
+  else if(e.key==='Escape'){w.classList.remove('open');inp.value=cur();inp.blur()}});
+ ul.addEventListener('mousedown',e=>{const li=e.target.closest('li[data-i]');if(!li)return;e.preventDefault();pick(items[+li.dataset.i])});
+ inp.addEventListener('blur',()=>setTimeout(()=>{w.classList.remove('open');inp.value=cur()},120));
+ new MutationObserver(syncLabel).observe(sel,{childList:true,subtree:true,attributes:true});
+ sel.addEventListener('change',syncLabel);
+ const set=Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype,'value');
+ Object.defineProperty(sel,'value',{get(){return set.get.call(this)},set(v){set.set.call(this,v);setTimeout(syncLabel,0)}});
+ syncLabel();
+}
+document.addEventListener('DOMContentLoaded',()=>{makeSearchable(document.getElementById('wasel'),'Search smart money wallets…');makeSearchable(document.getElementById('pfsel'),'Search smart money wallets…')});
+setTimeout(()=>{makeSearchable(document.getElementById('wasel'),'Search smart money wallets…');makeSearchable(document.getElementById('pfsel'),'Search smart money wallets…')},0);
 function slugOf(url){const p=String(url||'').split('?')[0].replace(/\/+$/,'').split('/');try{return decodeURIComponent(p[p.length-1]||'').toLowerCase()}catch(e){return (p[p.length-1]||'').toLowerCase()}}
 function findLiveMarket(url, cid){const slug=slugOf(url);const id=String(cid||'').toLowerCase();let loose=null;for(const m of DS){const mc=String(m.cid||'').toLowerCase();if((id&&mc&&mc===id)||m.url===url)return m;if(!loose&&slug&&slugOf(m.url)===slug)loose=m}return loose}
 function openTrackedMarket(url, cid){const m=findLiveMarket(url, cid);if(!m)return false;if(HID.has(m.url))SHOWH=true;REVEAL=SAV[m.url]?m.url:'';const box=document.getElementById('q');if(box)box.value='';Q='';view.hold=true;view('markets');view.hold=false;const card=[...document.querySelectorAll('#grid .card')].find(el=>el.dataset.u===m.url);if(!card)return false;card.classList.add('flash');card.scrollIntoView({behavior:'smooth',block:'center'});clearTimeout(openTrackedMarket.t);openTrackedMarket.t=setTimeout(()=>card.classList.remove('flash'),2000);return true}
