@@ -55,7 +55,7 @@ def rpc(method, params, tries=5):
         url = RPCS[i % len(RPCS)]
         try:
             req = urllib.request.Request(url, data=body, headers={'content-type': 'application/json', **UA})
-            with urllib.request.urlopen(req, timeout=60) as r:
+            with urllib.request.urlopen(req, timeout=30) as r:
                 d = json.loads(r.read().decode())
             if 'result' in d: return d['result']
             err = d.get('error')
@@ -66,27 +66,41 @@ def rpc(method, params, tries=5):
 
 def pad(a): return '0x' + a.lower()[2:].rjust(64, '0')
 
-def scan(addrs, b0, b1, threads=8):
-    """All stablecoin Transfer logs from or to any of addrs between blocks b0..b1."""
+def scan(addrs, b0, b1, threads=8, budget=None):
+    """Stablecoin Transfer logs from/to any of addrs in blocks b0..b1, newest chunk first.
+    Stops starting new chunks after `budget` seconds. Returns (rows, lo, stats): every block in lo..b1 was read."""
     pads = [pad(a) for a in addrs]
-    jobs = []
-    for s in range(b0, b1 + 1, CHUNK + 1):
-        e = min(s + CHUNK, b1)
-        jobs += [(s, e, [TOPIC, pads]), (s, e, [TOPIC, None, pads])]
-    out, bad = [], 0
-    def one(j):
-        s, e, tp = j
+    chunks = []
+    e = b1
+    while e >= b0:
+        s = max(b0, e - CHUNK); chunks.append((s, e)); e = s - 1
+    t0 = time.time()
+    def one(c):
+        if budget and time.time() - t0 > budget: return c, None
+        s, e = c
+        got = []
         try:
-            return rpc('eth_getLogs', [{'fromBlock': hex(s), 'toBlock': hex(e), 'address': sorted(STABLES), 'topics': tp}])
+            for tp in ([TOPIC, pads], [TOPIC, None, pads]):
+                got += rpc('eth_getLogs', [{'fromBlock': hex(s), 'toBlock': hex(e), 'address': sorted(STABLES), 'topics': tp}], tries=4)
         except Exception as ex:
-            return ex
+            print('   chunk failed', s, str(ex)[:120]); return c, None
+        return c, got
+    rows, done, n = [], {}, 0
     with cf.ThreadPoolExecutor(threads) as ex:
-        for res in ex.map(one, jobs):
-            if isinstance(res, Exception): bad += 1; continue
-            for l in res:
+        for c, res in ex.map(one, chunks):
+            n += 1
+            if n % 100 == 0: print(f'   {n}/{len(chunks)} chunks, {int(time.time() - t0)}s')
+            done[c] = res is not None
+            for l in res or []:
                 if len(l.get('topics', [])) < 3: continue
-                out.append(('0x' + l['topics'][1][26:], '0x' + l['topics'][2][26:], int(l['data'], 16) / 1e6, int(l['blockNumber'], 16)))
-    return out, len(jobs), bad
+                rows.append(('0x' + l['topics'][1][26:], '0x' + l['topics'][2][26:], int(l['data'], 16) / 1e6, int(l['blockNumber'], 16)))
+    lo = b1 + 1
+    for c in chunks:
+        if not done.get(c): break
+        lo = c[0]
+    # drop rows from chunks below the contiguous range (they will be read again next time)
+    rows = [r for r in rows if r[3] >= lo]
+    return rows, lo, {'chunks': len(chunks), 'ok': sum(done.values()), 'secs': int(time.time() - t0)}
 
 _code = {}
 def is_contract(a):
@@ -129,6 +143,8 @@ def pm_value(a):
 # ---------- main analysis
 DAYS = float(os.environ.get('ENT_DAYS', 180))      # history depth for the tracked wallets
 HOP_DAYS = float(os.environ.get('ENT_HOP_DAYS', 90))
+SCAN_BUDGET = float(os.environ.get('ENT_SCAN_SECS', 480))
+HOP_BUDGET = float(os.environ.get('ENT_HOP_SECS', 240))
 
 def merge(agg, rows, wallets):
     for f, t, v, b in rows:
@@ -153,19 +169,25 @@ def analyse(W, state):
     spb = (hts - ots) / span
     bts = lambda b: int(hts - (head - b) * spb)
 
-    agg = {w: {c: list(v) for c, v in m.items()} for w, m in (state.get('agg') or {}).items() if w in wallets}
-    last = state.get('block') or 0
-    old = [w for w in wallets if w in agg and last]
-    new = [w for w in wallets if w not in old]
+    target = head - span
+    same = set(state.get('wallets') or []) == wallets
+    agg = {w: {c: list(v) for c, v in m.items()} for w, m in (state.get('agg') or {}).items()} if same else {}
+    hi, lo = (state.get('hi'), state.get('lo')) if same and state.get('hi') else (None, None)
     stats = {}
-    if new:
-        rows, n, bad = scan(new, head - span, head)
-        merge(agg, rows, set(new)); stats['new'] = [len(new), len(rows), n, bad]
-        print(f'  scanned {len(new)} wallets over {DAYS:.0f} days: {len(rows)} transfers ({n} queries, {bad} failed)')
-    if old and last < head:
-        rows, n, bad = scan(old, last + 1, head)
-        merge(agg, rows, set(old)); stats['old'] = [len(old), len(rows), n, bad]
-        print(f'  updated {len(old)} wallets since block {last}: {len(rows)} transfers')
+    t0 = time.time()
+    if hi is None:
+        rows, lo, st = scan(list(wallets), target, head, budget=SCAN_BUDGET)
+        merge(agg, rows, wallets); hi = head; stats['first'] = st
+    else:
+        if hi < head:
+            rows, l2, st = scan(list(wallets), hi + 1, head, budget=SCAN_BUDGET)
+            if l2 == hi + 1: merge(agg, rows, wallets); hi = head
+            stats['new'] = st
+        left = SCAN_BUDGET - (time.time() - t0)
+        if lo > target and left > 30:
+            rows, l2, st = scan(list(wallets), target, lo - 1, budget=left)
+            merge(agg, rows, wallets); lo = min(lo, l2); stats['back'] = st
+    print(f'  history: {(head - lo) * spb / 86400:.0f} of {DAYS:.0f} days read, {stats}')
     for w in wallets: agg.setdefault(w, {})
 
     seen = collections.Counter(c for m in agg.values() for c in m)
@@ -193,8 +215,8 @@ def analyse(W, state):
     hop = collections.defaultdict(dict)
     if hop_src:
         src = set(hop_src)
-        rows, n, bad = scan(hop_src, head - int(HOP_DAYS * 86400 / 2.05), head, threads=6)
-        stats['hop'] = [len(hop_src), len(rows), n, bad]
+        rows, hlo, st = scan(hop_src, head - int(HOP_DAYS * 86400 / 2.05), head, threads=6, budget=HOP_BUDGET)
+        stats['hop'] = st; stats['hop_days'] = round((head - hlo) * spb / 86400)
         for f, t, v, b in rows:
             for x, o in ((f, t), (t, f)):
                 if x not in src or o in infra or o == x: continue
@@ -243,13 +265,14 @@ def analyse(W, state):
     keep = {w: {c: [round(e[0], 2), round(e[1], 2), e[2], e[3], e[4]] for c, e in m.items() if c in infra or e[0] + e[1] >= 20 or e[2] >= 2} for w, m in agg.items()}
     debug = {'infra': sorted(infra)[:80], 'infra_n': len(infra), 'scan': stats, 'n_cand': len(cand), 'n_pm': len(PM),
              'shared_funders': shared, 'cp_per_wallet': {names[w]: len(m) for w, m in agg.items()}}
-    return ents, debug, {'block': head, 'agg': keep}
+    debug['days'] = round((head - lo) * spb / 86400); debug['complete'] = lo <= target
+    return ents, debug, {'hi': hi, 'lo': lo, 'wallets': sorted(wallets), 'agg': keep}
 
 def main():
     force = os.environ.get('ENT_FORCE') == '1'
     old = {} if force else (get(SITE + '/entities.json', tries=2) or {})
     if not isinstance(old, dict): old = {}
-    if old.get('built') and old.get('n_tx') and time.time() - old['built'] < ENT_HOURS * 3600:
+    if old.get('built') and old.get('n_tx') and (old.get('debug') or {}).get('complete') and time.time() - old['built'] < ENT_HOURS * 3600:
         json.dump(old, open(os.path.join(HERE, 'entities.json'), 'w'))
         print(f'entities: reused cached file from {int((time.time() - old["built"]) / 60)} min ago')
         return
