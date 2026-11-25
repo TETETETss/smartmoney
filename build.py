@@ -731,6 +731,46 @@ def weekly(addrs, names):
     print(f'weekly: {len(mk)} markets with 3+ new traders')
     return {'built': int(time.time()), 'mk': mk}
 
+# ---- Kalshi post-count markets (Trump Truth Social weekly/daily, Elon weekly when listed).
+# Kalshi's API has no CORS, so prices are fetched here and embedded; the page adds live counts.
+KPOST_SERIES = [('KXTRUTHSOCIAL', 'trump'), ('KXTRUTHSOCIALD', 'trump'), ('KXELONTWEETS', 'elon')]
+_MON = {m: i for i, m in enumerate(['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], 1)}
+def _et_ms(y, mo, d, end=False):
+    from zoneinfo import ZoneInfo
+    from datetime import datetime, timedelta
+    t = datetime(y, mo, d, tzinfo=ZoneInfo('America/New_York'))
+    if end: t = t + timedelta(days=1)
+    return int(t.timestamp() * 1000)
+def kalshi_posts():
+    out = []
+    for ser, who in KPOST_SERIES:
+        j = get(f'https://api.elections.kalshi.com/trade-api/v2/events?series_ticker={ser}&status=open&with_nested_markets=true', quiet=True) or {}
+        for ev in j.get('events') or []:
+            ms = ev.get('markets') or []
+            if not ms: continue
+            rule = ms[0].get('rules_primary') or ''
+            dts = re.findall(r'([A-Z][a-z]{2}) (\d{1,2}), (\d{4})', rule)
+            if not dts: continue
+            a = dts[0]; b = dts[1] if len(dts) > 1 else dts[0]
+            try:
+                start = _et_ms(int(a[2]), _MON[a[0]], int(a[1])); end = _et_ms(int(b[2]), _MON[b[0]], int(b[1]), True)
+            except Exception:
+                continue
+            br = []
+            for m in ms:
+                f = lambda k: (float(m[k]) if m.get(k) not in (None, '') else None)
+                st, lo, hi = m.get('strike_type'), m.get('floor_strike'), m.get('cap_strike')
+                if st == 'less': lo, hi = 0, (hi - 1 if hi is not None else None)
+                elif st in ('greater', 'greater_or_equal'): hi = None
+                if st == 'greater' and lo is not None: lo = lo + 1
+                br.append({'l': m.get('yes_sub_title') or '', 'lo': lo if lo is not None else 0, 'hi': hi,
+                           'b': f('yes_bid_dollars'), 'a': f('yes_ask_dollars'), 'p': f('last_price_dollars'), 'v': f('volume_fp'), 't': m.get('ticker')})
+            br.sort(key=lambda x: x['lo'])
+            out.append({'who': who, 'venue': 'kalshi', 'id': ev.get('event_ticker'), 'title': ev.get('title') or '', 'start': start, 'end': end,
+                        'url': 'https://kalshi.com/markets/' + ser.lower(), 'br': br})
+    print(f'Kalshi post-count events: {len(out)}')
+    return {'built': int(time.time()), 'ev': out}
+
 def main():
     # One tracked list. Each wallet keeps its own position minimum (macro $500, fast $10).
     W = load_wallets('wallets.json')
@@ -742,6 +782,10 @@ def main():
     LIVE = live_feed(addrs, names)
     INFLOW, OUTFLOW = money_flow(addrs, names)
     WEEKLY = weekly(addrs, names)
+    try:
+        KPOSTS = kalshi_posts()
+    except Exception as e:
+        print('  kalshi post counts failed', e); KPOSTS = {'built': int(time.time()), 'ev': []}
     for m in D: m.pop('tok', None)
     json.dump(RAW, open(os.path.join(HERE, 'raw.json'), 'w', encoding='utf-8'))
     if not ok:
@@ -752,7 +796,7 @@ def main():
     html = open(os.path.join(HERE, 'template.html'), encoding='utf-8').read()
     html = html.replace('__CHARTS__', js_json(CH)).replace('__DATA__', js_json(D)).replace('__TRADERS__', js_json(T)).replace('__NTRADERS__', str(len(W)))
     html = html.replace('__LIVE__', js_json(LIVE)).replace('__NLIVE__', str(len(LIVE))).replace('__BUILT__', str(int(time.time())))
-    html = html.replace('__INFLOW__', js_json(INFLOW)).replace('__OUTFLOW__', js_json(OUTFLOW)).replace('__WEEKLY__', js_json(WEEKLY)).replace('__AVATARS__', js_json(wallet_avatars(W)))
+    html = html.replace('__INFLOW__', js_json(INFLOW)).replace('__OUTFLOW__', js_json(OUTFLOW)).replace('__WEEKLY__', js_json(WEEKLY)).replace('__AVATARS__', js_json(wallet_avatars(W))).replace('__KPOSTS__', js_json(KPOSTS))
     open(os.path.join(HERE, 'index.html'), 'w', encoding='utf-8').write(html)
     print(f'\nDone: {len(W)} traders, {len(D)} markets shown -> index.html')
 
