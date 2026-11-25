@@ -61,12 +61,12 @@ def rpc(method, params, tries=5):
             err = d.get('error')
         except Exception as e:
             err = str(e)[:120]
-        time.sleep(1.5 * (i + 1))
+        time.sleep((6 if '403' in str(err) or '429' in str(err) else 1.5) * (i + 1))
     raise RuntimeError(f'{method} failed: {err}')
 
 def pad(a): return '0x' + a.lower()[2:].rjust(64, '0')
 
-def scan(addrs, b0, b1, threads=8, budget=None):
+def scan(addrs, b0, b1, threads=5, budget=None):
     """Stablecoin Transfer logs from/to any of addrs in blocks b0..b1, newest chunk first.
     Stops starting new chunks after `budget` seconds. Returns (rows, lo, stats): every block in lo..b1 was read."""
     pads = [pad(a) for a in addrs]
@@ -93,7 +93,7 @@ def scan(addrs, b0, b1, threads=8, budget=None):
             done[c] = res is not None
             for l in res or []:
                 if len(l.get('topics', [])) < 3: continue
-                rows.append(('0x' + l['topics'][1][26:], '0x' + l['topics'][2][26:], int(l['data'], 16) / 1e6, int(l['blockNumber'], 16)))
+                rows.append(('0x' + l['topics'][1][26:], '0x' + l['topics'][2][26:], int(l['data'], 16) / 1e6, int(l['blockNumber'], 16), l.get('transactionHash')))
     lo = b1 + 1
     for c in chunks:
         if not done.get(c): break
@@ -144,14 +144,27 @@ def pm_value(a):
 DAYS = float(os.environ.get('ENT_DAYS', 180))      # history depth for the tracked wallets
 HOP_DAYS = float(os.environ.get('ENT_HOP_DAYS', 90))
 SCAN_BUDGET = float(os.environ.get('ENT_SCAN_SECS', 480))
-HOP_BUDGET = float(os.environ.get('ENT_HOP_SECS', 240))
+HOP_BUDGET = float(os.environ.get('ENT_HOP_SECS', 180))
+RC_BUDGET = float(os.environ.get('ENT_RC_SECS', 180))
 
 def merge(agg, rows, wallets):
-    for f, t, v, b in rows:
+    for f, t, v, b, h in rows:
         for w, c, side in ((f, t, 1), (t, f, 0)):
             if w not in wallets or c == w: continue
-            e = agg.setdefault(w, {}).setdefault(c, [0.0, 0.0, 0, b, b])   # in, out, count, first block, last block
+            e = agg.setdefault(w, {}).setdefault(c, [0.0, 0.0, 0, b, b, []])   # in, out, count, first block, last block, top transfers
             e[side] += v; e[2] += 1; e[3] = min(e[3], b); e[4] = max(e[4], b)
+            if h and v >= 50:
+                e[5].append([round(v, 2), h, b, side]); e[5].sort(key=lambda x: -x[0]); del e[5][TOPS:]
+
+CTF = '0x4d97dcd97ec945f40cf65f87097ace5ea0476045'    # Polymarket outcome tokens (ERC1155)
+TOPS = 4
+def has_ctf(h):
+    """True if the transaction also moved outcome tokens (a trade, split, merge or redeem), not a plain transfer."""
+    try:
+        r = rpc('eth_getTransactionReceipt', [h], tries=3)
+        return any(str(l.get('address', '')).lower() == CTF for l in (r or {}).get('logs', []))
+    except Exception:
+        return None
 
 def pm_check(a):
     s = pm_stats(a)
@@ -170,7 +183,7 @@ def analyse(W, state):
     bts = lambda b: int(hts - (head - b) * spb)
 
     target = head - span
-    same = set(state.get('wallets') or []) == wallets
+    same = set(state.get('wallets') or []) == wallets and state.get('ver') == 2
     agg = {w: {c: list(v) for c, v in m.items()} for w, m in (state.get('agg') or {}).items()} if same else {}
     hi, lo = (state.get('hi'), state.get('lo')) if same and state.get('hi') else (None, None)
     stats = {}
@@ -196,11 +209,40 @@ def analyse(W, state):
     cand = {}
     for w, m in agg.items():
         ranked = sorted(((c, e) for c, e in m.items() if c not in infra), key=lambda kv: -(kv[1][0] + kv[1][1]))
-        for c, e in ranked[:12]:
-            if e[0] + e[1] < 200 and e[2] < 3: continue
+        for c, e in ranked[:40]:
+            if e[0] + e[1] < 200: continue
             cand.setdefault(c, []).append(w)
     others = [c for c in cand if c not in wallets]
     with cf.ThreadPoolExecutor(8) as ex: list(ex.map(is_contract, others))
+
+    # contract <-> wallet transfers are usually trade fills (they settle wallet to wallet).
+    # Keep a pair only if at least one of its biggest transfers moved no outcome tokens.
+    RC = dict(state.get('rc') or {})
+    need = []
+    for c, ws in cand.items():
+        if _code.get(c) is False: continue
+        for w in ws: need += [x[1] for x in agg[w][c][5] if x[1] not in RC]
+    need = list(dict.fromkeys(need))
+    t1 = time.time()
+    def rc_one(h):
+        if time.time() - t1 > RC_BUDGET: return h, None
+        return h, has_ctf(h)
+    with cf.ThreadPoolExecutor(6) as ex:
+        for h, v in ex.map(rc_one, need):
+            if v is not None: RC[h] = 1 if v else 0
+    pending = sum(1 for h in need if h not in RC)
+    GEN = {}
+    for c, ws in list(cand.items()):
+        if _code.get(c) is False: continue
+        keep = []
+        for w in ws:
+            g = [x for x in agg[w][c][5] if RC.get(x[1]) == 0]
+            if g:
+                GEN[(w, c)] = g; keep.append(w)
+        if keep: cand[c] = keep
+        else: del cand[c]
+    print(f'  receipts: {len(need) - pending} checked, {pending} left for next run, {len(GEN)} wallet pairs with plain transfers')
+    others = [c for c in cand if c not in wallets]
     PM = {}
     with cf.ThreadPoolExecutor(6) as ex:
         for a, s in ex.map(pm_check, [c for c in others if _code.get(c)]): PM[a] = s
@@ -215,9 +257,9 @@ def analyse(W, state):
     hop = collections.defaultdict(dict)
     if hop_src:
         src = set(hop_src)
-        rows, hlo, st = scan(hop_src, head - int(HOP_DAYS * 86400 / 2.05), head, threads=6, budget=HOP_BUDGET)
+        rows, hlo, st = scan(hop_src, head - int(HOP_DAYS * 86400 / 2.05), head, threads=4, budget=HOP_BUDGET)
         stats['hop'] = st; stats['hop_days'] = round((head - hlo) * spb / 86400)
-        for f, t, v, b in rows:
+        for f, t, v, b, _h in rows:
             for x, o in ((f, t), (t, f)):
                 if x not in src or o in infra or o == x: continue
                 e = hop[x].setdefault(o, [0.0, 0])
@@ -232,9 +274,13 @@ def analyse(W, state):
     ents = {}
     for w, m in agg.items():
         accts, fund = [], []
-        for c, (i, o, k, b0, b1) in m.items():
+        for c, (i, o, k, b0, b1, tops) in m.items():
             if c not in cand or w not in cand[c]: continue
             row = {'a': c, 'in': round(i), 'out': round(o), 'n': k, 'first': bts(b0), 'last': bts(b1)}
+            g = GEN.get((w, c))
+            if g:   # contract pair: count only the plain transfers we verified
+                row.update({'in': round(sum(x[0] for x in g if x[3] == 0)), 'out': round(sum(x[0] for x in g if x[3] == 1)), 'n': len(g),
+                            'first': bts(min(x[2] for x in g)), 'last': bts(max(x[2] for x in g)), 'tx': [x[1] for x in g][:3]})
             if c in wallets:
                 row.update({'tracked': names[c], 'name': names[c]}); accts.append(row)
             elif c in PM and PM[c].get('vol'):
@@ -262,17 +308,21 @@ def analyse(W, state):
         if _code.get(c) is False and len(ws) >= 2: shared[c] = [names[x] for x in ws]
 
     # keep state small: drop dust counterparties
-    keep = {w: {c: [round(e[0], 2), round(e[1], 2), e[2], e[3], e[4]] for c, e in m.items() if c in infra or e[0] + e[1] >= 20 or e[2] >= 2} for w, m in agg.items()}
+    keep = {w: {c: [round(e[0], 2), round(e[1], 2), e[2], e[3], e[4], e[5] if c not in infra and e[0] + e[1] >= 200 else []]
+                for c, e in m.items() if c in infra or e[0] + e[1] >= 20 or e[2] >= 2} for w, m in agg.items()}
+    live = {x[1] for m in keep.values() for e in m.values() for x in e[5]}
+    RC = {h: v for h, v in RC.items() if h in live}
     debug = {'infra': sorted(infra)[:80], 'infra_n': len(infra), 'scan': stats, 'n_cand': len(cand), 'n_pm': len(PM),
              'shared_funders': shared, 'cp_per_wallet': {names[w]: len(m) for w, m in agg.items()}}
     debug['days'] = round((head - lo) * spb / 86400); debug['complete'] = lo <= target
-    return ents, debug, {'hi': hi, 'lo': lo, 'wallets': sorted(wallets), 'agg': keep}
+    debug['receipts_left'] = pending
+    return ents, debug, {'ver': 2, 'hi': hi, 'lo': lo, 'wallets': sorted(wallets), 'agg': keep, 'rc': RC}
 
 def main():
     force = os.environ.get('ENT_FORCE') == '1'
     old = {} if force else (get(SITE + '/entities.json', tries=2) or {})
     if not isinstance(old, dict): old = {}
-    if old.get('built') and old.get('n_tx') and (old.get('debug') or {}).get('complete') and time.time() - old['built'] < ENT_HOURS * 3600:
+    if old.get('built') and old.get('n_tx') and (old.get('debug') or {}).get('complete') and not (old.get('debug') or {}).get('receipts_left') and time.time() - old['built'] < ENT_HOURS * 3600:
         json.dump(old, open(os.path.join(HERE, 'entities.json'), 'w'))
         print(f'entities: reused cached file from {int((time.time() - old["built"]) / 60)} min ago')
         return
@@ -284,6 +334,13 @@ def main():
     out = {'built': int(time.time()), 'secs': int(time.time() - t0), 'n_tx': n_tx, 'entities': ents, 'debug': debug, 'state': state}
     json.dump(out, open(os.path.join(HERE, 'entities.json'), 'w'), default=list, separators=(',', ':'))
     n = sum(1 for e in ents.values() if e['accounts'])
+    print('\n=== linked accounts ===')
+    for t, e in sorted(ents.items()):
+        for r in e['accounts'][:6]:
+            print(f"  {t:22s} <-> {(r.get('name') or r['a'][:10]):22s} {r['a']} in ${r['in']:>9,} out ${r['out']:>9,} n={r['n']:<3} {r.get('conf')} vol=${r.get('vol', 0):,} pnl=${r.get('pnl', 0):,}")
+        for r in e['funders'][:3]:
+            print(f"  {t:22s} <- wallet {r['a']} in ${r['in']:>9,} out ${r['out']:>9,} n={r['n']:<3} nonce={r.get('nonce')} also funds: {[o.get('tracked') or o.get('name') or o['a'][:10] for o in r['others'][:5]]}")
+    print('shared funders:', debug['shared_funders'])
     print(f'entities: done in {out["secs"]}s, {n} traders with linked accounts, file {os.path.getsize(os.path.join(HERE, "entities.json")) // 1024} KB')
 
 if __name__ == '__main__':
