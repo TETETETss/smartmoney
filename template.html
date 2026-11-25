@@ -684,6 +684,16 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
 #v-strength .ms-tk{font-size:12.5px;padding:3px 10px;border-radius:6px;background:rgba(250,204,21,.12);color:#facc15;margin-left:16px;border:0;cursor:pointer}
 #v-strength .ms-wl{margin:6px 0 4px 16px;border-left:2px solid #262626;padding-left:10px}
 #v-strength .ms-wl a{display:flex;justify-content:space-between;gap:10px;padding:4px 0;font-size:13px;color:#8a8a8a;cursor:pointer}#v-strength .ms-wl a:hover{color:#fff}
+#v-strength .ms-wl{border-left:0;padding-left:0;margin:8px 0 6px;overflow-x:auto}
+#v-strength .ms-tb{width:100%;border-collapse:collapse;font-size:13px}
+#v-strength .ms-tb th{font:11px ui-monospace,Menlo,Consolas,monospace;letter-spacing:1px;text-transform:uppercase;color:#777;text-align:left;font-weight:400;padding:6px 8px 8px 0;white-space:nowrap}
+#v-strength .ms-tb td{padding:8px 8px 8px 0;border-top:1px solid #1e1e1e;white-space:nowrap;font-variant-numeric:tabular-nums;color:#e8e8e8}
+#v-strength .ms-wl a.ms-tw{display:flex;justify-content:flex-start;align-items:center;gap:9px;color:#e8e8e8;min-width:0;padding:0;font-size:13px}
+#v-strength .ms-tw:hover .ms-nm>span{text-decoration:underline}
+#v-strength .ms-tw img,#v-strength .ms-av{width:28px;height:28px;border-radius:50%;object-fit:cover;flex:none;background:#262626;display:inline-flex;align-items:center;justify-content:center;font-size:12px;color:#ccc}
+#v-strength .ms-nm{display:flex;flex-direction:column;gap:4px;min-width:0}#v-strength .ms-nm>span{max-width:130px;overflow:hidden;text-overflow:ellipsis}
+#v-strength .ms-pb{display:block;width:90px;height:3px;border-radius:2px;background:#262626}#v-strength .ms-pb b{display:block;height:3px;border-radius:2px;background:#86efac}#v-strength .ms-pbn b{background:#fca5a5}
+#v-strength .ms-tb td.ms-g{color:#4ade80}#v-strength .ms-tb td.ms-r{color:#f87171}#v-strength .ms-tb td.ms-mut{color:#777}
 #v-strength .ms-st{color:#facc15}
 #v-strength .ms-sep{border-top:1px solid #262626;margin-top:8px;padding-top:10px}
 #v-strength .ms-g{color:#4ade80}#v-strength .ms-r{color:#f87171}#v-strength .ms-mut{color:#8a8a8a}
@@ -2358,7 +2368,9 @@ document.querySelectorAll('main .hero').forEach(h=>{if(h.querySelector('.pg-rf')
 /* Market Strength: smart money vs regular wallets on each side of one market.
    Smart = a tracked trader (TRS, starred) or any wallet passing MS_RULES. Loaded live from the data API. */
 const MS_DATA='https://data-api.polymarket.com',MS_GAMMA='https://gamma-api.polymarket.com',MS_REF='via=brams';
-const MS_RULES={minPnl:10000,minMarkets:20,maxLuck:0.5},MS_MAX=250;
+const MS_RULES={minPnl:10000,minMarkets:20,maxLuck:0.5},MS_MAX=250,MS_PV={};
+const msName=h=>{const n=String(h.tname||h.name||'');return !n||/^0x[0-9a-f]{8,}/i.test(n)?h.w.slice(0,6)+'…':n};
+const msK=v=>{v=msNum(v);return v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?Math.round(v/1e3)+'K':Math.round(v)+''};
 const MS_STATS={};let msDemoOn=false,msTok=0;
 const ms$=s=>document.querySelector(s);
 const msEsc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -2393,7 +2405,7 @@ async function msAnalyze(m){
  const h=await msGet(MS_DATA,'/v2/holders',{condition:cond,include_pnl:true,limit:100});
  const holders=[];
  (h.data||[]).forEach(tok=>(tok.holders||[]).forEach(x=>{const side=msNum(msPick(x,'outcome_index','outcomeIndex')),size=msNum(msPick(x,'amount','size','shares'));
-  holders.push({w:String(msPick(x,'proxy_wallet','proxyWallet')).toLowerCase(),name:msPick(x,'name','pseudonym'),side,value:size*(px[side]||0),mpnl:msVal(msPick(x,'pnl','total_pnl','cash_pnl'))})}));
+  holders.push({w:String(msPick(x,'proxy_wallet','proxyWallet')).toLowerCase(),name:msPick(x,'name','pseudonym'),img:msPick(x,'profile_image_optimized','profile_image','profileImage'),side,size,value:size*(px[side]||0),avg:msNum(msPick(x,'avg_price','avgPrice'))||null,mpnl:msVal(msPick(x,'pnl','total_pnl','cash_pnl'))})}));
  let trades=[],cur=null;
  do{const j=await msGet(MS_DATA,'/v2/trades',{condition:cond,limit:1000,cursor:cur}).catch(()=>null);if(!j)break;trades=trades.concat(j.data||[]);cur=j.pagination&&j.pagination.next_cursor}while(cur&&trades.length<10000);
  const usd=t=>msNum(msPick(t,'usdc_size'))||msNum(t.size)*msNum(t.price),who=t=>String(msPick(t,'proxy_wallet','proxyWallet')).toLowerCase();
@@ -2401,10 +2413,17 @@ async function msAnalyze(m){
  const ws=[...new Set([...holders.map(x=>x.w),...Object.keys(vol).sort((a,b)=>vol[b]-vol[a])])].slice(0,MS_MAX);
  const cls=await msClassify(ws);
  holders.forEach(x=>Object.assign(x,cls[x.w]||{smart:false,tracked:false}));
+ const smW=[...new Set(holders.filter(x=>x.smart).map(x=>x.w))].filter(w=>!(w in MS_PV)).slice(0,80);
+ const pv=await msPool(smW,8,w=>msGet(MS_DATA,'/v2/value',{user:w}).then(j=>msVal(msPick(j.data||j,'value'))));
+ smW.forEach((w,i)=>MS_PV[w]=pv[i]);
+ holders.forEach(x=>{const cost=x.avg&&x.size?x.avg*x.size:(x.mpnl!=null?x.value-x.mpnl:null);if(!x.avg&&cost>0&&x.size)x.avg=cost/x.size;
+  x.ppct=x.mpnl!=null&&cost>0?x.mpnl/cost*100:null;const v=MS_PV[x.w];x.szp=v>0?Math.min(100,x.value/v*100):null});
  const net={s:[0,0],r:[0,0]},ser={},pct=n=>n[0]+n[1]>0?n[1]/(n[0]+n[1])*100:null;
  trades.slice().sort((a,b)=>a.timestamp-b.timestamp).forEach(t=>{const g=cls[who(t)]&&cls[who(t)].smart?'s':'r',i=msNum(msPick(t,'outcome_index','outcomeIndex'))?1:0;
   net[g][i]=Math.max(0,net[g][i]+(t.side=='SELL'?-usd(t):usd(t)));ser[new Date(msNum(t.timestamp)*1000).toISOString().slice(0,10)]={s:pct(net.s),r:pct(net.r)}});
- return{outs,holders,series:Object.entries(ser).slice(-30)}}
+ let price=[];const tid=msJ(m.clobTokenIds,[])[0];
+ if(tid){const ph=await fetch('https://clob.polymarket.com/prices-history?market='+encodeURIComponent(tid)+'&interval=max&fidelity=720').then(r=>r.ok?r.json():null).catch(()=>null);price=((ph&&ph.history)||[]).map(x=>[msNum(x.t),msNum(x.p)]).filter(x=>x[0])}
+ return{outs,holders,series:Object.entries(ser).slice(-30),price}}
 function msSvg(series,label){
  if(series.length<2)return'<div class="ms-load" style="padding:30px">Not enough trade history yet</div>';
  const W=1000,H=200,P=36,X=i=>P+i/(series.length-1)*(W-P-8),Y=v=>8+(1-v/100)*(H-34);
@@ -2415,11 +2434,23 @@ function msSvg(series,label){
   <path d="${path('r')}" fill="none" stroke="#8a8a8a" stroke-width="2" stroke-dasharray="6 5" vector-effect="non-scaling-stroke"/>
   <path d="${path('s')}" fill="none" stroke="#dc2626" stroke-width="2.5" vector-effect="non-scaling-stroke"/>
   <text x="${P}" y="${H-4}" fill="#666" font-size="11">${d(series[0][0])}</text><text x="${W}" y="${H-4}" fill="#666" font-size="11" text-anchor="end">${d(series[series.length-1][0])}</text></svg>`}
+function msPrice(pr,label){
+ const col=pr&&pr.length>1&&pr[pr.length-1][1]<pr[0][1]?'#f87171':'#4ade80';
+ if(!pr||pr.length<2)return'<div class="ms-load" style="padding:30px">Price history unavailable for this market</div>';
+ const W=1000,H=200,P=36,t0=pr[0][0],t1=pr[pr.length-1][0],X=t=>P+(t-t0)/((t1-t0)||1)*(W-P-8),Y=v=>8+(1-v)*(H-34);
+ const d=pr.map((x,i)=>(i?'L':'M')+X(x[0]).toFixed(1)+','+Y(x[1]).toFixed(1)).join('');
+ const grid=[0,.25,.5,.75,1].map(v=>`<line x1="${P}" x2="${W}" y1="${Y(v)}" y2="${Y(v)}" stroke="#222"/><text x="${P-6}" y="${Y(v)+4}" fill="#666" font-size="11" text-anchor="end">${Math.round(v*100)}¢</text>`).join('');
+ const dt=t=>new Date(t*1000).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+ return`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="${msEsc(label)} price over time">${grid}
+  <path d="${d}L${X(t1).toFixed(1)},${Y(0)}L${X(t0).toFixed(1)},${Y(0)}Z" fill="${col}" fill-opacity=".08"/>
+  <path d="${d}" fill="none" stroke="${col}" stroke-width="2.2" vector-effect="non-scaling-stroke"/>
+  <text x="${P}" y="${H-4}" fill="#666" font-size="11">${dt(t0)}</text><text x="${W}" y="${H-4}" fill="#666" font-size="11" text-anchor="end">${dt(t1)}</text></svg>`}
 function msBar(title,y,n,yl,nl,yc,nc,yt,nt,h,cnt){const t=y+n,yp=t?Math.round(y/t*100):0,np=t?100-yp:0;
  const seg=(v,p,c,tc,l)=>v>0?`<div title="${msEsc(l)} ${msMoney(v)}" style="width:${p}%;background:${c};color:${tc}">${p>=12?msEsc(l)+' '+p+'% · '+msMoney(v):''}</div>`:'';
  return`<div class="ms-row"><div class="ms-rl"><b>${title}</b><span class="ms-mut">${cnt} · ${msMoney(t)}</span></div><div class="ms-bar" style="height:${h}px;font-size:${h>26?13:12}px">${t?seg(y,yp,yc,yt,yl)+seg(n,np,nc,nt,nl):'<div style="width:100%;color:#666">—</div>'}</div></div>`}
 function msRender(m,data,markets){
- const {outs,holders,series}=data;
+ const {outs,holders,series,price}=data;
+ const p0=price&&price.length>1?price[0][1]:null,p1=price&&price.length?price[price.length-1][1]:null,pch=p0!=null?Math.round((p1-p0)*100):null;
  const sides=[0,1].map(i=>{const hs=holders.filter(h=>h.side===i),sm=hs.filter(h=>h.smart),rg=hs.filter(h=>!h.smart),sum=a=>a.reduce((s,h)=>s+h.value,0),mp=sm.filter(h=>h.mpnl!=null);
   return{label:outs[i]||(i?'No':'Yes'),total:sum(hs),smart:sum(sm),reg:sum(rg),sN:sm.length,rN:rg.length,tk:sm.filter(h=>h.tracked).length,
    list:sm.sort((a,b)=>(b.tracked-a.tracked)||b.value-a.value),sp:mp.length?mp.reduce((s,h)=>s+msNum(h.mpnl),0):null}});
@@ -2429,7 +2460,8 @@ function msRender(m,data,markets){
  const w=v=>(v/all*100).toFixed(2)+'%',lab=(v,t,c)=>v/all>.12?`<span style="color:${c}">${t}</span>`:'';
  const card=(s,i)=>`<div class="ms-side"><h4 class="${i?'ms-r':'ms-g'}">${msEsc(s.label)} · ${msMoney(s.total)}</h4>
    <div class="ms-ln"><span><span class="ms-sq" style="background:${i?'#991b1b':'#166534'}"></span>Smart (${msPl(s.sN,'wallet')})</span><b>${msMoney(s.smart)} · ${s.total?Math.round(s.smart/s.total*100):0}%</b></div>
-   ${s.sN?`<button class="ms-tk" data-i="${i}">${s.tk?'★ ':''}${s.tk} on your list ▾</button><div class="ms-wl ms-hide" id="mswl${i}">${s.list.map(h=>`<a href="https://polymarket.com/profile/${h.w}?${MS_REF}" target="_blank" rel="noopener"><span>${h.tracked?'<span class="ms-st">★</span> ':''}${msEsc(h.tname||h.name||(h.w.slice(0,6)+'…'+h.w.slice(-4)))}</span><span>${msMoney(h.value)} · ${h.pnl==null?'—':msMoney(h.pnl,true)} all-time</span></a>`).join('')}</div>`:''}
+   ${s.sN?`<button class="ms-tk" data-i="${i}">${s.tk?'★ ':''}${s.tk} on your list ▾</button><div class="ms-wl ms-hide" id="mswl${i}"><table class="ms-tb"><tr><th>Trader</th><th>Value</th><th>Size</th><th>Avg</th><th title="Share of the trader's open positions in this market">Size %</th><th title="Profit on this position">PnL</th><th>All-time</th></tr>${(()=>{const mx=Math.max(1,...s.list.map(h=>h.value));return s.list.map(h=>`<tr><td><a class="ms-tw" href="https://polymarket.com/profile/${h.w}?${MS_REF}" target="_blank" rel="noopener">${h.img?`<img src="${msEsc(h.img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'ms-av',textContent:'${msEsc(msName(h)[0].toUpperCase())}'}))">`:`<span class="ms-av">${msEsc(msName(h)[0].toUpperCase())}</span>`}<span class="ms-nm"><span>${h.tracked?'<span class="ms-st">★</span> ':''}${msEsc(msName(h))}</span><i class="ms-pb ${i?'ms-pbn':''}"><b style="width:${Math.max(3,Math.round(h.value/mx*100))}%"></b></i></span></a></td>
+<td>${msMoney(h.value)}</td><td>${msK(h.size)}</td><td>${h.avg?'@'+Math.round(h.avg*100):'—'}</td><td class="ms-g">${h.szp==null?'—':(h.szp<10?h.szp.toFixed(1):Math.round(h.szp))+'%'}</td><td class="${h.ppct==null?'ms-mut':h.ppct>=0?'ms-g':'ms-r'}">${h.ppct==null?'—':(h.ppct>=0?'+':'')+h.ppct.toFixed(1)+'%'}</td><td class="${h.pnl==null?'ms-mut':h.pnl>=0?'ms-g':'ms-r'}">${h.pnl==null?'—':msMoney(h.pnl,true)}</td></tr>`).join('')})()}</table></div>`:''}
    <div class="ms-ln"><span><span class="ms-sq" style="background:${i?'#fca5a5':'#86efac'}"></span>Regular (${msPl(s.rN,'wallet')})</span><b>${msMoney(s.reg)} · ${s.total?Math.round(s.reg/s.total*100):0}%</b></div>
    <div class="ms-ln ms-sep"><span>Smart PnL on this market</span><b class="${msNum(s.sp)>=0?'ms-g':'ms-r'}">${s.sp==null?'—':msMoney(s.sp,true)}</b></div></div>`;
  ms$('#msout').innerHTML=`<div class="ms-card">
@@ -2441,6 +2473,8 @@ function msRender(m,data,markets){
   ${msBar('Regular wallets',Y.reg,N.reg,Y.label,N.label,'#86efac','#fca5a5','#052e16','#450a0a',22,msPl(Y.rN+N.rN,'wallet'))}
   <div class="ms-note">Smart = tracked traders (★), plus other wallets with ${msMoney(MS_RULES.minPnl)}+ all-time profit, ${MS_RULES.minMarkets}+ markets, and not from one lucky bet</div>
   <div class="ms-cols">${card(Y,0)}${card(N,1)}</div>
+  <div class="ms-ch">Price movement · ${msEsc(outs[0]||'Yes')}${p1!=null?` <span style="color:#fff">${Math.round(p1*100)}¢</span> <span class="${pch>=0?'ms-g':'ms-r'}">${pch>=0?'+':''}${pch}¢ since start</span>`:''}</div>
+  <div class="ms-chart">${msPrice(price,outs[0]||'Yes')}</div>
   <div class="ms-ch">Share on ${msEsc(N.label)} over time</div>
   <div class="ms-lg" style="margin-top:2px"><span><span class="ms-sq" style="background:#dc2626"></span>Smart money</span><span><span class="ms-sq" style="background:#8a8a8a"></span>Regular wallets (dashed)</span></div>
   <div class="ms-chart">${msSvg(series,N.label)}</div></div>`;
@@ -2451,15 +2485,17 @@ async function msRun(m,markets){
  try{const d=msDemoOn?msDemo():await msAnalyze(m);if(tok===msTok)msRender(m,d,markets)}catch(e){if(tok===msTok){ms$('#msout').innerHTML='';msErr(e.message)}}}
 function msDemo(){
  const TK=msTracked(),tk=Object.keys(TK).slice(0,3);
- const H=(name,side,value,smart,pnl,mpnl,i)=>{const w=(smart&&i!=null&&tk[i])||('0x'+name.toLowerCase().replace(/[^a-z0-9]/g,'').padEnd(40,'0').slice(0,40));return{w,name,side,value,smart,tracked:w in TK,tname:TK[w],pnl,mpnl}};
+ const H=(name,side,value,smart,pnl,mpnl,i)=>{const w=(smart&&i!=null&&tk[i])||(/^0x/.test(name)?name.toLowerCase().replace(/[^0-9a-fx]/g,'').padEnd(42,'0'):'0x'+name.toLowerCase().replace(/[^a-z0-9]/g,'').padEnd(40,'0').slice(0,40));return{w,name,side,value,smart,tracked:w in TK,tname:TK[w],pnl,mpnl}};
  const hs=[H('bbbbbbbbbzzz',0,5200,true,41000,6102),H('KKK1919',0,2800,true,18000,2818),
   ...['0xEC1Fe51724','jsdk3k21k','Winwinwin008','tsihkodiives','pmrev','yesguy','lotto77','newb2026'].map((n,i)=>H(n,0,[20000,15000,9000,8000,30000,12000,6800,5000][i],false,-500,300)),
   H('aenews2',1,96000,true,2400000,-3935,0),H('betwick',1,92700,true,880000,-3172,1),H('Tenebrus7',1,91500,true,610000,-5128,2),
   H('DonaldinhoTr..',1,71700,true,520000,-5735),H('0x9112edc7d8..',1,71300,true,300000,-5201),H('Vespuccii',1,39400,true,140000,-800),H('Unfinished-J..',1,49400,true,80000,-893),
   H('nohodler',1,40000,false,2000,0),H('fadeitall',1,28500,false,-9000,0)];
+ hs.forEach((x,k)=>{x.size=x.value/(x.side?0.45:0.55);const cost=x.value-(x.mpnl||0);x.avg=cost/x.size;x.ppct=cost>0?(x.mpnl||0)/cost*100:null;if(x.mpnl>x.value*.5){x.mpnl=x.value*.3;const c2=x.value-x.mpnl;x.avg=c2/x.size;x.ppct=x.mpnl/c2*100}x.szp=x.smart?[4.2,12,0.8,27,2.5,9.1,0.4][k%7]:null});
  let s=9;const r=()=>(s=(s*16807)%2147483647)/2147483647;let a=75,b=55;
  const series=[...Array(30)].map((_,i)=>{a=i==29?98:Math.min(98,a+(r()-.25)*1.8);b=i==29?39:Math.max(35,b-(r()-.3)*1.4);return[new Date(Date.now()-(29-i)*864e5).toISOString().slice(0,10),{s:a,r:b}]});
- return{outs:['Yes','No'],holders:hs,series}}
+ let q=.62;const price=[...Array(120)].map((_,i)=>{q=Math.min(.97,Math.max(.03,q+(r()-.55)*.03));return[Math.floor(Date.now()/1000)-(119-i)*43200,q]});
+ return{outs:['Yes','No'],holders:hs,series,price}}
 function msInit(){if(msInit.done)return;msInit.done=1;
  ms$('#msf').onsubmit=async e=>{e.preventDefault();msDemoOn=false;const v=ms$('#msq').value.trim();if(!v)return msErr('Paste a Polymarket market link first.');
   try{const {markets,chosen}=await msFind(v);msRun(chosen,markets)}catch(er){msErr(er.message)}};
