@@ -18,7 +18,7 @@ jobs:
       group: smartmoney-pages
       cancel-in-progress: false
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 70
     env:
       # Project name is smartmoney. smartmoney.pages.dev is already taken, so
       # the production hostname may be a different *.pages.dev subdomain.
@@ -140,7 +140,7 @@ jobs:
 
       - name: Find linked wallets (entities)
         continue-on-error: true
-        timeout-minutes: 20
+        timeout-minutes: 35
         run: python -u entities.py
 
       - name: Stage dist

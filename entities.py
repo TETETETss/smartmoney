@@ -23,7 +23,7 @@ BS = 'https://polygon.blockscout.com'
 V2 = 'https://data-api.polymarket.com/v2/'
 STABLES = {'0xc011a7e12a19f7b1f670d46f03b03f3342e82dfb', '0x2791bca1f2de4661ed88a30c99a7a9449aa84174', '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359'}
 ZERO = '0x0000000000000000000000000000000000000000'
-PROBE = [1]
+PROBE = []
 UA = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/130 Safari/537.36', 'Accept': 'application/json'}
 
 def get(url, tries=6, timeout=40):
@@ -44,35 +44,60 @@ def get(url, tries=6, timeout=40):
             time.sleep(2 * (i + 1))
     return None
 
-# ---------- Blockscout (throttled: one request at a time, ~4/s)
-_last = [0.0]
-def bs(path):
-    wait = 0.28 - (time.time() - _last[0])
-    if wait > 0: time.sleep(wait)
-    _last[0] = time.time()
-    return get(BS + path)
+# ---------- Polygon RPC (Blockscout blocks GitHub runners, public RPC does not)
+RPCS = ['https://polygon-bor-rpc.publicnode.com', 'https://polygon.drpc.org', 'https://1rpc.io/matic']
+TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
+CHUNK = 9999
+def rpc(method, params, tries=5):
+    body = json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': method, 'params': params}).encode()
+    err = None
+    for i in range(tries):
+        url = RPCS[i % len(RPCS)]
+        try:
+            req = urllib.request.Request(url, data=body, headers={'content-type': 'application/json', **UA})
+            with urllib.request.urlopen(req, timeout=60) as r:
+                d = json.loads(r.read().decode())
+            if 'result' in d: return d['result']
+            err = d.get('error')
+        except Exception as e:
+            err = str(e)[:120]
+        time.sleep(1.5 * (i + 1))
+    raise RuntimeError(f'{method} failed: {err}')
 
-def transfers(addr, n=10000):
-    d = bs(f'/api?module=account&action=tokentx&address={addr}&sort=desc&page=1&offset={n}')
-    rows = (d or {}).get('result') or []
-    if not isinstance(rows, list): rows = []
-    out = []
-    for x in rows:
-        if str(x.get('contractAddress', '')).lower() not in STABLES: continue
-        dec = int(x.get('tokenDecimal') or 6)
-        out.append({'f': x['from'].lower(), 't': x['to'].lower(), 'v': int(x['value']) / 10 ** dec,
-                    'ts': int(x['timeStamp']), 'm': str(x.get('input', ''))[:10], 'h': x['hash']})
-    return out, len(rows)
+def pad(a): return '0x' + a.lower()[2:].rjust(64, '0')
 
-_info = {}
-def addr_info(a):
-    if a in _info: return _info[a]
-    d = bs(f'/api/v2/addresses/{a}') or {}
-    impl = d.get('implementations') or []
-    i = {'contract': bool(d.get('is_contract')), 'name': d.get('name') or (impl[0].get('name') if impl else None) or '',
-         'tx': None}
-    _info[a] = i
-    return i
+def scan(addrs, b0, b1, threads=8):
+    """All stablecoin Transfer logs from or to any of addrs between blocks b0..b1."""
+    pads = [pad(a) for a in addrs]
+    jobs = []
+    for s in range(b0, b1 + 1, CHUNK + 1):
+        e = min(s + CHUNK, b1)
+        jobs += [(s, e, [TOPIC, pads]), (s, e, [TOPIC, None, pads])]
+    out, bad = [], 0
+    def one(j):
+        s, e, tp = j
+        try:
+            return rpc('eth_getLogs', [{'fromBlock': hex(s), 'toBlock': hex(e), 'address': sorted(STABLES), 'topics': tp}])
+        except Exception as ex:
+            return ex
+    with cf.ThreadPoolExecutor(threads) as ex:
+        for res in ex.map(one, jobs):
+            if isinstance(res, Exception): bad += 1; continue
+            for l in res:
+                if len(l.get('topics', [])) < 3: continue
+                out.append(('0x' + l['topics'][1][26:], '0x' + l['topics'][2][26:], int(l['data'], 16) / 1e6, int(l['blockNumber'], 16)))
+    return out, len(jobs), bad
+
+_code = {}
+def is_contract(a):
+    if a not in _code:
+        try: _code[a] = len(rpc('eth_getCode', [a, 'latest'])) > 2
+        except Exception: _code[a] = None
+    return _code[a]
+
+def nonce(a):
+    try: return int(rpc('eth_getTransactionCount', [a, 'latest']), 16)
+    except Exception: return None
 
 # ---------- Polymarket checks
 def pm_profile(a):
@@ -100,161 +125,143 @@ def pm_value(a):
         except Exception: return 0
     return 0
 
-def is_pm_account(info):
-    n = (info.get('name') or '').lower()
-    return info.get('contract') and ('safe' in n or 'proxy' in n)
 
 # ---------- main analysis
-def analyse(W):
-    names = {w['address'].lower(): w['name'] for w in W}
-    TX, totals = {}, {}
-    for w in W:
-        a = w['address'].lower()
-        TX[a], totals[a] = transfers(a)
-        print(f'  {names[a]}: {len(TX[a])} stable transfers ({totals[a]} rows)')
+DAYS = float(os.environ.get('ENT_DAYS', 180))      # history depth for the tracked wallets
+HOP_DAYS = float(os.environ.get('ENT_HOP_DAYS', 90))
 
-    # selectors used by trade fills: the ones whose rows mostly touch many different wallets
-    seen = collections.Counter()
-    for a, rows in TX.items():
-        for c in {r['t'] if r['f'] == a else r['f'] for r in rows}: seen[c] += 1
+def merge(agg, rows, wallets):
+    for f, t, v, b in rows:
+        for w, c, side in ((f, t, 1), (t, f, 0)):
+            if w not in wallets or c == w: continue
+            e = agg.setdefault(w, {}).setdefault(c, [0.0, 0.0, 0, b, b])   # in, out, count, first block, last block
+            e[side] += v; e[2] += 1; e[3] = min(e[3], b); e[4] = max(e[4], b)
+
+def pm_check(a):
+    s = pm_stats(a)
+    if s['vol']:
+        s.update(pm_profile(a)); s['value'] = pm_value(a)
+    return a, s
+
+def analyse(W, state):
+    names = {w['address'].lower(): w['name'] for w in W}
+    wallets = set(names)
+    head = int(rpc('eth_blockNumber', []), 16)
+    span = int(DAYS * 86400 / 2.05)
+    hts = int(rpc('eth_getBlockByNumber', [hex(head), False])['timestamp'], 16)
+    ots = int(rpc('eth_getBlockByNumber', [hex(head - span), False])['timestamp'], 16)
+    spb = (hts - ots) / span
+    bts = lambda b: int(hts - (head - b) * spb)
+
+    agg = {w: {c: list(v) for c, v in m.items()} for w, m in (state.get('agg') or {}).items() if w in wallets}
+    last = state.get('block') or 0
+    old = [w for w in wallets if w in agg and last]
+    new = [w for w in wallets if w not in old]
+    stats = {}
+    if new:
+        rows, n, bad = scan(new, head - span, head)
+        merge(agg, rows, set(new)); stats['new'] = [len(new), len(rows), n, bad]
+        print(f'  scanned {len(new)} wallets over {DAYS:.0f} days: {len(rows)} transfers ({n} queries, {bad} failed)')
+    if old and last < head:
+        rows, n, bad = scan(old, last + 1, head)
+        merge(agg, rows, set(old)); stats['old'] = [len(old), len(rows), n, bad]
+        print(f'  updated {len(old)} wallets since block {last}: {len(rows)} transfers')
+    for w in wallets: agg.setdefault(w, {})
+
+    seen = collections.Counter(c for m in agg.values() for c in m)
     infra = {c for c, k in seen.items() if k >= 5} | {ZERO}
 
-    sel_all, sel_tt = collections.Counter(), collections.Counter()
-    for a, rows in TX.items():
-        for r in rows:
-            sel_all[r['m']] += 1
-            c = r['t'] if r['f'] == a else r['f']
-            if c in names: sel_tt[r['m']] += 1
-    # a selector is "trade" if most of its rows go to infra or to other traders -> learned from data
-    sel_infra = collections.Counter()
-    for a, rows in TX.items():
-        for r in rows:
-            c = r['t'] if r['f'] == a else r['f']
-            if c in infra: sel_infra[r['m']] += 1
-    TRADE_SEL = {s for s, k in sel_all.items() if k >= 30 and sel_infra[s] / k >= 0.6}
-
-    CP = {}
-    for a, rows in TX.items():
-        m = {}
-        for r in rows:
-            if r['m'] in TRADE_SEL: continue
-            out = r['f'] == a
-            c = r['t'] if out else r['f']
-            if c in infra: continue
-            e = m.setdefault(c, {'in': 0.0, 'out': 0.0, 'k': 0, 'first': r['ts'], 'last': r['ts'], 'sel': collections.Counter()})
-            e['out' if out else 'in'] += r['v']; e['k'] += 1; e['sel'][r['m']] += 1
-            e['first'] = min(e['first'], r['ts']); e['last'] = max(e['last'], r['ts'])
-        CP[a] = m
-
-    # candidates: real money moved, repeated or big
     cand = {}
-    for a, m in CP.items():
-        ranked = sorted(m.items(), key=lambda kv: -(kv[1]['in'] + kv[1]['out']))
+    for w, m in agg.items():
+        ranked = sorted(((c, e) for c, e in m.items() if c not in infra), key=lambda kv: -(kv[1][0] + kv[1][1]))
         for c, e in ranked[:12]:
-            tot = e['in'] + e['out']
-            if tot < 200 and e['k'] < 3: continue
-            cand.setdefault(c, []).append(a)
-    print(f'  {len(cand)} candidate counterparties, {len(infra)} infra, trade selectors {sorted(TRADE_SEL)}')
-
-    for c in cand: addr_info(c)
-
-    # 2-hop: funding wallets (EOAs) -> other Polymarket accounts they send to / receive from
-    hop = {}
-    eoas = [c for c in cand if not _info[c]['contract'] and c not in names]
-    for c in eoas[:80]:
-        rows, _ = transfers(c, 2000)
-        m = collections.defaultdict(lambda: [0.0, 0])
-        for r in rows:
-            o = r['t'] if r['f'] == c else r['f']
-            if o in infra or o == c: continue
-            m[o][0] += r['v']; m[o][1] += 1
-        hop[c] = {o: v for o, v in m.items() if v[0] >= 100}
-    second = {o for h in hop.values() for o in h if o not in names and o not in cand}
-    # only keep second-hop addresses shared by a funder that also touches a tracked wallet
-    for o in list(second)[:250]: addr_info(o)
-
-    # Polymarket check for every account-like address
-    pm_addrs = [c for c in set(cand) | second if c in _info and is_pm_account(_info[c]) and c not in names]
+            if e[0] + e[1] < 200 and e[2] < 3: continue
+            cand.setdefault(c, []).append(w)
+    others = [c for c in cand if c not in wallets]
+    with cf.ThreadPoolExecutor(8) as ex: list(ex.map(is_contract, others))
     PM = {}
-    def chk(a):
-        p = pm_profile(a); s = pm_stats(a)
-        s.update(p); s['value'] = pm_value(a) if s['vol'] else 0
-        return a, s
     with cf.ThreadPoolExecutor(6) as ex:
-        for a, s in ex.map(chk, pm_addrs): PM[a] = s
+        for a, s in ex.map(pm_check, [c for c in others if _code.get(c)]): PM[a] = s
+    funders = [c for c in others if _code.get(c) is False]
+    NON = {}
+    with cf.ThreadPoolExecutor(8) as ex:
+        for c, n in zip(funders, ex.map(nonce, funders)): NON[c] = n
+    hop_src = [c for c in funders if NON.get(c) is not None and NON[c] < 20000]
+    print(f'  {len(cand)} candidates: {len(PM)} contracts, {sum(1 for s in PM.values() if s["vol"])} Polymarket accounts, {len(funders)} plain wallets ({len(hop_src)} followed)')
+
+    # one hop out from the plain (funding) wallets
+    hop = collections.defaultdict(dict)
+    if hop_src:
+        src = set(hop_src)
+        rows, n, bad = scan(hop_src, head - int(HOP_DAYS * 86400 / 2.05), head, threads=6)
+        stats['hop'] = [len(hop_src), len(rows), n, bad]
+        for f, t, v, b in rows:
+            for x, o in ((f, t), (t, f)):
+                if x not in src or o in infra or o == x: continue
+                e = hop[x].setdefault(o, [0.0, 0])
+                e[0] += v; e[1] += 1
+        second = {o for h in hop.values() for o, e in h.items() if e[0] >= 100 and o not in wallets and o not in PM}
+        second = sorted(second, key=lambda o: -max(h.get(o, [0])[0] for h in hop.values()))[:250]
+        with cf.ThreadPoolExecutor(8) as ex: list(ex.map(is_contract, second))
+        with cf.ThreadPoolExecutor(6) as ex:
+            for a, s in ex.map(pm_check, [o for o in second if _code.get(o)]): PM[a] = s
+        print(f'  hop: {len(rows)} transfers, {len(second)} new addresses checked')
 
     ents = {}
-    for a, m in CP.items():
-        trader = names[a]
-        accts, funders = [], []
-        for c, e in m.items():
-            if c not in cand: continue
-            i = _info.get(c, {})
-            tot = e['in'] + e['out']
-            row = {'a': c, 'in': round(e['in']), 'out': round(e['out']), 'n': e['k'], 'first': e['first'], 'last': e['last']}
-            if c in names:
-                row.update({'tracked': names[c], 'name': names[c]})
-                accts.append(row); continue
-            if is_pm_account(i):
-                s = PM.get(c, {})
-                if not s.get('vol'): continue
-                row.update(s)
-                accts.append(row)
-            elif not i.get('contract'):
+    for w, m in agg.items():
+        accts, fund = [], []
+        for c, (i, o, k, b0, b1) in m.items():
+            if c not in cand or w not in cand[c]: continue
+            row = {'a': c, 'in': round(i), 'out': round(o), 'n': k, 'first': bts(b0), 'last': bts(b1)}
+            if c in wallets:
+                row.update({'tracked': names[c], 'name': names[c]}); accts.append(row)
+            elif c in PM and PM[c].get('vol'):
+                row.update(PM[c]); accts.append(row)
+            elif _code.get(c) is False:
+                row['nonce'] = NON.get(c)
+                if NON.get(c) is not None and NON[c] >= 20000: row['exchange'] = True
                 row['others'] = []
-                for o, (v, k) in (hop.get(c) or {}).items():
-                    if o == a: continue
-                    if o in names: row['others'].append({'a': o, 'tracked': names[o], 'v': round(v), 'n': k}); continue
-                    if o in PM and PM[o].get('vol'):
-                        row['others'].append({'a': o, 'v': round(v), 'n': k, **PM[o]})
-                funders.append(row)
-        # score
+                for x, (v, kk) in hop.get(c, {}).items():
+                    if x == w or v < 100: continue
+                    if x in wallets: row['others'].append({'a': x, 'tracked': names[x], 'v': round(v), 'n': kk})
+                    elif x in PM and PM[x].get('vol'): row['others'].append({'a': x, 'v': round(v), 'n': kk, **PM[x]})
+                row['others'].sort(key=lambda r: -r['v']); row['others'] = row['others'][:10]
+                fund.append(row)
         for r in accts:
-            both = r['in'] > 0 and r['out'] > 0
-            big = r['in'] + r['out']
-            sc = 0
-            sc += 2 if r['n'] >= 3 else 1 if r['n'] == 2 else 0
-            sc += 2 if big >= 10000 else 1 if big >= 1000 else 0
-            sc += 1 if both else 0
-            r['score'] = sc
-            r['conf'] = 'high' if sc >= 4 else 'medium' if sc >= 2 else 'low'
+            tot = r['in'] + r['out']
+            sc = (2 if r['n'] >= 3 else 1 if r['n'] == 2 else 0) + (2 if tot >= 10000 else 1 if tot >= 1000 else 0) + (1 if r['in'] and r['out'] else 0)
+            r['score'] = sc; r['conf'] = 'high' if sc >= 4 else 'medium' if sc >= 2 else 'low'
         accts.sort(key=lambda r: (-r['score'], -(r['in'] + r['out'])))
-        funders.sort(key=lambda r: -(r['in'] + r['out']))
-        ents[trader] = {'a': a, 'accounts': accts[:15], 'funders': funders[:10]}
+        fund.sort(key=lambda r: -(r['in'] + r['out']))
+        ents[names[w]] = {'a': w, 'accounts': accts[:15], 'funders': fund[:10]}
 
-    # shared funders: same EOA touching 2+ tracked wallets
     shared = collections.defaultdict(list)
-    for a, m in CP.items():
-        for c in m:
-            if c in cand and c in _info and not _info[c]['contract']: shared[c].append(names[a])
-    shared = {c: v for c, v in shared.items() if len(v) >= 2}
+    for c, ws in cand.items():
+        if _code.get(c) is False and len(ws) >= 2: shared[c] = [names[x] for x in ws]
 
-    debug = {'infra_n': len(infra), 'trade_sel': sorted(TRADE_SEL), 'sel_all': sel_all.most_common(25),
-             'sel_tracked_to_tracked': sel_tt.most_common(15), 'totals': {names[a]: totals[a] for a in totals},
-             'shared_funders': shared, 'n_cand': len(cand), 'n_second': len(second), 'n_pm': len(PM),
-             'info_names': collections.Counter(i['name'] for i in _info.values()).most_common(15)}
-    return ents, debug
+    # keep state small: drop dust counterparties
+    keep = {w: {c: [round(e[0], 2), round(e[1], 2), e[2], e[3], e[4]] for c, e in m.items() if c in infra or e[0] + e[1] >= 20 or e[2] >= 2} for w, m in agg.items()}
+    debug = {'infra': sorted(infra)[:80], 'infra_n': len(infra), 'scan': stats, 'n_cand': len(cand), 'n_pm': len(PM),
+             'shared_funders': shared, 'cp_per_wallet': {names[w]: len(m) for w, m in agg.items()}}
+    return ents, debug, {'block': head, 'agg': keep}
 
 def main():
     force = os.environ.get('ENT_FORCE') == '1'
-    if not force:
-        old = get(SITE + '/entities.json', tries=2)
-        if isinstance(old, dict) and old.get('built') and old.get('n_tx') and time.time() - old['built'] < ENT_HOURS * 3600:
-            json.dump(old, open(os.path.join(HERE, 'entities.json'), 'w'))
-            print(f'entities: reused cached file from {int((time.time() - old["built"]) / 60)} min ago')
-            return
+    old = {} if force else (get(SITE + '/entities.json', tries=2) or {})
+    if not isinstance(old, dict): old = {}
+    if old.get('built') and old.get('n_tx') and time.time() - old['built'] < ENT_HOURS * 3600:
+        json.dump(old, open(os.path.join(HERE, 'entities.json'), 'w'))
+        print(f'entities: reused cached file from {int((time.time() - old["built"]) / 60)} min ago')
+        return
     W = json.load(open(os.path.join(HERE, 'wallets.json'), encoding='utf-8'))
     W = [dict(w, name=w.get('name') or w['address'][:6] + '…' + w['address'][-4:]) for w in W if w.get('address')]
-    probe = get(BS + '/api?module=account&action=tokentx&address=' + W[0]['address'] + '&sort=desc&page=1&offset=5', tries=2)
-    print('blockscout probe:', str(probe)[:300])
-    PROBE.clear()
     t0 = time.time()
-    ents, debug = analyse(W)
-    n_tx = sum(debug['totals'].values())
-    out = {'built': int(time.time()), 'n_tx': n_tx, 'secs': int(time.time() - t0), 'entities': ents, 'debug': debug}
-    json.dump(out, open(os.path.join(HERE, 'entities.json'), 'w'), default=list)
+    ents, debug, state = analyse(W, old.get('state') or {})
+    n_tx = sum(debug['cp_per_wallet'].values())
+    out = {'built': int(time.time()), 'secs': int(time.time() - t0), 'n_tx': n_tx, 'entities': ents, 'debug': debug, 'state': state}
+    json.dump(out, open(os.path.join(HERE, 'entities.json'), 'w'), default=list, separators=(',', ':'))
     n = sum(1 for e in ents.values() if e['accounts'])
-    print(f'entities: done in {out["secs"]}s, {n} traders with linked accounts')
+    print(f'entities: done in {out["secs"]}s, {n} traders with linked accounts, file {os.path.getsize(os.path.join(HERE, "entities.json")) // 1024} KB')
 
 if __name__ == '__main__':
     main()
