@@ -2438,7 +2438,7 @@ document.querySelectorAll('main .hero').forEach(h=>{if(h.querySelector('.pg-rf')
 
 /* Market Strength: smart money vs regular wallets on each side of one market.
    Smart = a tracked trader (TRS, starred) or any wallet passing MS_RULES. Loaded live from the data API. */
-const MS_DATA='https://data-api.polymarket.com',MS_GAMMA='https://gamma-api.polymarket.com',MS_REF='via=brams';
+const MS_DATA='https://data-api.polymarket.com',MS_GAMMA='https://gamma-api.polymarket.com';
 const MS_RULES={minPnl:10000,minMarkets:20,maxLuck:0.5},MS_MAX=250,MS_PV={};
 const msName=h=>{const n=String(h.tname||h.name||'');return !n||/^0x[0-9a-f]{8,}/i.test(n)?h.w.slice(0,6)+'…':n};
 const msK=v=>{v=msNum(v);return v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?Math.round(v/1e3)+'K':Math.round(v)+''};
@@ -2531,13 +2531,13 @@ function msRender(m,data,markets){
  const w=v=>(v/all*100).toFixed(2)+'%',lab=(v,t,c)=>v/all>.12?`<span style="color:${c}">${t}</span>`:'';
  const card=(s,i)=>`<div class="ms-side"><h4 class="${i?'ms-r':'ms-g'}">${msEsc(s.label)} · ${msMoney(s.total)}</h4>
    <div class="ms-ln"><span><span class="ms-sq" style="background:${i?'#991b1b':'#166534'}"></span>Smart (${msPl(s.sN,'wallet')})</span><b>${msMoney(s.smart)} · ${s.total?Math.round(s.smart/s.total*100):0}%</b></div>
-   ${s.sN?`<button class="ms-tk" data-i="${i}">${s.tk?'★ ':''}${s.tk} on your list ▾</button><div class="ms-wl ms-hide" id="mswl${i}"><table class="ms-tb"><tr><th>Trader</th><th>Value</th><th>Size</th><th>Avg</th><th title="Share of the trader's open positions in this market">Size %</th><th title="Profit on this position">PnL</th><th>All-time</th></tr>${(()=>{const mx=Math.max(1,...s.list.map(h=>h.value));return s.list.map(h=>`<tr><td><a class="ms-tw" href="https://polymarket.com/profile/${h.w}?${MS_REF}" target="_blank" rel="noopener">${h.img?`<img src="${msEsc(h.img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'ms-av',textContent:'${msEsc(msName(h)[0].toUpperCase())}'}))">`:`<span class="ms-av">${msEsc(msName(h)[0].toUpperCase())}</span>`}<span class="ms-nm"><span>${h.tracked?'<span class="ms-st">★</span> ':''}${msEsc(msName(h))}</span><i class="ms-pb ${i?'ms-pbn':''}"><b style="width:${Math.max(3,Math.round(h.value/mx*100))}%"></b></i></span></a></td>
+   ${s.sN?`<button class="ms-tk" data-i="${i}">${s.tk?'★ ':''}${s.tk} on your list ▾</button><div class="ms-wl ms-hide" id="mswl${i}"><table class="ms-tb"><tr><th>Trader</th><th>Value</th><th>Size</th><th>Avg</th><th title="Share of the trader's open positions in this market">Size %</th><th title="Profit on this position">PnL</th><th>All-time</th></tr>${(()=>{const mx=Math.max(1,...s.list.map(h=>h.value));return s.list.map(h=>`<tr><td><a class="ms-tw" href="https://polymarket.com/profile/${h.w}" target="_blank" rel="noopener">${h.img?`<img src="${msEsc(h.img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'ms-av',textContent:'${msEsc(msName(h)[0].toUpperCase())}'}))">`:`<span class="ms-av">${msEsc(msName(h)[0].toUpperCase())}</span>`}<span class="ms-nm"><span>${h.tracked?'<span class="ms-st">★</span> ':''}${msEsc(msName(h))}</span><i class="ms-pb ${i?'ms-pbn':''}"><b style="width:${Math.max(3,Math.round(h.value/mx*100))}%"></b></i></span></a></td>
 <td>${msMoney(h.value)}</td><td>${msK(h.size)}</td><td>${h.avg?'@'+Math.round(h.avg*100):'—'}</td><td class="ms-g">${h.szp==null?'—':(h.szp<10?h.szp.toFixed(1):Math.round(h.szp))+'%'}</td><td class="${h.ppct==null?'ms-mut':h.ppct>=0?'ms-g':'ms-r'}">${h.ppct==null?'—':(h.ppct>=0?'+':'')+h.ppct.toFixed(1)+'%'}</td><td class="${h.pnl==null?'ms-mut':h.pnl>=0?'ms-g':'ms-r'}">${h.pnl==null?'—':msMoney(h.pnl,true)}</td></tr>`).join('')})()}</table></div>`:''}
    <div class="ms-ln"><span><span class="ms-sq" style="background:${i?'#fca5a5':'#86efac'}"></span>Regular (${msPl(s.rN,'wallet')})</span><b>${msMoney(s.reg)} · ${s.total?Math.round(s.reg/s.total*100):0}%</b></div>
    <div class="ms-ln ms-sep"><span>Smart PnL on this market</span><b class="${msNum(s.sp)>=0?'ms-g':'ms-r'}">${s.sp==null?'—':msMoney(s.sp,true)}</b></div></div>`;
  ms$('#msout').innerHTML=`<div class="ms-card">
   <div class="ms-mk">${m.image||m.icon?`<img src="${msEsc(m.image||m.icon)}" alt="" onerror="this.remove()">`:''}<div>
-   <h3>${m.slug&&m.slug!='demo'?`<a href="https://polymarket.com/market/${msEsc(m.slug)}?${MS_REF}" target="_blank" rel="noopener">${msEsc(m.question)}</a>`:msEsc(m.question)}</h3>
+   <h3>${m.slug&&m.slug!='demo'?`<a href="https://polymarket.com/market/${msEsc(m.slug)}" target="_blank" rel="noopener">${msEsc(m.question)}</a>`:msEsc(m.question)}</h3>
    ${markets.length>1?`<select id="mssel">${markets.map((x,i)=>`<option value="${i}" ${x===m?'selected':''}>${msEsc(x.groupItemTitle||x.question)}</option>`).join('')}</select>`:''}</div></div>
   <div class="ms-ttl"><b>Market strength</b>${sA?`<span class="${sSide===N?'ms-r':'ms-g'}">Smart money backs ${msEsc(sSide.label)} · ${sPct}%</span>`:'<span class="ms-mut">No smart money in this market yet</span>'}</div>
   ${msBar('Smart money',Y.smart,N.smart,Y.label,N.label,'#166534','#991b1b','#dcfce7','#fff',34,msPl(Y.sN+N.sN,'wallet'))}
@@ -2568,7 +2568,7 @@ function msDemo(){
  let q=.62;const price=[...Array(120)].map((_,i)=>{q=Math.min(.97,Math.max(.03,q+(r()-.55)*.03));return[Math.floor(Date.now()/1000)-(119-i)*43200,q]});
  return{outs:['Yes','No'],holders:hs,series,price}}
 // ===== Post Counts: Elon Musk on X, Donald Trump on Truth Social. Live count + model odds vs market price =====
-const PC_X='https://xtracker.polymarket.com/api',PC_G='https://gamma-api.polymarket.com',PC_REF='via=brams';
+const PC_X='https://xtracker.polymarket.com/api',PC_G='https://gamma-api.polymarket.com';
 const KPOSTS=__KPOSTS__;
 const PC_ACC={elon:{h:'elonmusk',pf:'X',name:'Elon Musk',where:'X'},trump:{h:'realDonaldTrump',pf:'TRUTH_SOCIAL',name:'Donald Trump',where:'Truth Social'}};
 const PC={hist:{},hAt:0,cards:[],f:'all',ven:'all',at:0,busy:false,open:{},err:''};
@@ -2625,7 +2625,7 @@ async function pcLoad(force){
    if(!ev||!ev.markets)return null;
    const br=ev.markets.map(m=>{const r=pcBr(m.groupItemTitle);if(!r)return null;const px=(()=>{try{return JSON.parse(m.outcomePrices)}catch(e){return[]}})();
     return{l:m.groupItemTitle,lo:r[0],hi:r[1],b:m.bestBid==null?null:+m.bestBid,a:m.bestAsk==null?null:+m.bestAsk,p:m.closed?+px[0]:(m.lastTradePrice==null?null:+m.lastTradePrice),closed:!!m.closed,v:+m.volume||0}}).filter(Boolean).sort((a,b)=>a.lo-b.lo);
-   return{who,venue:'poly',id:x.id,title:x.title,start:Date.parse(x.startDate),end:Date.parse(x.endDate)+1000,url:x.marketLink+(x.marketLink.includes('?')?'&':'?')+PC_REF,count:st.total!=null?+st.total:null,br,vol:+ev.volume||0,avatar:x.user.avatarUrl}}));
+   return{who,venue:'poly',id:x.id,title:x.title,start:Date.parse(x.startDate),end:Date.parse(x.endDate)+1000,url:x.marketLink,count:st.total!=null?+st.total:null,br,vol:+ev.volume||0,avatar:x.user.avatarUrl}}));
   const ks=(KPOSTS&&KPOSTS.ev||[]).map(e=>Object.assign({},e,{count:null,avatar:null,kAt:KPOSTS.built}));
   PC.cards=cards.filter(Boolean).concat(ks);PC.av={};tr.forEach(x=>PC.av[x.user.handle==='elonmusk'?'elon':'trump']=x.user.avatarUrl);PC.at=Date.now();
  }catch(e){PC.err='Could not load live data ('+e.message+'). Polymarket may need a VPN where you are.'}
