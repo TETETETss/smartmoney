@@ -267,7 +267,8 @@ def build_group(W, min_value, label):
                  'yes': yes, 'tok': (F(p,'token_id','asset','tokenId'), side), 'end': str(F(p,'endDate','end_date',default='') or '')[:10], 'img': F(p,'icon','image',default='') or '', 'tr': {}, 'out2': (out, F(p,'oppositeOutcome','opposite_outcome'))})
             prev = m['tr'].get(n)
             if prev and prev['val'] >= val: continue   # a trader holding both sides: keep the bigger one
-            m['tr'][n] = {'n': n, 'side': side, 'sh': round(float(F(p,'current_size','size','shares',default=0)), 4), 'avg': round(float(F(p,'avgPrice','avg_price','average_price',default=0) or 0), 4), 'val': round(val, 4), 'ex': None, 'fe': int(float(F(p,'first_entry_at','firstEntryAt',default=0) or 0))}
+            m['tr'][n] = {'n': n, 'side': side, 'sh': round(float(F(p,'current_size','size','shares',default=0)), 4), 'avg': round(float(F(p,'avgPrice','avg_price','average_price',default=0) or 0), 4), 'val': round(val, 4), 'ex': None, 'fe': int(float(F(p,'first_entry_at','firstEntryAt',default=0) or 0)),
+                          'bt': round(float(_num(F(p,'total_size','totalSize')) or 0), 2) or None}
         # portfolio value = all open positions (any market) + stablecoin cash, used for "Size %" on the site
         pos_v = round(sum(float(F(q,'currentValue','current_value','value',default=0) or 0) for q in P
                        if F(q,'redeemable') not in (True, 'True', 'true') and float(F(q,'currentValue','current_value','value',default=0) or 0) > 0), 2)
@@ -380,6 +381,31 @@ def pos_index():
             vslot = vals.setdefault(addr, {}).setdefault(cid, {})
             vslot[out] = vslot.get(out, 0.0) + val
     return idx, vals
+
+_BT = None
+def bought_index():
+    """Total shares ever bought per open position: addr -> condition -> outcome -> total_size (data-api v2)."""
+    global _BT
+    if _BT is not None: return _BT
+    _BT, more, same, ex = {}, 0, 0, []
+    for addr, P in RAW.items():
+        for p in P or []:
+            cid = F(p, 'condition_id', 'conditionId')
+            tot = _num(F(p, 'total_size', 'totalSize', 'total_bought', 'totalBought'))
+            cur = _num(F(p, 'current_size', 'size')) or 0
+            if not cid or not tot or cur <= 0.01: continue
+            out = F(p, 'outcome') or ('Yes' if str(F(p, 'outcome_index', 'outcomeIndex')) == '0' else 'No')
+            s = _BT.setdefault(str(addr).lower(), {}).setdefault(cid, {})
+            s[out] = s.get(out, 0.0) + tot
+            if tot > cur + 0.01:
+                more += 1
+                if len(ex) < 3: ex.append((F(p, 'title', default='')[:40], round(cur, 2), round(tot, 2)))
+            else: same += 1
+    print(f'  bought index: {more} open positions partly sold, {same} untouched; examples {ex}')
+    return _BT
+
+def bought_of(addr, cid, out):
+    return round(float(((bought_index().get(str(addr).lower()) or {}).get(cid) or {}).get(out) or 0), 2) or None
 
 def _holders(state):
     """state: addr -> outcome -> shares. One wallet on both outcomes is a hedge and is left out."""
@@ -591,7 +617,8 @@ def _flow_markets(books, held, is_out):
                 sh = slot['buy_sh'] - slot['sell_sh']
                 avg = _avg(slot['buy_usd'], slot['buy_sh'])
             row = {'n': b['names'].get(addr, addr[:6]), 'avatar': b['avatar'].get(addr, ''), 'out': out,
-                   'usd': round(val), 'sh': round(sh, 2) if sh and sh > 0 else 0, 'avg': avg}
+                   'usd': round(val), 'sh': round(sh, 2) if sh and sh > 0 else 0, 'avg': avg,
+                   'hd': round(float(((held.get(addr) or {}).get(cid) or {}).get(out) or 0), 2), 'bt': bought_of(addr, cid, out)}
             if is_out:
                 left = float(((held.get(addr) or {}).get(cid) or {}).get(out) or 0)
                 row['exited'] = left <= 0.01
@@ -711,7 +738,7 @@ def weekly(addrs, names):
                 slot['val'] += val
                 slot['fe'] = min(slot['fe'], int(fe))
             else:
-                b['tr'][(str(addr).lower(), side)] = {'n': name, 'side': side, 'sh': sh, 'avg': avg, 'val': val, 'fe': int(fe)}
+                b['tr'][(str(addr).lower(), side)] = {'n': name, 'side': side, 'sh': sh, 'avg': avg, 'val': val, 'fe': int(fe), 'bt': bought_of(addr, cid, side)}
             if not b['t']:
                 b['t'] = F(p, 'title', 'market_title', 'question') or ''
                 b['img'] = F(p, 'icon', 'image') or ''
@@ -722,7 +749,7 @@ def weekly(addrs, names):
         rows = list(b['tr'].values())
         if len({r['n'] for r in rows}) < 3: continue
         ask = _yes_price(cid)
-        tr = [{'n': r['n'], 'side': r['side'], 'sh': round(r['sh'], 2), 'avg': round(r['avg'], 4), 'val': round(r['val'], 2), 'fe': r['fe']} for r in rows]
+        tr = [{'n': r['n'], 'side': r['side'], 'sh': round(r['sh'], 2), 'avg': round(r['avg'], 4), 'val': round(r['val'], 2), 'fe': r['fe'], 'bt': r.get('bt')} for r in rows]
         tr.sort(key=lambda r: -r['val'])
         mk.append({'cid': cid, 't': b['t'], 'url': b['url'], 'img': b['img'] or '', 'ask': None if ask is None else round(ask, 4), 'tr': tr})
     def rank(m):
