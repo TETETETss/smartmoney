@@ -45,7 +45,7 @@ header .r{display:flex;gap:18px;align-items:center;font-size:13px}
 .chips{display:flex;gap:8px;flex-wrap:wrap}
 .chip{border:1px solid #333;border-radius:99px;padding:8px 15px;font-size:12px;cursor:pointer;background:none;color:#ccc}
 .chip.on{background:#fff;color:#000;border-color:#fff}
-.grid{display:flex;gap:14px;align-items:flex-start;padding:22px 36px 60px}.mcol{flex:1;min-width:0;display:flex;flex-direction:column;gap:14px}
+.grid{display:flex;gap:14px;align-items:flex-start;padding:22px 36px 60px}.grid.cv .card{content-visibility:auto;contain-intrinsic-size:auto 600px}.mcol{flex:1;min-width:0;display:flex;flex-direction:column;gap:14px}
 .card{background:#121212;border-radius:20px;padding:22px;display:flex;flex-direction:column;gap:14px}
 .ct{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
 .ct a{font-size:17px;line-height:1.3;font-weight:500}
@@ -1151,8 +1151,13 @@ function chipsR(){const nh=D.filter(m=>HID.has(m.url)).length;chips.innerHTML=ca
 function prepMarkets(){DS.forEach(m=>{const yes=m.top=='Yes',now=yes?m.ask:1-m.bid,h=m.tr.filter(t=>!t.ex&&t.side==m.top);m.cav=h.length?h.reduce((a,t)=>a+t.avg,0)/h.length:0;m.gap=Math.abs(now-m.cav);m.hc=m.tr.filter(t=>!t.ex).length;m.nw=Math.max(0,...m.tr.map(t=>t.fe||0))})}
 prepMarkets();
 function masonry(el){el=el||grid;if(!el)return;const cards=[...el.querySelectorAll('.card')];if(!cards.length)return;const w=el.clientWidth||innerWidth;const n=Math.max(1,Math.floor((w+14)/(300+14)));
- el.innerHTML='';const cols=[...Array(n)].map(()=>{const c=document.createElement('div');c.className='mcol';el.appendChild(c);return c});
- cards.forEach(cd=>{const s=cols.reduce((a,b)=>b.offsetHeight<a.offsetHeight?b:a);s.appendChild(cd)})}
+ /* measure every card once (one layout pass), then place them by the numbers; reading column heights after each append forced hundreds of layouts */
+ el.classList.remove('cv');el.innerHTML='';const cols=[...Array(n)].map(()=>{const c=document.createElement('div');c.className='mcol';el.appendChild(c);return c});
+ const f=document.createDocumentFragment();cards.forEach(cd=>f.appendChild(cd));cols[0].appendChild(f);
+ const gap=parseFloat(getComputedStyle(cols[0]).rowGap||getComputedStyle(cols[0]).gap)||14,hs=cards.map(cd=>cd.offsetHeight),H=cols.map(()=>0),buckets=cols.map(()=>[]);
+ cards.forEach((cd,i)=>{let k=0;for(let j=1;j<n;j++)if(H[j]<H[k])k=j;buckets[k].push(cd);H[k]+=hs[i]+gap});
+ cols.forEach((c,k)=>{const fr=document.createDocumentFragment();buckets[k].forEach(cd=>fr.appendChild(cd));c.appendChild(fr)});
+ el.classList.add('cv')}
 let mrT,lastW=innerWidth;addEventListener('resize',()=>{if(innerWidth===lastW)return;lastW=innerWidth;clearTimeout(mrT);mrT=setTimeout(()=>{if(dash.style.display!='none'){const y=scrollY;grid.style.minHeight=grid.offsetHeight+'px';render();const inf=document.getElementById('v-inflows');if(inf&&inf.style.display!=='none')(IFM=='week'?wkRender:ifRender)();grid.style.minHeight='';scrollTo(0,y)}},150)});
 function ana(m,ask){
  const val=t=>t.val||t.sh*t.avg,hs=m.tr.filter(t=>!t.ex),tp=hs.filter(t=>t.side==m.top);
