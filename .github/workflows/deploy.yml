@@ -142,6 +142,7 @@ jobs:
         run: |
           mkdir -p dist
           cp index.html dist/index.html
+          if [ -s xindex.json ]; then cp xindex.json dist/xindex.json; fi
           test -s dist/index.html
           # Deploy this file only. raw.json, data.json, and debug.json stay on the runner.
           find dist -type f -print

@@ -798,6 +798,49 @@ def kalshi_posts():
     print(f'Kalshi post-count events: {len(out)}')
     return {'built': int(time.time()), 'ev': out}
 
+# ---- X (Twitter) -> Polymarket index. Only accounts that linked X on their own Polymarket profile.
+# Grows over time: starts from the copy published with the previous build, adds leaderboard traders
+# (the leaderboard returns x_username) and tracked wallets (checked via /public-profile).
+SITE_URL = 'https://smartmoney-2ym.pages.dev'
+X_CATS = ['politics', 'geopolitics', 'culture', 'finance', 'tech', 'crypto', 'economics', 'sports', 'weather', 'mentions', 'esports']
+def x_index(addrs):
+    now = int(time.time())
+    prev = get(SITE_URL + '/xindex.json?t=' + str(now), quiet=True) or {}
+    idx = {}
+    for h, rows in (prev.get('x') or {}).items():
+        if isinstance(rows, list): idx[h] = [r for r in rows if isinstance(r, list) and len(r) >= 5]
+    def add(handle, wallet, name, verified):
+        handle = (handle or '').strip().lstrip('@'); wallet = (wallet or '').lower()
+        if not handle or not re.match(r'^0x[0-9a-f]{40}$', wallet): return
+        rows = idx.setdefault(handle.lower(), [])
+        for r in rows:
+            if r[0] == wallet:
+                r[1], r[2], r[3], r[4] = name or r[1], bool(verified), handle, now // 86400; return
+        rows.append([wallet, name or '', bool(verified), handle, now // 86400])
+    combos = [('all', 'overall', 25), ('month', 'overall', 10), ('week', 'overall', 5), ('day', 'overall', 3)] + [('month', c, 4) for c in X_CATS] + [('all', c, 4) for c in X_CATS]
+    def crawl(combo):
+        period, cat, pages = combo; got = []; cur = ''
+        for _ in range(pages):
+            q = f'{V2}leaderboard?time_period={period}&limit=200' + ('' if cat == 'overall' else f'&category={cat}') + (f'&cursor={urllib.parse.quote(cur)}' if cur else '')
+            j = get(q, quiet=True)
+            if not j or not j.get('data'): break
+            got += [(r.get('x_username'), r.get('user_id'), r.get('user_name'), r.get('verified')) for r in j['data'] if r.get('x_username')]
+            cur = (j.get('pagination') or {}).get('next_cursor') or ''
+            if not cur: break
+        return got
+    with cf.ThreadPoolExecutor(8) as ex:
+        for got in ex.map(crawl, combos):
+            for g in got: add(*g)
+    def prof(a):
+        j = get('https://gamma-api.polymarket.com/public-profile?address=' + a, quiet=True) or {}
+        return (j.get('xUsername'), a, j.get('name'), j.get('verifiedBadge'))
+    with cf.ThreadPoolExecutor(8) as ex:
+        for g in ex.map(prof, addrs[:400]):
+            add(*g)
+    out = {'built': now, 'x': idx}
+    json.dump(out, open(os.path.join(HERE, 'xindex.json'), 'w', encoding='utf-8'), separators=(',', ':'))
+    print(f'X index: {len(idx)} linked X accounts')
+
 def main():
     # One tracked list. Each wallet keeps its own position minimum (macro $500, fast $10).
     W = load_wallets('wallets.json')
@@ -813,6 +856,10 @@ def main():
         KPOSTS = kalshi_posts()
     except Exception as e:
         print('  kalshi post counts failed', e); KPOSTS = {'built': int(time.time()), 'ev': []}
+    try:
+        x_index(addrs)
+    except Exception as e:
+        print('  X index failed', e)
     for m in D: m.pop('tok', None)
     json.dump(RAW, open(os.path.join(HERE, 'raw.json'), 'w', encoding='utf-8'))
     if not ok:

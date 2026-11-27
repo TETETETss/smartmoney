@@ -941,6 +941,15 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
 #v-posts .pc-hid{display:none}
 #v-posts .pc-nl{display:inline-block;font-size:12px;color:#7aa7ff;margin-top:8px}
 @media(max-width:700px){#v-posts .pc-inf{grid-template-columns:1fr 1fr}#v-posts .pc-wk{gap:4px}#v-posts .pc-stk{width:78%}#v-posts .pc-col small{font-size:9.5px}#v-posts .pc-brl{display:none}#v-posts .pc-evf{grid-template-columns:1fr 1fr}#v-posts .pc-ev{grid-template-columns:84px minmax(0,1fr) 20px}#v-posts .pc-ev .pc-tag{display:none}#v-posts .pc-g2{grid-template-columns:1fr}}
+#v-wallet .wamode{display:flex;gap:6px;margin-bottom:10px}
+#v-wallet .wamode button{background:none;border:1px solid #2e2e2e;color:#aaa;border-radius:999px;padding:6px 14px;font:inherit;font-size:13px;cursor:pointer}
+#v-wallet .wamode button.on{background:#fff;color:#000;border-color:#fff}
+#v-wallet .wainfo{background:#0f1a12;border:1px solid #1f3b2c;color:#cfe9d6;border-radius:12px;padding:10px 14px;margin:0 0 14px;font-size:14px}
+#v-wallet .wainfo a{color:#fff;text-decoration:underline}
+#v-wallet .waxl{display:grid;gap:8px;max-width:640px}
+#v-wallet .waxr{display:flex;align-items:center;gap:12px;background:#0b0b0b;border:1px solid #1d1d1d;border-radius:14px;padding:12px 14px;color:#fff;font:inherit;text-align:left;cursor:pointer}
+#v-wallet .waxr:hover{border-color:#444}#v-wallet .waxr img{width:36px;height:36px;border-radius:50%;object-fit:cover}
+#v-wallet .waxr span{flex:1;min-width:0}#v-wallet .waxr small{display:block;color:#888;font:12px ui-monospace,Menlo,Consolas,monospace;margin-top:2px}#v-wallet .waxr em{font-style:normal;color:#aaa;font-size:13px}
 </style></head><body class="indash">
 <canvas id="orb"></canvas>
 
@@ -1035,6 +1044,7 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
     <div class="sortnote">Daily PnL, category ranks, open positions, trades, and a performance report</div>
    </div></div>
    <div class="wa-wrap">
+    <div class="wamode"><button type="button" class="on" data-m="pm">Wallet or username</button><button type="button" data-m="x">Find by 𝕏 account</button></div>
     <form class="search" id="waf">
      <select id="wasel" class="wasel" aria-label="Smart money wallets"><option value="">Smart money wallets</option></select>
      <span class="waor">or</span>
@@ -1042,6 +1052,7 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
      <button class="btn" id="wago" type="submit">Analyze</button>
     </form>
     <div id="waerr" class="err hidden"></div>
+    <div id="wainfo" class="wainfo hidden"></div>
     <div id="waapp"><div class="wa-empty"><h2>Analyze any Polymarket wallet</h2><p>Search a tracked trader, any username, or a 0x address. Daily PnL, ranks, positions, activity, history, and a performance report.</p></div></div>
    </div>
   </div>
@@ -1800,6 +1811,24 @@ async function resolveWallet(raw){
   return String(hit.proxyWallet).toLowerCase();
 }
 
+// ---- Find a Polymarket account by X username. Only accounts that linked X on their own Polymarket profile.
+let WAM='pm';
+const WA_PH={pm:'Wallet address, Polymarket username, or profile link',x:'X username, e.g. @CarOnPolymarket or x.com/handle'};
+document.querySelectorAll('#v-wallet .wamode button').forEach(b=>b.onclick=()=>{WAM=b.dataset.m;document.querySelectorAll('#v-wallet .wamode button').forEach(x=>x.classList.toggle('on',x===b));const q=wa$('#waq');q.placeholder=WA_PH[WAM];q.focus()});
+const waIsX=raw=>WAM==='x'||/^(https?:\/\/)?(www\.)?(x|twitter)\.com\//i.test(String(raw||'').trim());
+async function xLookup(raw){
+  const h=String(raw||'').trim().replace(/^(https?:\/\/)?(www\.)?(x|twitter)\.com\//i,'').split(/[/?#\s]/)[0].replace(/^@/,'').trim();
+  if(!/^[A-Za-z0-9_]{1,15}$/.test(h)) throw new Error('Enter an X username, like @CarOnPolymarket.');
+  const hl=h.toLowerCase(),cand=new Set();
+  try{if(!xLookup.idx)xLookup.idx=await fetch('xindex.json',{cache:'no-cache'}).then(r=>r.ok?r.json():{x:{}});((xLookup.idx.x||{})[hl]||[]).forEach(r=>r&&r[0]&&cand.add(String(r[0]).toLowerCase()))}catch(e){}
+  try{(await waProfiles(h)).forEach(p=>p.proxyWallet&&cand.add(String(p.proxyWallet).toLowerCase()))}catch(e){}
+  const list=[...cand].slice(0,20);
+  const profs=await Promise.all(list.map(a=>fetch('https://gamma-api.polymarket.com/public-profile?address='+a).then(r=>r.ok?r.json():null).catch(()=>null)));
+  const seen=new Set(),hits=profs.filter(p=>p&&p.proxyWallet&&p.xUsername&&String(p.xUsername).replace(/^@/,'').toLowerCase()===hl&&!seen.has(p.proxyWallet.toLowerCase())&&seen.add(p.proxyWallet.toLowerCase()));
+  return{h,hits}}
+function waInfo(html){const e=wa$('#wainfo');e.innerHTML=html||'';e.classList.toggle('hidden',!html)}
+window.waPickX=async a=>{waInfo(wa$('#wainfo').dataset.banner||'');wa$('#waapp').innerHTML='<div class="loading"><span class="spin"></span>Loading…</div>';try{await load(a)}catch(err){showErr(err.message||String(err))}};
+
 const WA_API = 'https://data-api.polymarket.com';
 const CATS = ['politics','geopolitics','culture','finance','tech','crypto','economics','sports','weather','mentions','esports'];
 const S = {}; // state
@@ -2354,7 +2383,20 @@ wa$('#waf').addEventListener('submit', async e => {
   wa$('#wago').disabled = true;
   showErr('');
   wa$('#waapp').innerHTML = '<div class="loading"><span class="spin"></span>Looking up '+esc(raw).slice(0,80)+'…</div>';
+  waInfo('');
   try {
+    if (waIsX(raw)) {
+      const {h, hits} = await xLookup(raw);
+      const xl = `<a href="https://x.com/${esc(h)}" target="_blank" rel="noopener">𝕏 @${esc(h)}</a>`;
+      if (!hits.length) throw new Error(`No Polymarket account has @${h} linked as its X account. This only finds accounts that linked X on their Polymarket profile.`);
+      const banner = `${xl} is linked to this Polymarket account`;
+      wa$('#wainfo').dataset.banner = banner;
+      if (hits.length === 1) { waInfo(banner + (hits[0].verifiedBadge ? ' · <span class="g">verified</span>' : '')); await load(String(hits[0].proxyWallet).toLowerCase()); return; }
+      waInfo(`${xl} is linked to ${hits.length} Polymarket accounts. Pick one:`);
+      wa$('#waapp').innerHTML = `<div class="waxl">${hits.map(p => `<button class="waxr" onclick="waPickX('${String(p.proxyWallet).toLowerCase()}')">${p.profileImage ? `<img src="${esc(p.profileImage)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">` : ''}<span><b>${esc(p.name || p.pseudonym || 'Unnamed')}</b>${p.verifiedBadge ? ' <span class="g">✔</span>' : ''}<small>${String(p.proxyWallet).slice(0, 8)}…${String(p.proxyWallet).slice(-6)}</small></span><em>Analyze →</em></button>`).join('')}</div>`;
+      wa$('#wago').disabled = false;
+      return;
+    }
     const a = await resolveWallet(raw);
     await load(a);
   } catch (err) {
