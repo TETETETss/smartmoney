@@ -1125,7 +1125,8 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
 document.addEventListener('dragstart',e=>{if(e.target&&e.target.tagName==='IMG')e.preventDefault()});
 document.addEventListener('keydown',e=>{const t=e.target;if(t&&(t.isContentEditable||(t.closest&&t.closest('input,textarea'))))return;const k=e.key.toLowerCase();if(e.key=='F12'||((e.ctrlKey||e.metaKey)&&['s','u','p'].includes(k))||((e.ctrlKey||e.metaKey)&&e.shiftKey&&['i','j','c'].includes(k))){e.preventDefault();e.stopPropagation()}},true);
 
-let CH=/*__CH_S__*/__CHARTS__/*__CH_E__*/;
+let CH=/*__CH_S__*/__CHARTS__/*__CH_E__*/;let CHD=null,CHB=0;
+async function chData(){if(!CHD||CHB!==BUILT){CHB=BUILT;CHD=await fetch('charts.json?b='+BUILT).then(r=>r.ok?r.json():{}).catch(()=>({}))}return CHD}
 let DS=/*__DS_S__*/__DATA__/*__DS_E__*/,NT=/*__NT_S__*/__NTRADERS__/*__NT_E__*/;let D=DS;
 const mark=s=>{let g='';for(let i=0;i<8;i++){const a=i*Math.PI/4,r1=s*.18,r2=(i%2?s*.62:s);g+=`<line x1="${(Math.cos(a)*r1).toFixed(1)}" y1="${(Math.sin(a)*r1).toFixed(1)}" x2="${(Math.cos(a)*r2).toFixed(1)}" y2="${(Math.sin(a)*r2).toFixed(1)}"/>`}return g};
 
@@ -1150,14 +1151,23 @@ function hideM(i,on){const u=D[i].url;on?HID.add(u):HID.delete(u);saveH();render
 function chipsR(){const nh=D.filter(m=>HID.has(m.url)).length;chips.innerHTML=cats.map(x=>`<button class="chip ${x==F?'on':''}" onclick="F='${x}';render()">${x}</button>`).join('')+(nh&&!SV?`<button class="chip hidc ${SHOWH?'on':''}" onclick="SHOWH=!SHOWH;render()">${SHOWH?'Hide hidden':'Show hidden'} (${nh})</button>`:'')}
 function prepMarkets(){DS.forEach(m=>{const yes=m.top=='Yes',now=yes?m.ask:1-m.bid,h=m.tr.filter(t=>!t.ex&&t.side==m.top);m.cav=h.length?h.reduce((a,t)=>a+t.avg,0)/h.length:0;m.gap=Math.abs(now-m.cav);m.hc=m.tr.filter(t=>!t.ex).length;m.nw=Math.max(0,...m.tr.map(t=>t.fe||0))})}
 prepMarkets();
-function masonry(el){el=el||grid;if(!el)return;const cards=[...el.querySelectorAll('.card')];if(!cards.length)return;const w=el.clientWidth||innerWidth;const n=Math.max(1,Math.floor((w+14)/(300+14)));
- /* measure every card once (one layout pass), then place them by the numbers; reading column heights after each append forced hundreds of layouts */
- el.classList.remove('cv');el.innerHTML='';const cols=[...Array(n)].map(()=>{const c=document.createElement('div');c.className='mcol';el.appendChild(c);return c});
+function masonry(el,add){el=el||grid;if(!el)return;
+ /* measure cards once (one layout pass), then place them by the numbers; reading column heights after each append forced hundreds of layouts */
+ let cols=el._cols,H=el._H,cards;
+ if(add&&cols&&cols[0]&&cols[0].parentNode===el){cards=add}
+ else{cards=[...el.querySelectorAll('.card')];if(!cards.length){el._cols=null;return}const w=el.clientWidth||innerWidth;const n=Math.max(1,Math.floor((w+14)/(300+14)));
+  el.classList.remove('cv');el.innerHTML='';cols=[...Array(n)].map(()=>{const c=document.createElement('div');c.className='mcol';el.appendChild(c);return c});H=cols.map(()=>0);el._cols=cols;el._H=H}
+ if(!cards.length)return;
  const f=document.createDocumentFragment();cards.forEach(cd=>f.appendChild(cd));cols[0].appendChild(f);
- const gap=parseFloat(getComputedStyle(cols[0]).rowGap||getComputedStyle(cols[0]).gap)||14,hs=cards.map(cd=>cd.offsetHeight),H=cols.map(()=>0),buckets=cols.map(()=>[]);
- cards.forEach((cd,i)=>{let k=0;for(let j=1;j<n;j++)if(H[j]<H[k])k=j;buckets[k].push(cd);H[k]+=hs[i]+gap});
+ const gap=parseFloat(getComputedStyle(cols[0]).rowGap||getComputedStyle(cols[0]).gap)||14,hs=cards.map(cd=>cd.offsetHeight),buckets=cols.map(()=>[]);
+ cards.forEach((cd,i)=>{let k=0;for(let j=1;j<cols.length;j++)if(H[j]<H[k])k=j;buckets[k].push(cd);H[k]+=hs[i]+gap});
  cols.forEach((c,k)=>{const fr=document.createDocumentFragment();buckets[k].forEach(cd=>fr.appendChild(cd));c.appendChild(fr)});
  el.classList.add('cv')}
+/* Markets grid shows cards in pages: the first page right away, the next ones as you scroll near the end */
+const PAGE=36;
+function gridMore(all){const rest=grid._rest||[];if(!rest.length)return false;const take=all?rest.splice(0):rest.splice(0,PAGE);const t=document.createElement('div');t.innerHTML=take.join('');masonry(grid,[...t.children]);gridSent();return true}
+function gridSent(){let s=document.getElementById('gridmore');if(!s){s=document.createElement('div');s.id='gridmore';s.style.height='1px';grid.after(s);new IntersectionObserver(e=>{if(e[0].isIntersecting)gridMore()},{rootMargin:'1500px 0px'}).observe(s)}
+ s.textContent='';s.hidden=!(grid._rest&&grid._rest.length)}
 let mrT,lastW=innerWidth;addEventListener('resize',()=>{if(innerWidth===lastW)return;lastW=innerWidth;clearTimeout(mrT);mrT=setTimeout(()=>{if(dash.style.display!='none'){const y=scrollY;grid.style.minHeight=grid.offsetHeight+'px';render();const inf=document.getElementById('v-inflows');if(inf&&inf.style.display!=='none')(IFM=='week'?wkRender:ifRender)();grid.style.minHeight='';scrollTo(0,y)}},150)});
 function ana(m,ask){
  const val=t=>t.val||t.sh*t.avg,hs=m.tr.filter(t=>!t.ex),tp=hs.filter(t=>t.side==m.top);
@@ -1212,7 +1222,7 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&FOC){FOC=null;grid.querySelectorAll('.card.foc').forEach(x=>x.classList.remove('foc'));focR()}});
 let REVEAL='';
-function render(){const vm=document.getElementById('v-markets');if(vm)vm.classList.toggle('booked',!!SV);setTimeout(focR);pickD();D.sort(SORTS[SORT][2]);chipsR();headR();grid.innerHTML=D.map((m,i)=>[m,i]).filter(([m])=>{const reveal=!SV&&REVEAL&&m.url===REVEAL;return (F=='All'||m.cat==F||reveal)&&(qm(m)||reveal)&&(SV?!!SAV[m.url]:((!SAV[m.url]||reveal)&&(SHOWH||reveal||!HID.has(m.url))))}).map(([m,mi])=>{const hid=HID.has(m.url),sav=!!SAV[m.url];
+function render(){const vm=document.getElementById('v-markets');if(vm)vm.classList.toggle('booked',!!SV);setTimeout(focR);pickD();D.sort(SORTS[SORT][2]);chipsR();headR();const CARDS=D.map((m,i)=>[m,i]).filter(([m])=>{const reveal=!SV&&REVEAL&&m.url===REVEAL;return (F=='All'||m.cat==F||reveal)&&(qm(m)||reveal)&&(SV?!!SAV[m.url]:((!SAV[m.url]||reveal)&&(SHOWH||reveal||!HID.has(m.url))))}).map(([m,mi])=>{const hid=HID.has(m.url),sav=!!SAV[m.url];
  const sides={};m.tr.filter(t=>!t.ex).forEach(t=>{const s=sides[t.side]||(sides[t.side]={sh:0,ap:0,k:0});s.sh+=t.sh;s.ap+=t.avg;s.k++});
  const valOf=t=>t.val||t.sh*(t.avg||0),maxV=Math.max(1,...m.tr.filter(t=>!t.ex).map(valOf));
  const row=t=>{const cls=t.side=='Yes'?'sy':t.side=='No'?'sn':'sx',S=t.side?String(t.side).toUpperCase():'—';return `<tr class="${t.ex?'ex':''}"><td class="tn"><div class="tw">${avImg(t.n)}<div><a class="tlk" href="https://polymarket.com/@${t.n}" target="_blank">${t.n}</a>${waBtn(t.n)}${t.ex?'':holdBar(t.sh,t.bt,cls)}</div></div></td><td class="r">${t.ex?'Exited @'+c(t.ex):usdK(valOf(t))}</td><td class="r">${K(t.sh)}</td><td class="r">@${c(t.avg)}</td><td class="r">${t.ex?'<span class="szp szsx">—</span>':sizeCell(t.n,valOf(t),cls)}</td><td class="r">${t.ex?'—':pnlPct(t.val!=null?+t.val:null,t.sh*(+t.avg||0))}</td></tr>`};
@@ -1230,7 +1240,7 @@ const grpHtml=['Yes','No',null].map(sd=>{const g=m.tr.filter(t=>(t.side||null)==
  <div class="st"><label>NOW</label><div class="v"><span class="${yes?'g':'rd'}">${m.top.toUpperCase()} ${c(ask)}¢</span></div></div></div>
  <table><tr><th>Trader</th><th class="r">Value</th><th class="r">Size</th><th class="r">Avg</th><th class="r szh" title="% of the trader's portfolio (open positions + stablecoin cash) in this market">Size %</th><th class="r">PnL</th></tr>${rows}</table>
  ${CH[m.url]?`<button class="chb" onclick="openChart(${mi})"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>Open chart<span class="muted">· trader buys on chart</span></button>`:''}
- <details><summary><span>News &amp; analysis</span><span class="stags"><span class="pill acc">${m.cat}</span><span class="pill">Ends ${endS(m.end)}</span></span></summary>${ana(m,ask)}</details></div>`}).join('');masonry()}
+ <details><summary><span>News &amp; analysis</span><span class="stags"><span class="pill acc">${m.cat}</span><span class="pill">Ends ${endS(m.end)}</span></span></summary>${ana(m,ask)}</details></div>`});grid._rest=CARDS.slice(PAGE);grid.innerHTML=CARDS.slice(0,PAGE).join('');masonry();gridSent()}
 
 const API='https://data-api.polymarket.com/v2/';
 async function jget(route,q){const r=await fetch(API+route+'?'+new URLSearchParams(q));if(!r.ok)throw new Error(route+' '+r.status);return r.json()}
@@ -1632,7 +1642,7 @@ document.addEventListener('DOMContentLoaded',()=>{makeSearchable(document.getEle
 setTimeout(()=>{makeSearchable(document.getElementById('wasel'),'Search smart money wallets…');makeSearchable(document.getElementById('pfsel'),'Search smart money wallets…')},0);
 function slugOf(url){const p=String(url||'').split('?')[0].replace(/\/+$/,'').split('/');try{return decodeURIComponent(p[p.length-1]||'').toLowerCase()}catch(e){return (p[p.length-1]||'').toLowerCase()}}
 function findLiveMarket(url, cid){const slug=slugOf(url);const id=String(cid||'').toLowerCase();let loose=null;for(const m of DS){const mc=String(m.cid||'').toLowerCase();if((id&&mc&&mc===id)||m.url===url)return m;if(!loose&&slug&&slugOf(m.url)===slug)loose=m}return loose}
-function openTrackedMarket(url, cid){const m=findLiveMarket(url, cid);if(!m)return false;if(HID.has(m.url))SHOWH=true;REVEAL=SAV[m.url]?m.url:'';const box=document.getElementById('q');if(box)box.value='';Q='';view.hold=true;view('markets');view.hold=false;const card=[...document.querySelectorAll('#grid .card')].find(el=>el.dataset.u===m.url);if(!card)return false;card.classList.add('flash');card.scrollIntoView({behavior:'smooth',block:'center'});clearTimeout(openTrackedMarket.t);openTrackedMarket.t=setTimeout(()=>card.classList.remove('flash'),2000);return true}
+function openTrackedMarket(url, cid){const m=findLiveMarket(url, cid);if(!m)return false;if(HID.has(m.url))SHOWH=true;REVEAL=SAV[m.url]?m.url:'';const box=document.getElementById('q');if(box)box.value='';Q='';view.hold=true;view('markets');view.hold=false;let card=[...document.querySelectorAll('#grid .card')].find(el=>el.dataset.u===m.url);if(!card&&gridMore(true))card=[...document.querySelectorAll('#grid .card')].find(el=>el.dataset.u===m.url);if(!card)return false;card.classList.add('flash');card.scrollIntoView({behavior:'smooth',block:'center'});clearTimeout(openTrackedMarket.t);openTrackedMarket.t=setTimeout(()=>card.classList.remove('flash'),2000);return true}
 function showLiveMarket(url, cid){return openTrackedMarket(url, cid)}
 document.addEventListener('click',e=>{if(e.defaultPrevented||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;const a=e.target.closest('a');if(!a||a.classList.contains('arr')||(a.closest('#grid')&&!SV))return;const href=a.getAttribute('href')||'';if(!/polymarket\.com\/(?:event|market)\//i.test(href))return;const host=a.closest('[data-cid]');const cid=a.dataset.cid||(host&&host.dataset.cid)||'';if(openTrackedMarket(href,cid))e.preventDefault()});
 document.getElementById('lttbl').addEventListener('click',e=>{const hb=e.target.closest('[data-hide]');if(hb){e.preventDefault();hideLiveTrader(decodeURIComponent(hb.dataset.hide||''),decodeURIComponent(hb.dataset.hn||''),decodeURIComponent(hb.dataset.ha||''));return}const b=e.target.closest('[data-fill]');if(b){const id=+b.dataset.fill;liveOpen.has(id)?liveOpen.delete(id):liveOpen.add(id);liveRender();return}const hit=e.target.closest('.market a, .market .mhit, .market .icon');if(!hit)return;const mk=hit.closest('.market');if(mk&&showLiveMarket(mk.dataset.url, mk.dataset.cid))e.preventDefault();else if(hit.tagName!=='A'&&mk)window.open(mk.dataset.url,'_blank','noopener')});
@@ -1716,18 +1726,19 @@ g+='<circle r="3" fill="#e8e8e8"/>';motif.innerHTML=g})();render();
 /* chart: YES price over time with the tracked traders' trades as bubbles */
 let CHM=null,CHR='all';
 function endS(e){if(!e)return'?';const d=new Date(e+'T00:00:00Z');if(isNaN(d))return e;return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',timeZone:'UTC'})+(d.getUTCFullYear()!==new Date().getFullYear()?' '+String(d.getUTCFullYear()).slice(2):'')}
-function openChart(i){CHM=D[i];CHR='all';chsell.checked=false;chttl.textContent=CHM.t;chsub.textContent=CHM.cat.toUpperCase()+' · '+CHM.n+' TRACKED TRADERS';chm.hidden=false;document.body.style.overflow='hidden';drawChart()}
+async function openChart(i){CHM=D[i];CHR='all';chsell.checked=false;chttl.textContent=CHM.t;chsub.textContent=CHM.cat.toUpperCase()+' · '+CHM.n+' TRACKED TRADERS';chm.hidden=false;document.body.style.overflow='hidden';const me=CHM;if(!CHD||CHB!==BUILT){CHD0=1;drawChart();await chData();CHD0=0;if(CHM!==me)return}drawChart()}
+let CHD0=0;
 function closeChart(){chm.hidden=true;CHM=null;document.body.style.overflow=''}
 addEventListener('keydown',e=>{if(e.key==='Escape'&&!chm.hidden)closeChart()});
 addEventListener('resize',()=>{if(CHM)drawChart()});
 function drawChart(){
- const c=CH[CHM.url]||{p:[],t:[]},now=Date.now()/1000,R={'1w':7,'1m':30,'3m':90,all:0};
+ const c=(CHD&&CHD[CHM.url])||{p:[],t:[]},now=Date.now()/1000,R={'1w':7,'1m':30,'3m':90,all:0};
  chrng.innerHTML=Object.keys(R).map(k=>`<button class="${k==CHR?'on':''}" onclick="CHR='${k}';drawChart()">${k.toUpperCase()}</button>`).join('');
  const from=R[CHR]?now-R[CHR]*86400:-Infinity,sells=chsell.checked;
  const P=c.p.filter(x=>x[0]>=from),T=c.t.filter(x=>x[0]>=from&&(sells||x[2]=='B'));
  const W=chw.clientWidth||800,H=Math.max(260,Math.min(440,Math.round(W*.5))),pl=44,pr=14,pt=14,pb=28;
  const ts=[...P.map(x=>x[0]),...T.map(x=>x[0])];
- if(!ts.length){chsvg.setAttribute('viewBox',`0 0 ${W} ${H}`);chsvg.innerHTML=`<text x="${W/2}" y="${H/2}" text-anchor="middle" fill="#777" font-size="13">No data in this range</text>`;chn.textContent='';return}
+ if(!ts.length){chsvg.setAttribute('viewBox',`0 0 ${W} ${H}`);chsvg.innerHTML=`<text x="${W/2}" y="${H/2}" text-anchor="middle" fill="#777" font-size="13">${CHD0?'Loading chart…':'No data in this range'}</text>`;chn.textContent='';return}
  const yeq=x=>x[3]=='Y'?x[4]:1-x[4];  // trade drawn at its YES-equivalent price so it sits on the line
  const ys=[...P.map(x=>x[1]),...T.map(yeq)];
  let t0=Math.min(...ts),t1=Math.max(...ts,P.length?P[P.length-1][0]:0);if(t1-t0<3600){t0-=1800;t1+=1800}

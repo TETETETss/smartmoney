@@ -868,7 +868,8 @@ def main():
         sys.exit('No recent trades came back from the Polymarket data API. index.html was NOT changed.')
     json.dump({'D': D, 'TR': T, 'CH': CH, 'LIVE': LIVE, 'INFLOW': INFLOW, 'OUTFLOW': OUTFLOW, 'WEEKLY': WEEKLY}, open(os.path.join(HERE, 'data.json'), 'w', encoding='utf-8'))
     html = open(os.path.join(HERE, 'template.html'), encoding='utf-8').read()
-    html = html.replace('__CHARTS__', js_json(CH)).replace('__DATA__', js_json(D)).replace('__TRADERS__', js_json(T)).replace('__NTRADERS__', str(len(W)))
+    json.dump(CH, open(os.path.join(HERE, 'charts.json'), 'w', encoding='utf-8'), separators=(',', ':'))   # price charts load on demand from charts.json
+    html = html.replace('__CHARTS__', js_json({u: 1 for u in CH})).replace('__DATA__', js_json(D)).replace('__TRADERS__', js_json(T)).replace('__NTRADERS__', str(len(W)))
     html = html.replace('__LIVE__', js_json(LIVE)).replace('__NLIVE__', str(len(LIVE))).replace('__BUILT__', str(int(time.time())))
     html = html.replace('__INFLOW__', js_json(INFLOW)).replace('__OUTFLOW__', js_json(OUTFLOW)).replace('__WEEKLY__', js_json(WEEKLY)).replace('__AVATARS__', js_json(wallet_avatars(W))).replace('__KPOSTS__', js_json(KPOSTS))
     open(os.path.join(HERE, 'index.html'), 'w', encoding='utf-8').write(html)
