@@ -8,14 +8,12 @@ jobs:
     steps:
       - run: |
           set +e
-          G=https://gamma-api.polymarket.com; D=https://data-api.polymarket.com
-          echo "=== search profiles"; curl -s "$G/public-search?q=cashy&search_profiles=true&limit_per_type=10" | jq -c '.profiles[0:3], (.profiles|length), .pagination'
-          echo "=== search keys"; curl -s "$G/public-search?q=car&search_profiles=true&limit_per_type=10" | jq -c '[.profiles[]?|keys]|unique'
-          echo "=== search by handle"; curl -s "$G/public-search?q=Domahhhh&search_profiles=true&limit_per_type=20" | jq -c '[.profiles[]?|{name,pseudonym,proxyWallet,xUsername,verifiedBadge}]'
-          echo "=== public-profile"; curl -s "$G/public-profile?address=0x7c3db723f1d4d8cb9c550095203b686cb11e5c6b" | jq -c '.'
-          echo "=== leaderboard list"; curl -s "$D/v2/leaderboard?time_period=all&limit=5" | jq -c '.' | head -c 2500; echo
-          curl -s "$D/v2/leaderboard?time_period=all&limit=500&offset=0" | jq -c '(.data|length), ([.data[]?|select(.x_username!=null and .x_username!="")]|length), .pagination'
-          curl -s "$D/v2/leaderboard?time_period=all&limit=500&offset=5000" | jq -c '(.data|length), .pagination'
-          curl -s "$D/v2/leaderboard?time_period=month&limit=500" | jq -c '(.data|length), ([.data[]?|select(.x_username!=null and .x_username!="")]|length)'
-          echo "=== old lb"; curl -s "$D/v1/leaderboard?timePeriod=all&limit=50" | jq -c '.[0:2]' | head -c 800; echo
-          echo "=== cors search"; curl -s -D - -o /dev/null -H "Origin: https://x.pages.dev" "$G/public-search?q=car&search_profiles=true" | grep -i access-control
+          D=https://data-api.polymarket.com
+          for L in 50 100 200; do echo "-- all limit $L"; curl -s "$D/v2/leaderboard?time_period=all&limit=$L" | jq -c '(.data|length), .pagination.has_more'; done
+          C=$(curl -s "$D/v2/leaderboard?time_period=all&limit=100" | jq -r '.pagination.next_cursor')
+          echo "-- cursor page"; curl -s "$D/v2/leaderboard?time_period=all&limit=100&cursor=$C" | jq -c '(.data|length), .data[0].rank, .pagination.has_more'
+          echo "-- offset 100"; curl -s "$D/v2/leaderboard?time_period=all&limit=100&offset=100" | jq -c '(.data|length), .data[0].rank'
+          echo "-- offset 2000"; curl -s "$D/v2/leaderboard?time_period=all&limit=100&offset=2000" | jq -c '(.data|length), .data[0].rank'
+          echo "-- cat politics"; curl -s "$D/v2/leaderboard?time_period=month&limit=100&category=politics" | jq -c '(.data|length), ([.data[]|select(.x_username!="")]|length)'
+          echo "-- order vol"; curl -s "$D/v2/leaderboard?time_period=month&limit=100&order_by=VOL" | jq -c '(.data|length)'
+          echo "-- deep cursor"; c=""; n=0; for i in $(seq 1 30); do r=$(curl -s "$D/v2/leaderboard?time_period=all&limit=100${c:+&cursor=$c}"); k=$(echo "$r"|jq '.data|length'); x=$(echo "$r"|jq '[.data[]|select(.x_username!="")]|length'); n=$((n+x)); c=$(echo "$r"|jq -r '.pagination.next_cursor // empty'); echo -n "$k/$x "; [ -z "$c" ] && break; done; echo " total x=$n"
