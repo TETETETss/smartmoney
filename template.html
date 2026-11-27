@@ -711,6 +711,11 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
 #v-strength .ms-g{color:#4ade80}#v-strength .ms-r{color:#f87171}#v-strength .ms-mut{color:#8a8a8a}
 #v-strength .ms-ch{font-weight:600;font-size:15px;margin:24px 0 4px}
 #v-strength .ms-chart svg{width:100%;height:200px;display:block}
+.ms-entries .ms-er{display:grid;grid-template-columns:120px minmax(0,1fr);gap:14px;align-items:end;margin-bottom:18px}
+.ms-entries .ms-el{padding-bottom:30px}.ms-entries .ms-el b{display:block;font-size:15px}.ms-entries .ms-el small{display:block;color:#888;font-size:12px}
+.ms-entries .ms-el .pc{display:block;font:700 18px ui-monospace,"SF Mono",Menlo,Consolas,monospace;margin:4px 0 2px}
+.ms-entries svg{display:block;width:100%;height:auto;overflow:visible}
+@media(max-width:700px){.ms-entries .ms-er{grid-template-columns:1fr}.ms-entries .ms-el{padding-bottom:0;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}.ms-entries .ms-el .pc{margin:0}}
 #v-strength .ms-load{padding:50px;text-align:center;color:#8a8a8a}
 #v-strength .ms-hide{display:none!important}
 /* ===== Card style v2 (wallet lookup + wallet analysis): dark cards, icon headers, mono labels, big light numbers ===== */
@@ -2623,7 +2628,7 @@ async function msAnalyze(m){
  const net={s:[0,0],r:[0,0]},ser={},pct=n=>n[0]+n[1]>0?n[1]/(n[0]+n[1])*100:null;
  trades.slice().sort((a,b)=>a.timestamp-b.timestamp).forEach(t=>{const g=cls[who(t)]&&cls[who(t)].smart?'s':'r',i=msNum(msPick(t,'outcome_index','outcomeIndex'))?1:0;
   net[g][i]=Math.max(0,net[g][i]+(t.side=='SELL'?-usd(t):usd(t)));ser[new Date(msNum(t.timestamp)*1000).toISOString().slice(0,10)]={s:pct(net.s),r:pct(net.r)}});
- let price=[];const tid=msJ(m.clobTokenIds,[])[0];
+ let price=[];const tid=null;   // price history no longer shown (replaced by 'Where smart money got in')
  if(tid){const ph=await fetch('https://clob.polymarket.com/prices-history?market='+encodeURIComponent(tid)+'&interval=max&fidelity=720').then(r=>r.ok?r.json():null).catch(()=>null);price=((ph&&ph.history)||[]).map(x=>[msNum(x.t),msNum(x.p)]).filter(x=>x[0])}
  return{outs,holders,series:Object.entries(ser).slice(-30),price}}
 function msSvg(series,label){
@@ -2636,6 +2641,35 @@ function msSvg(series,label){
   <path d="${path('r')}" fill="none" stroke="#8a8a8a" stroke-width="2" stroke-dasharray="6 5" vector-effect="non-scaling-stroke"/>
   <path d="${path('s')}" fill="none" stroke="#dc2626" stroke-width="2.5" vector-effect="non-scaling-stroke"/>
   <text x="${P}" y="${H-4}" fill="#666" font-size="11">${d(series[0][0])}</text><text x="${W}" y="${H-4}" fill="#666" font-size="11" text-anchor="end">${d(series[series.length-1][0])}</text></svg>`}
+/* Where smart money got in: one line per side (NO line runs 100¢ -> 0¢ so it sits under the matching YES price).
+   Bars = dollars put in (shares x avg entry) at each price, same scale on both lines. */
+function msEntries(m,holders,outs){
+ const px=msJ(m.outcomePrices,[.5,.5]).map(Number),ba=msNum(m.bestAsk),bb=msNum(m.bestBid);
+ const NOW=[ba>0&&ba<1?ba*100:px[0]*100,bb>0&&bb<1?(1-bb)*100:(px[1]||1-px[0])*100].map(v=>Math.round(v));
+ const mono='font-family="ui-monospace,SF Mono,Menlo,Consolas,monospace"',K=v=>v>=1e3?(v/1e3).toFixed(1)+'K':Math.round(v)+'';
+ const S=[0,1].map(i=>{const b={};holders.filter(h=>h.smart&&h.side===i&&h.avg>0&&h.size>0).forEach(h=>{const k=Math.max(0,Math.min(100,Math.round(h.avg*100))),o=b[k]||(b[k]={usd:0,ws:[]});o.usd+=h.size*h.avg;o.ws.push([msName(h),h.size*h.avg,h.tracked])});
+  const tot=Object.values(b).reduce((a,o)=>a+o.usd,0),avg=tot?Object.entries(b).reduce((a,[k,o])=>a+k*o.usd,0)/tot:null;return{b,tot,avg}});
+ if(!S[0].tot&&!S[1].tot)return '<div class="ms-mut" style="padding:14px 0">No smart money entries in this market yet.</div>';
+ const MX=Math.max(1,...S.flatMap(x=>Object.values(x.b).map(o=>o.usd)));
+ const row=i=>{const c=i?'#f87171':'#4ade80',{b,tot,avg}=S[i],n=NOW[i],lbl=msEsc(outs[i]||(i?'No':'Yes'));
+  const W=900,pl=10,pr=10,base=104,h=72,X=p=>pl+(W-pl-pr)*(i?100-p:p)/100,bw=6;
+  let s=`<line x1="${X(0)}" x2="${X(100)}" y1="${base}" y2="${base}" stroke="#2e2e2e" stroke-width="3" stroke-linecap="round"/>`;
+  for(let t=0;t<=100;t+=10)s+=`<line x1="${X(t)}" x2="${X(t)}" y1="${base-5}" y2="${base+5}" stroke="#3a3a3a"/><text x="${X(t)}" y="${base+22}" text-anchor="middle" fill="#666" font-size="11" ${mono}>${t}¢</text>`;
+  for(const[k,o]of Object.entries(b)){const hh=Math.max(3,o.usd/MX*h),tip=`${lbl} at ${k}¢ · $${K(o.usd)}\n`+o.ws.sort((a,b)=>b[1]-a[1]).map(([w,u,tk])=>(tk?'★ ':'')+w+'  $'+K(u)).join('\n');
+   s+=`<rect x="${X(+k)-bw/2}" y="${base-4-hh}" width="${bw}" height="${hh}" rx="2" fill="${c}"><title>${msEsc(tip)}</title></rect>`}
+  let side='';
+  if(avg!=null){const up=n>=avg,mc=up?'#4ade80':'#f87171',a=X(avg),bx=X(n),pc=(n-avg)/avg*100;
+   s+=`<line x1="${Math.min(a,bx)}" x2="${Math.max(a,bx)}" y1="${base}" y2="${base}" stroke="${mc}" stroke-width="3" stroke-linecap="round" opacity=".4"/>`;
+   if(Math.abs(bx-a)>60)s+=`<text x="${(a+bx)/2}" y="${base-8}" text-anchor="middle" fill="${mc}" font-size="12" font-weight="700" ${mono}>${pc>=0?'+':''}${Math.round(pc)}%</text>`;
+   s+=`<circle cx="${a}" cy="${base}" r="6" fill="#121212" stroke="#bbb" stroke-width="2.5"/><text x="${a}" y="${base+40}" text-anchor="middle" fill="#999" font-size="11" ${mono}>avg ${Math.round(avg)}¢</text>`;
+   side=`<span class="pc ${up?'ms-g':'ms-r'}">${pc>=0?'+':''}${Math.round(pc)}%</span><small>${n-avg>=0?'+':''}${Math.round(n-avg)}¢ since avg</small>`}
+  const nx=X(n),lw=70;
+  s+=`<line x1="${nx}" x2="${nx}" y1="${base-h-6}" y2="${base}" stroke="#fff" stroke-width="1" stroke-dasharray="3 3" opacity=".45"/>`;
+  s+=`<rect x="${nx-lw/2}" y="${base-h-28}" width="${lw}" height="21" rx="10.5" fill="#161616" stroke="${c}" stroke-width="1.2"/><text x="${nx}" y="${base-h-13.5}" text-anchor="middle" fill="${c}" font-size="12" font-weight="700" ${mono}>now ${n}¢</text>`;
+  s+=`<circle cx="${nx}" cy="${base}" r="7" fill="${c}" stroke="#121212" stroke-width="2"/>`;
+  return `<div class="ms-er"><div class="ms-el"><b class="${i?'ms-r':'ms-g'}">${lbl.toUpperCase()}</b><small>$${K(tot)} smart money in</small>${side}</div><svg viewBox="0 0 ${W} ${base+48}">${s}</svg></div>`};
+ return row(0)+row(1);
+}
 function msPrice(pr,label){
  const col=pr&&pr.length>1&&pr[pr.length-1][1]<pr[0][1]?'#f87171':'#4ade80';
  if(!pr||pr.length<2)return'<div class="ms-load" style="padding:30px">Price history unavailable for this market</div>';
@@ -2675,8 +2709,9 @@ function msRender(m,data,markets){
   ${msBar('Regular wallets',Y.reg,N.reg,Y.label,N.label,'#86efac','#fca5a5','#052e16','#450a0a',22,msPl(Y.rN+N.rN,'wallet'))}
   <div class="ms-note">Smart = tracked traders (★), plus other wallets with ${msMoney(MS_RULES.minPnl)}+ all-time profit, ${MS_RULES.minMarkets}+ markets, and not from one lucky bet</div>
   <div class="ms-cols">${card(Y,0)}${card(N,1)}</div>
-  <div class="ms-ch">Price movement · ${msEsc(outs[0]||'Yes')}${p1!=null?` <span style="color:#fff">${Math.round(p1*100)}¢</span> <span class="${pch>=0?'ms-g':'ms-r'}">${pch>=0?'+':''}${pch}¢ since start</span>`:''}</div>
-  <div class="ms-chart">${msPrice(price,outs[0]||'Yes')}</div>
+  <div class="ms-ch">Where smart money got in</div>
+  <div class="ms-note" style="margin:0 0 10px">Bars = dollars smart wallets put in at each price (hover for names). The ${msEsc(outs[1]||'No')} line runs 100¢ → 0¢, so each price sits under the matching ${msEsc(outs[0]||'Yes')} price.</div>
+  <div class="ms-entries">${msEntries(m,holders,outs)}</div>
   <div class="ms-ch">Share on ${msEsc(N.label)} over time</div>
   <div class="ms-lg" style="margin-top:2px"><span><span class="ms-sq" style="background:#dc2626"></span>Smart money</span><span><span class="ms-sq" style="background:#8a8a8a"></span>Regular wallets (dashed)</span></div>
   <div class="ms-chart">${msSvg(series,N.label)}</div></div>`;
