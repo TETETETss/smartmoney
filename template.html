@@ -2434,7 +2434,7 @@ function drawPnlCard() {
   const ts = v => { v = num(v); return v > 1e12 ? v / 1000 : v };
   const C = [...seen.values()].map(p => { const sl = p.slug || p.market_slug || '', ev = p.event_slug || p.eventSlug || ''; return {t: ts(p.last_event_at || p.timestamp), pl: num(p.realized_pnl), img: p.icon || p.image || '', title: p.title || '', slug: sl, side: p.outcome || '', sh: num(p.total_size || p.size), avg: num(p.avg_price), cost: num(p.total_cost_usdc || p.initial_value), pct: p.percent_realized_pnl != null ? num(p.percent_realized_pnl) : null, url: sl ? 'https://polymarket.com/event/' + (ev && ev !== sl ? ev + '/' : '') + sl : ''} })
     .filter(c => c.t >= from && c.t <= now + 86400 && c.pl);
-  const W = Math.max(680, Math.round(box.clientWidth || 680)), X0 = 50, X1 = W - 40, Yt = 140, Yb = 292;
+  const W = Math.max(680, Math.round(box.clientWidth || 680)), X0 = 50, X1 = W - 78, Yt = 140, Yb = 292;
   const vmin = Math.min(0, ...V.map(p => p.v)), vmax = Math.max(0, ...V.map(p => p.v)), span = (vmax - vmin) || 1;
   const x = t => X0 + (t - from) / ((now - from) || 1) * (X1 - X0), y = v => Yb - (v - vmin) / span * (Yb - Yt);
   const at = t => { let v = V[0].v; for (const p of V) { if (p.t <= t) v = p.v; else break } return v };
@@ -2442,6 +2442,9 @@ function drawPnlCard() {
   const area = d + ` V${y(vmin).toFixed(1)} H${X0} Z`;
   const sd = n => { const a = Math.abs(n); return (n < 0 ? '−' : '+') + '$' + (a >= 1e6 ? (a / 1e6).toFixed(2) + 'M' : a >= 1e3 ? (a / 1e3).toFixed(1) + 'K' : Math.round(a)) };
   const pd = n => '$' + (n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1e3 ? (n / 1e3).toFixed(1) + 'K' : Math.round(n));
+  const yst = (() => { const r = span / 4, m = Math.pow(10, Math.floor(Math.log10(r))), f = r / m; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * m })();
+  const yl = n => { const a = Math.abs(n), s = n < 0 ? '−$' : '$'; return a === 0 ? '$0' : s + (a >= 1e6 ? +(a / 1e6).toFixed(2) + 'M' : a >= 1e3 ? +(a / 1e3).toFixed(1) + 'K' : Math.round(a)) };
+  let axis = ''; for (let v = Math.ceil(vmin / yst) * yst; v <= vmax + 1e-9; v += yst) { const yy = y(v).toFixed(1); if (v !== 0) axis += `<line x1="${X0}" y1="${yy}" x2="${X1}" y2="${yy}" stroke="#1d1d26"/>`; axis += `<text x="${X1 + 10}" y="${(+yy + 4).toFixed(1)}" font-size="11" fill="#6f6f80" font-family="monospace">${yl(v)}</text>` }
   const pick = (arr, n) => { const out = []; for (const c of arr) { if (out.length >= n) break; if (out.every(o => Math.abs(x(o.t) - x(c.t)) > 84)) out.push(c) } return out };
   const wins = pick(C.filter(c => c.pl > 0).sort((a, b) => b.pl - a.pl), 3), losses = pick(C.filter(c => c.pl < 0).sort((a, b) => a.pl - b.pl), 2);
   const mk = [...wins, ...losses]; for (const c of C.slice().sort((a, b) => Math.abs(b.pl) - Math.abs(a.pl))) { if (mk.length >= 40) break; if (mk.includes(c)) continue; const cx = x(c.t), cy = y(at(c.t)); if (mk.every(o => Math.hypot(x(o.t) - cx, y(at(o.t)) - cy) > 17)) mk.push(c) }
@@ -2469,7 +2472,7 @@ function drawPnlCard() {
   <text x="78" y="68" font-size="11" fill="#7d7d8c" font-family="monospace">${S.addr.slice(0, 6)}…${S.addr.slice(-4)} · ${S.open.length} open</text>
   <text x="${W - 28}" y="40" text-anchor="end" font-size="11" fill="#7d7d8c" font-family="monospace" letter-spacing="2">${R30 ? 'LAST 30 DAYS PNL' : 'ALL-TIME PNL'}</text>
   <text x="${W - 28}" y="76" text-anchor="end" font-size="36" font-weight="700" fill="${total >= 0 ? '#4ade80' : '#f87171'}">${sd(total)}</text>
-  <line x1="40" y1="${y(0).toFixed(1)}" x2="${W - 30}" y2="${y(0).toFixed(1)}" stroke="#2c2c38" stroke-dasharray="3 4"/>
+  ${axis}<line x1="40" y1="${y(0).toFixed(1)}" x2="${X1}" y2="${y(0).toFixed(1)}" stroke="#2c2c38" stroke-dasharray="3 4"/>
   <path d="${area}" fill="#7f77dd" fill-opacity=".16"/><path d="${d}" fill="none" stroke="#cfcfe0" stroke-width="2"/>${marks}${pins}
   <line x1="20" y1="346" x2="${W - 20}" y2="346" stroke="#24242e"/>
   <g font-family="monospace" font-size="10" fill="#7d7d8c" letter-spacing="1"><text x="${40 + 0 * (W - 150) / 5}" y="364">VOLUME</text><text x="${40 + 1 * (W - 150) / 5}" y="364">GREEN DAYS</text><text x="${40 + 2 * (W - 150) / 5}" y="364">BEST WIN</text><text x="${40 + 3 * (W - 150) / 5}" y="364">WORST LOSS</text><text x="${40 + 4 * (W - 150) / 5}" y="364">TOP TOPIC</text><text x="${40 + 5 * (W - 150) / 5}" y="364">PORTFOLIO</text></g>
