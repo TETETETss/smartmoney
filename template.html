@@ -640,7 +640,7 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
 #v-portfolio .grph{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding-bottom:10px;border-bottom:1px solid #262626;flex-wrap:wrap}
 #v-portfolio .grph b{text-transform:uppercase;font-weight:600;letter-spacing:.4px;font-size:14px}
 #v-portfolio .grph span{font:11px ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:#999;letter-spacing:.5px}
-#v-portfolio .prow{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(200px,1fr) 110px 76px;gap:18px;align-items:center;padding:14px 0;border-top:1px solid #1e1e1e}
+#v-portfolio .prow{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(200px,1fr) 110px 76px 76px;gap:18px;align-items:center;padding:14px 0;border-top:1px solid #1e1e1e}
 #v-portfolio .prow:first-of-type{border-top:0}
 #v-portfolio .pmk{display:flex;gap:10px;align-items:flex-start;min-width:0}
 #v-portfolio .pmk img,#v-portfolio .pmk .mph{width:32px;height:32px;border-radius:8px;object-fit:cover;flex:none;background:#1c1c1c;border:1px solid #262626;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#bbb}
@@ -658,7 +658,7 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
 #v-portfolio .track .lb.n{color:#fff}
 #v-portfolio .psz{text-align:right}#v-portfolio .psz b{display:block;font-size:15px;font-weight:600}#v-portfolio .psz small{font-size:11px;color:#777}
 #v-portfolio .psz .sb{height:3px;border-radius:2px;background:#262626;margin-top:6px;overflow:hidden}#v-portfolio .psz .sb i{display:block;height:100%;background:#e8e8e8;border-radius:2px;margin-left:auto}
-#v-portfolio .ppl{text-align:right}#v-portfolio .ppl b{display:block;font-size:15px;font-weight:600}#v-portfolio .ppl small{font-size:11px;color:#777}
+#v-portfolio .ppl{text-align:right}#v-portfolio .pszp b{color:#ddd}#v-portfolio .pfpv{margin:6px 0 2px;font:12px ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:var(--xmu,#888)}#v-portfolio .pfpv b{color:#fff;font-weight:600}#v-portfolio .ppl b{display:block;font-size:15px;font-weight:600}#v-portfolio .ppl small{font-size:11px;color:#777}
 #v-portfolio .pfleg{display:flex;gap:16px;flex-wrap:wrap;font:11px ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:#999;letter-spacing:.4px}
 #v-portfolio .pfleg span{display:flex;align-items:center;gap:6px}
 #v-portfolio .pfleg .o{width:12px;height:12px;border-radius:50%;border:2px solid #bbb;display:inline-block}#v-portfolio .pfleg .f{width:12px;height:12px;border-radius:50%;background:#4ade80;display:inline-block}#v-portfolio .pfleg .f.r{background:#f87171}
@@ -666,7 +666,7 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
 #v-portfolio .sghead b{display:block;text-transform:uppercase;font-weight:600;letter-spacing:.3px;font-size:15px;margin-bottom:4px}
 #v-portfolio .sghead .muted{font-size:12px;line-height:1.5}
 @media(max-width:900px){#v-signals .sgwrap,#v-portfolio .pfwrap{padding:16px 12px 40px}#v-signals .sgcard,#v-portfolio .sgcard{padding:14px}#v-portfolio .pfsearch{padding:0 12px 12px}#v-portfolio .pfk{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:700px){#v-signals .sgrow,#v-signals .sghd{grid-template-columns:minmax(0,1fr) 62px 62px 46px;gap:8px}#v-signals .sgrow .rk,#v-signals .sghd .rk{display:none}#v-signals .sgrow .sgv{grid-column:1/-1;order:3}#v-signals .sghd .h3{display:none}#v-signals .sgrow .mt a{font-size:13px}#v-portfolio .pfsearch{flex-wrap:wrap}#v-portfolio .pfpick{flex:1 1 100%;max-width:none}#v-portfolio .pfor{display:none}#v-portfolio .pfsearch input{flex:1 1 auto}#v-portfolio .prow{grid-template-columns:minmax(0,1fr) 84px 64px;gap:10px}#v-portfolio .prow .track{grid-column:1/-1;order:4;margin:2px 26px 0}#v-portfolio .topics{grid-template-columns:repeat(2,minmax(0,1fr))}#v-portfolio .topic b{font-size:15px}}
+@media(max-width:700px){#v-signals .sgrow,#v-signals .sghd{grid-template-columns:minmax(0,1fr) 62px 62px 46px;gap:8px}#v-signals .sgrow .rk,#v-signals .sghd .rk{display:none}#v-signals .sgrow .sgv{grid-column:1/-1;order:3}#v-signals .sghd .h3{display:none}#v-signals .sgrow .mt a{font-size:13px}#v-portfolio .pfsearch{flex-wrap:wrap}#v-portfolio .pfpick{flex:1 1 100%;max-width:none}#v-portfolio .pfor{display:none}#v-portfolio .pfsearch input{flex:1 1 auto}#v-portfolio .prow{grid-template-columns:minmax(0,1fr) 84px 56px 64px;gap:10px}#v-portfolio .prow .track{grid-column:1/-1;order:4;margin:2px 26px 0}#v-portfolio .topics{grid-template-columns:repeat(2,minmax(0,1fr))}#v-portfolio .topic b{font-size:15px}}
 
 #v-strength{color:#fff;font-size:14px}
 #v-strength .ms-wrap{padding:0 36px 60px}@media(max-width:900px){#v-strength .ms-wrap{padding:0 12px 40px}}
@@ -1338,6 +1338,7 @@ function pfFromTracked(ti){
 }
 async function pfFromWallet(a){
  const g=(o,...k)=>{for(const x of k)if(o&&o[x]!=null&&o[x]!=='')return o[x]};
+ const cashP=(typeof walletCash=='function'?walletCash(a):Promise.resolve(null)).catch(()=>null);
  let raw=[],cur=null;
  for(let i=0;i<20;i++){const d=await jget('positions',Object.assign({user:a,limit:100},cur?{cursor:cur}:{}));raw=raw.concat(d.data||d||[]);cur=d.pagination&&d.pagination.next_cursor;if(!cur)break}
  let allPnl=null,vol=null;
@@ -1347,7 +1348,7 @@ async function pfFromWallet(a){
   val=+g(p,'current_value','currentValue')||sh*now,slug=g(p,'slug','market_slug')||'',ev=g(p,'event_slug','eventSlug')||slug,title=g(p,'title','question')||slug;
   return {t:title,u:'https://polymarket.com/event/'+(ev&&ev!=slug?ev+'/':'')+slug,cid:g(p,'condition_id','conditionId')||'',cat:topicOf(slug,title),end:String(g(p,'end_date','endDate')||'').slice(0,10),img:g(p,'icon','image')||'',
    side:String(g(p,'outcome')||'').toUpperCase().slice(0,3)=='YES'?'YES':String(g(p,'outcome')||'NO').toUpperCase(),sh,avg,now,val}}).filter(x=>x.sh>0.5&&x.now>0.001&&x.now<0.999);
- return {name:g(who,'name')||a.slice(0,6)+'…'+a.slice(-4),addr:a,pic:g(who,'profile_image','profileImage')||null,allPnl,vol,src:'Live wallet',pos};
+ return {name:g(who,'name')||a.slice(0,6)+'…'+a.slice(-4),addr:a,pic:g(who,'profile_image','profileImage')||null,allPnl,vol,src:'Live wallet',pos,cash:await cashP};
 }
 async function pfResolveName(q){
  let name=String(q||'').trim();
@@ -1437,6 +1438,8 @@ function pfRender(){
  const pos=(P.pos||[]).map(x=>({...x,cost:(+x.sh||0)*(+x.avg||0),pl:(+x.val||0)-(+x.sh||0)*(+x.avg||0)}));
  if(!pos.length){box.innerHTML='<div class="card sgcard pfmsg">'+esc(P.name)+' has no open positions right now.</div>';return}
  const tv=pos.reduce((a,x)=>a+(+x.val||0),0),cost=pos.reduce((a,x)=>a+x.cost,0),win=pos.filter(x=>x.pl>0).length,maxV=Math.max(...pos.map(x=>+x.val||0),1);
+ const cash=P.cash!=null?+P.cash:((typeof TRS!=='undefined'&&P.addr&&(TRS.find(t=>t.a&&t.a.toLowerCase()==P.addr.toLowerCase())||{}).cash)??null),PV=tv+(cash||0);
+ const szp=v=>{const p=PV>0?(+v||0)/PV*100:0;return (p<10?p.toFixed(1):Math.round(p))+'%'};
  const groups={};pos.forEach(x=>(groups[x.cat]=groups[x.cat]||[]).push(x));
  const G=Object.entries(groups).map(([c,a])=>({c,a:a.sort((x,y)=>(+y.val||0)-(+x.val||0)),v:a.reduce((s,x)=>s+(+x.val||0),0),cost:a.reduce((s,x)=>s+x.cost,0)})).sort((a,b)=>b.v-a.v);
  if(PFTOP&&!groups[PFTOP]) PFTOP=null;
@@ -1459,6 +1462,7 @@ function pfRender(){
   '<div class="xc"><div class="xh"><div class="xi">'+(P.pic?'<img src="'+esc(P.pic)+'" alt="" referrerpolicy="no-referrer" onerror="this.remove()">':L1)+'</div><span class="xt">'+esc(name)+'</span><span class="xs">'+esc(P.src||'')+'</span>'+
    (P.addr?'<div class="xa"><span class="xl" style="text-transform:none">'+P.addr.slice(0,6)+'…'+P.addr.slice(-4)+'</span><a class="xb" title="Open on Polymarket" href="https://polymarket.com/profile/'+P.addr+'" target="_blank" rel="noopener">'+XIC.out+'</a></div>':'')+'</div>'+
   '<span class="xl">Open value</span><div><span class="xbig">'+usdK(tv)+'</span><span class="xd">'+pnlPct(tv,cost)+' vs cost</span></div>'+
+  '<div class="pfpv">Portfolio <b>'+usdK(PV)+'</b> = '+usdK(tv)+' positions + '+(cash==null?'cash unavailable':usdK(cash)+' cash')+'</div>'+
   '<div class="xrow" style="--n:4">'+
    '<div><span class="xl">Positions</span><b>'+pos.length+'</b><small>open right now</small></div>'+
    '<div><span class="xl">Open PnL</span><b>'+pnlPct(tv,cost)+'</b><small>vs what they paid</small></div>'+
@@ -1472,6 +1476,7 @@ function pfRender(){
    g.a.map(x=>{const img=x.img?'<img src="'+esc(x.img)+'" alt="" loading="lazy" referrerpolicy="no-referrer">':'<span class="mph">'+esc((String(x.t).match(/[A-Za-z0-9]/)||['?'])[0].toUpperCase())+'</span>';
     return '<div class="prow"><div class="pmk">'+img+'<div><a class="tlk" data-cid="'+esc(x.cid||'')+'" href="'+esc(x.u)+'" target="_blank" rel="noopener">'+esc(x.t)+'</a><small><span class="side '+(x.side=='YES'?'sy':'sn')+'">'+esc(x.side)+'</span> · ends '+d(x.end)+'</small></div></div>'+
      track(x)+'<div class="psz"><b>'+usdK(x.val)+'</b><small>'+K(x.sh)+' shares</small><div class="sb"><i style="width:'+Math.max(3,maxV?x.val/maxV*100:0)+'%"></i></div></div>'+
+     '<div class="ppl pszp" title="'+usdK(x.val)+' of a '+usdK(PV)+' portfolio (positions + cash)"><b>'+szp(x.val)+'</b><small>of portfolio</small></div>'+
      '<div class="ppl"><b>'+pnlPct(x.val,x.cost)+'</b><small>vs cost</small></div></div>'}).join('')+'</div>').join('');
 }
 document.getElementById('pfwrap')&&document.getElementById('pfwrap').addEventListener('click',e=>{
