@@ -2695,7 +2695,7 @@ async function msAnalyze(m){
   x.ppct=x.mpnl!=null&&cost>0?x.mpnl/cost*100:null;const v=MS_PV[x.w];x.szp=v>0?Math.min(100,x.value/v*100):null});
  const net={s:[0,0],r:[0,0]},ser={},pct=n=>n[0]+n[1]>0?n[1]/(n[0]+n[1])*100:null;
  trades.slice().sort((a,b)=>a.timestamp-b.timestamp).forEach(t=>{const g=cls[who(t)]&&cls[who(t)].smart?'s':'r',i=msNum(msPick(t,'outcome_index','outcomeIndex'))?1:0;
-  net[g][i]=Math.max(0,net[g][i]+(t.side=='SELL'?-usd(t):usd(t)));ser[new Date(msNum(t.timestamp)*1000).toISOString().slice(0,10)]={s:pct(net.s),r:pct(net.r)}});
+  net[g][i]=Math.max(0,net[g][i]+(t.side=='SELL'?-usd(t):usd(t)));ser[new Date(msNum(t.timestamp)*1000).toISOString().slice(0,10)]={y:net.s[0],n:net.s[1],s:pct(net.s),r:pct(net.r)}});
  const NEWMS=7*864e5,isNew=w=>{const c=cls[w];return c&&c.join&&Date.now()-c.join<NEWMS},hw=new Set(holders.map(x=>x.w)),fresh=holders.filter(x=>isNew(x.w)&&x.value>=MS_NEWMIN).map(x=>Object.assign({},x,{join:cls[x.w].join}));
  {const nb={},nm={};trades.forEach(t=>{const w=who(t);if(hw.has(w)||!isNew(w))return;const i=msNum(msPick(t,'outcome_index','outcomeIndex'))?1:0,k=w+'|'+i;nb[k]=(nb[k]||0)+(t.side=='SELL'?-usd(t):usd(t));nm[w]=nm[w]||msPick(t,'name','pseudonym')});
   Object.entries(nb).forEach(([k,v])=>{if(v<MS_NEWMIN)return;const [w,i]=k.split('|');fresh.push({w,name:nm[w],side:+i,value:v,join:cls[w].join,est:true,smart:false,tracked:false})})}
@@ -2703,18 +2703,19 @@ async function msAnalyze(m){
  let price=[];const tid=null;   // price history no longer shown (replaced by 'Where smart money got in')
  if(tid){const ph=await fetch('https://clob.polymarket.com/prices-history?market='+encodeURIComponent(tid)+'&interval=max&fidelity=720').then(r=>r.ok?r.json():null).catch(()=>null);price=((ph&&ph.history)||[]).map(x=>[msNum(x.t),msNum(x.p)]).filter(x=>x[0])}
  return{outs,holders,series:Object.entries(ser).slice(-30),price,fresh}}
-function msSvg(series,label){
+function msSvg(series,outs){
+ // Smart money dollars on each side over time (net bought, running total from the trades we can see)
  if(series.length<2)return'<div class="ms-load" style="padding:30px">Not enough trade history yet</div>';
- const W=1000,H=200,P=36,X=i=>P+i/(series.length-1)*(W-P-8),Y=v=>8+(1-v/100)*(H-34);
- const path=k=>{let d='',pen=false;series.forEach(([,v],i)=>{if(v[k]==null){pen=false;return}d+=(pen?'L':'M')+X(i).toFixed(1)+','+Y(v[k]).toFixed(1);pen=true});return d};
- const grid=[0,25,50,75,100].map(v=>`<line x1="${P}" x2="${W}" y1="${Y(v)}" y2="${Y(v)}" stroke="#222"/><text x="${P-6}" y="${Y(v)+4}" fill="#666" font-size="11" text-anchor="end">${v}%</text>`).join('');
- const d=s=>new Date(s).toLocaleDateString('en-US',{month:'short',day:'numeric'});
- return`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Smart vs regular share on ${msEsc(label)} over time">${grid}
-  <path d="${path('r')}" fill="none" stroke="#8a8a8a" stroke-width="2" stroke-dasharray="6 5" vector-effect="non-scaling-stroke"/>
-  <path d="${path('s')}" fill="none" stroke="#dc2626" stroke-width="2.5" vector-effect="non-scaling-stroke"/>
-  <text x="${P}" y="${H-4}" fill="#666" font-size="11">${d(series[0][0])}</text><text x="${W}" y="${H-4}" fill="#666" font-size="11" text-anchor="end">${d(series[series.length-1][0])}</text></svg>`}
-/* Where smart money got in: one line per side (NO line runs 100¢ -> 0¢ so it sits under the matching YES price).
-   Bars = dollars put in (shares x avg entry) at each price, same scale on both lines. */
+ const ys=series.map(([,v])=>msNum(v.y)),ns=series.map(([,v])=>msNum(v.n)),mx=Math.max(1,...ys,...ns)*1.1;
+ const W=1000,H=220,L=58,R=12,T=10,B=H-26,X=i=>L+i/(series.length-1)*(W-L-R),Y=v=>B-(v/mx)*(B-T);
+ const st=(()=>{const r=mx/4,m=Math.pow(10,Math.floor(Math.log10(r))),f=r/m;return(f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*m})();
+ let g='';for(let v=0;v<=mx;v+=st)g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" stroke="#222"/><text x="${L-8}" y="${(Y(v)+4).toFixed(1)}" fill="#666" font-size="11" text-anchor="end">${msMoney(v)}</text>`;
+ const line=(a,c)=>{const d=a.map((v,i)=>(i?'L':'M')+X(i).toFixed(1)+','+Y(v).toFixed(1)).join('');return`<path d="${d}L${X(a.length-1).toFixed(1)},${B}L${L},${B}Z" fill="${c}" fill-opacity=".10"/><path d="${d}" fill="none" stroke="${c}" stroke-width="2.5" vector-effect="non-scaling-stroke"/>`};
+ const dd=s=>new Date(s).toLocaleDateString('en-US',{month:'short',day:'numeric'}),n=series.length,ticks=[0,Math.round((n-1)/3),Math.round(2*(n-1)/3),n-1].filter((v,i,a)=>a.indexOf(v)===i);
+ const lastY=ys[n-1],lastN=ns[n-1];
+ return`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Smart money dollars on ${msEsc(outs[0]||'Yes')} and ${msEsc(outs[1]||'No')} over time">${g}${line(ns,'#f87171')}${line(ys,'#4ade80')}
+  ${ticks.map(i=>`<text x="${X(i).toFixed(1)}" y="${H-6}" fill="#666" font-size="11" text-anchor="${i==0?'start':i==n-1?'end':'middle'}">${dd(series[i][0])}</text>`).join('')}</svg>
+  <div class="ms-lg" style="margin-top:6px"><span><span class="ms-sq" style="background:#4ade80"></span>${msEsc(outs[0]||'Yes')} ${msMoney(lastY)}</span><span><span class="ms-sq" style="background:#f87171"></span>${msEsc(outs[1]||'No')} ${msMoney(lastN)}</span><span class="ms-mut">Smart money now: ${lastY+lastN?Math.round(Math.max(lastY,lastN)/(lastY+lastN)*100)+'% on '+msEsc(lastY>=lastN?outs[0]||'Yes':outs[1]||'No'):'—'}</span></div>`}
 function msEntries(m,holders,outs){
  const px=msJ(m.outcomePrices,[.5,.5]).map(Number),ba=msNum(m.bestAsk),bb=msNum(m.bestBid);
  const NOW=[ba>0&&ba<1?ba*100:px[0]*100,bb>0&&bb<1?(1-bb)*100:(px[1]||1-px[0])*100].map(v=>Math.round(v));
@@ -2796,9 +2797,9 @@ function msRender(m,data,markets){
   <div class="ms-ch">Where smart money got in</div>
   <div class="ms-note" style="margin:0 0 10px">Bars = dollars smart wallets put in at each price (hover for names). The ${msEsc(outs[1]||'No')} line runs 100¢ → 0¢, so each price sits under the matching ${msEsc(outs[0]||'Yes')} price.</div>
   <div class="ms-entries">${msEntries(m,holders,outs)}</div>
-  <div class="ms-ch">Share on ${msEsc(N.label)} over time</div>
-  <div class="ms-lg" style="margin-top:2px"><span><span class="ms-sq" style="background:#dc2626"></span>Smart money</span><span><span class="ms-sq" style="background:#8a8a8a"></span>Regular wallets (dashed)</span></div>
-  <div class="ms-chart">${msSvg(series,N.label)}</div></div>`;
+  <div class="ms-ch">Smart money on ${msEsc(Y.label)} vs ${msEsc(N.label)} over time</div>
+  <div class="ms-note" style="margin:0 0 8px">Dollars smart wallets have put in on each side (bought minus sold), day by day</div>
+  <div class="ms-chart">${msSvg(series,outs)}</div></div>`;
  document.querySelectorAll('#v-strength .ms-lk').forEach(b=>b.onclick=()=>{view('wallet');const pm=document.querySelector('#v-wallet .wamode button[data-m=pm]');if(pm)pm.click();const q=document.getElementById('waq');q.value=b.dataset.w;document.getElementById('waf').requestSubmit()});
  const fm=ms$('#msnwm');if(fm)fm.onclick=()=>{ms$('#msnw').querySelectorAll('.ms-hide2').forEach(r=>r.classList.remove('ms-hide2'));fm.remove()};
  document.querySelectorAll('#v-strength .ms-tk').forEach(b=>b.onclick=()=>{const el=ms$('#mswl'+b.dataset.i);el.classList.toggle('ms-hide');b.textContent=b.textContent.replace(/[▾▴]/,el.classList.contains('ms-hide')?'▾':'▴')});
@@ -2816,7 +2817,7 @@ function msDemo(){
   H('nohodler',1,40000,false,2000,0),H('fadeitall',1,28500,false,-9000,0)];
  hs.forEach((x,k)=>{x.size=x.value/(x.side?0.45:0.55);const cost=x.value-(x.mpnl||0);x.avg=cost/x.size;x.ppct=cost>0?(x.mpnl||0)/cost*100:null;if(x.mpnl>x.value*.5){x.mpnl=x.value*.3;const c2=x.value-x.mpnl;x.avg=c2/x.size;x.ppct=x.mpnl/c2*100}x.szp=x.smart?[4.2,12,0.8,27,2.5,9.1,0.4][k%7]:null});
  let s=9;const r=()=>(s=(s*16807)%2147483647)/2147483647;let a=75,b=55;
- const series=[...Array(30)].map((_,i)=>{a=i==29?98:Math.min(98,a+(r()-.25)*1.8);b=i==29?39:Math.max(35,b-(r()-.3)*1.4);return[new Date(Date.now()-(29-i)*864e5).toISOString().slice(0,10),{s:a,r:b}]});
+ let yv=2000,nv=8000;const series=[...Array(30)].map((_,i)=>{a=i==29?98:Math.min(98,a+(r()-.25)*1.8);b=i==29?39:Math.max(35,b-(r()-.3)*1.4);yv=Math.max(0,yv+(r()-.4)*900);nv=Math.max(0,nv+(r()-.2)*9000);return[new Date(Date.now()-(29-i)*864e5).toISOString().slice(0,10),{s:a,r:b,y:yv,n:nv}]});
  let q=.62;const price=[...Array(120)].map((_,i)=>{q=Math.min(.97,Math.max(.03,q+(r()-.55)*.03));return[Math.floor(Date.now()/1000)-(119-i)*43200,q]});
  const fresh=hs.filter(x=>!x.smart&&x.value>=MS_NEWMIN).filter((x,k)=>k%2==0).map((x,k)=>Object.assign({},x,{join:Date.now()-(k+1)*.7*864e5}));
  return{outs:['Yes','No'],holders:hs,series,price,fresh}}
