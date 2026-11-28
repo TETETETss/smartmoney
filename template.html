@@ -963,6 +963,8 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
 #v-strength .ms-nm small{color:#777;font:11px ui-monospace,Menlo,Consolas,monospace}
 #v-strength .ms-lk{background:none;border:1px solid #333;color:#bbb;border-radius:7px;padding:3px 9px;font:inherit;font-size:12px;cursor:pointer}#v-strength .ms-lk:hover{color:#fff;border-color:#666}
 #v-strength .ms-hide2{display:none}
+#v-live .lthl{font-size:14px;color:#ddd;margin:3px 0 2px;line-height:1.5}#v-live .lthl b{font-weight:600}#v-live .lthu{color:#999}
+#v-live .lthn{display:inline-block;font-size:11px;font-weight:600;background:#1f2a44;color:#93b4ff;border-radius:6px;padding:1px 7px;margin-left:6px;vertical-align:1px}
 </style></head><body class="indash">
 <canvas id="orb"></canvas>
 
@@ -1000,7 +1002,7 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
    <div class="ltshell">
     <div class="ltbar"><input id="liveq" type="search" aria-label="Search markets or traders" placeholder="Search markets or traders…" autocomplete="off" spellcheck="false" oninput="liveRender()"><button type="button" id="lthide" class="lt-hchip" hidden>Hidden (0)</button><span id="livecount"></span></div>
     <div id="lthidebox" class="lt-hbox" hidden></div>
-    <div class="ltfil"><div class="ltseg" id="ltmode"><button type="button" data-m="g">Grouped</button><button type="button" data-m="l">List</button></div><div class="ltchips" id="ltchips"><button type="button" data-f="all">All</button><button type="button" data-f="buy">Buys</button><button type="button" data-f="sell">Sells</button><button type="button" data-f="big">$1K+</button><button type="button" data-f="new">New entries</button><button type="button" data-f="against">Against the crowd</button></div></div>
+    <div class="ltfil"><div class="ltseg" id="ltmode"><button type="button" data-m="g">Grouped</button><button type="button" data-m="l">List</button></div><div class="ltchips" id="ltchips"><button type="button" data-f="all">All</button><button type="button" data-f="buy">Buys</button><button type="button" data-f="sell">Sells</button><button type="button" data-f="big">$1K+</button><button type="button" data-f="new">New entries</button><button type="button" data-f="against">Against the crowd</button><button type="button" data-f="multi">2+ traders</button></div></div>
     <div id="ltgroups" class="ltgroups"></div>
     <div class="ltscroll"><table id="lttbl"><thead><tr><th>Market</th><th>Trader</th><th>Side</th><th id="ltamt" title="Sort by amount">Amount<span id="ltamtarr"></span></th><th>Time</th></tr></thead><tbody id="ltbody"></tbody></table></div>
     <div class="ltfoot"><span>Held bar = shares currently held in that market. Empty = fully exited.</span><span id="liveasof"></span></div>
@@ -1571,7 +1573,7 @@ function liveHideChip(){const b=document.getElementById('lthide'),box=document.g
  box.innerHTML=LIVEHIDE.map(h=>{const ini=(h.n||'?').replace(/[^a-z0-9]/gi,'').slice(0,2).toUpperCase()||'?';const av=h.avatar?`<img class="avatar" src="${esc(h.avatar)}" alt="" width="28" height="28" referrerpolicy="no-referrer">`:`<span class="avatar">${esc(ini)}</span>`;return `<div class="lt-hrow">${av}<span class="name">${esc(h.n||h.a)}</span><button type="button" class="lt-un" data-unhide="${encodeURIComponent(h.a)}">Unhide</button></div>`}).join('')+'<button type="button" class="lt-un" data-unhide-all>Unhide all</button>'}
 function hideLiveTrader(a,n,av){a=String(a||'').toLowerCase();if(!a)return;if(!LIVEHIDE.some(h=>h.a===a))LIVEHIDE.push({a,n:n||a,avatar:av||''});saveLiveHide();liveRender()}
 function unhideLive(a){a=String(a||'').toLowerCase();LIVEHIDE=LIVEHIDE.filter(h=>h.a!==a);if(!LIVEHIDE.length)liveHideOpen=false;saveLiveHide();liveRender()}
-function liveRender(){const q=(document.getElementById('liveq').value||'').trim().toLowerCase();let data=LIVE.filter(r=>!LIVEHIDE.some(h=>h.a===String(r.a||'').toLowerCase())&&(!q||(r.n+' '+r.t+' '+r.out).toLowerCase().includes(q)));data=data.filter(ltFilter);if(liveAmt)data.sort((a,b)=>liveAmt*(b.usd-a.usd)||b.ts-a.ts);
+function liveRender(){const q=(document.getElementById('liveq').value||'').trim().toLowerCase();let data=LIVE.filter(r=>!LIVEHIDE.some(h=>h.a===String(r.a||'').toLowerCase())&&(!q||(r.n+' '+r.t+' '+r.out).toLowerCase().includes(q)));data=data.filter(ltFilter);if(LTF==='multi'){const c={};data.forEach(r=>{const k=r.cid||r.url;(c[k]=c[k]||new Set()).add(String(r.a||r.n))});data=data.filter(r=>c[r.cid||r.url].size>=2)}if(liveAmt)data.sort((a,b)=>liveAmt*(b.usd-a.usd)||b.ts-a.ts);
  if(typeof ltGroups==='function')ltGroups(data.slice().sort((a,b)=>b.ts-a.ts));
  document.getElementById('livecount').textContent=data.length+(data.length===1?' trade':' trades');
  const asof=document.getElementById('liveasof');if(asof)asof.textContent=BUILT?updatedLabel(BUILT):'';
@@ -1587,22 +1589,25 @@ function liveRender(){const q=(document.getElementById('liveq').value||'').trim(
   const fills=(r.fills&&r.fills.length>1)?`<button class="fills" type="button" data-fill="${r.id}" aria-expanded="${liveOpen.has(r.id)}">${liveOpen.has(r.id)?'⌄':'›'} ${r.fills.length} fills</button>`:'';
   const fillrow=liveOpen.has(r.id)&&r.fills&&r.fills.length?`<tr class="fillrow"><td colspan="5"><div class="fill-list">${r.fills.map((f,i)=>`<span>Fill ${i+1} · <b>${dollars(f.usd)}</b><br>${shn(f.shares)} shares @ ${cents(f.price)} · <span data-ts="${f.ts}">${ago(f.ts)}</span></span>`).join('')}</div></td></tr>`:'';
   return `<tr class="trade-row"><td><div class="market" data-url="${esc(r.url)}" data-cid="${esc(r.cid||'')}"><span class="mhit">${icon}</span><a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">${esc(r.t)}</a></div></td><td><div class="trader-top">${av}<span class="name">${esc(r.n)}</span>${waBtn(r.n)}${hideBtn}</div><div class="holding" title="${r.held>0?shn(r.held)+' '+esc(r.out)+' shares, '+holdUsd(r.hval):'Fully exited'}"><div class="track" role="meter" aria-label="Current shares held" aria-valuemin="0" aria-valuemax="${peak}" aria-valuenow="${r.held||0}"><i style="width:${width}%"></i></div><div class="held ${r.held>0?'':'exited'}">${held}</div></div></td><td><div class="side ${sell?'sell':''}">${sell?'Sell':'Buy'} ${esc(r.out)}<span class="price">${cents(r.price)}</span></div>${tag?`<span class="consensus ${r.chip==='Against'?'against':''}">${esc(tag)}</span>`:''}${fills}</td><td><div class="amount">${money(r.usd)}</div><div class="shares">${shn(r.shares)} shares</div></td><td class="time" data-ts="${r.ts}">${ago(r.ts)}</td></tr>${fillrow}`}).join('')||'<tr><td colspan="5" class="empty">No tracked-wallet trades match.</td></tr>'}
-// ---------- Live trades: grouped view (by time bucket -> market -> trader) ----------
+// ---------- Live trades: grouped view (last 24h / earlier -> market, headline counts distinct smart traders -> trader) ----------
 var LTMODE=LS.get('sm_ltmode','g'), LTF='all';
 function ltFilter(r){if(LTF==='buy')return r.side!=='SELL';if(LTF==='sell')return r.side==='SELL';if(LTF==='big')return (+r.usd||0)>=1000;
- if(LTF==='new')return r.side!=='SELL'&&(r.chip==='First smart wallet'||(+r.held||0)<=(+r.shares||0)*1.05+0.01);if(LTF==='against')return r.chip==='Against';return true}
+ if(LTF==='new')return r.side!=='SELL'&&(r.chip==='First smart wallet'||((+r.held||0)>0&&(+r.held||0)<=(+r.shares||0)*1.05+0.01));if(LTF==='against')return r.chip==='Against';return true}
 function ltUi(){const v=document.getElementById('v-live');v.classList.toggle('mode-g',LTMODE==='g');v.classList.toggle('mode-l',LTMODE!=='g');
  document.querySelectorAll('#ltmode button').forEach(b=>b.classList.toggle('on',b.dataset.m===LTMODE));document.querySelectorAll('#ltchips button').forEach(b=>b.classList.toggle('on',b.dataset.f===LTF))}
 function ltGroups(data){
  const box=document.getElementById('ltgroups');if(!box)return;ltUi();
  const now=Date.now()/1000,usd=n=>{const a=Math.abs(+n||0);return '$'+(a>=1e6?(a/1e6).toFixed(2)+'M':a>=1e4?Math.round(a/1e3)+'K':a>=1e3?(a/1e3).toFixed(1)+'K':a>=100?Math.round(a):a.toFixed(2))};
- const B=[['Last 15 min',900],['Last hour',3600],['Last 6 hours',21600],['Earlier',Infinity]];
+ const B=[['Last 24 hours',86400],['Earlier',Infinity]],isNewIn=r=>r.side!=='SELL'&&(r.chip==='First smart wallet'||((+r.held||0)>0&&(+r.held||0)<=(+r.shares||0)*1.05+0.01)),who=r=>String(r.a||r.n);
  const bk={};data.forEach(r=>{const age=now-(+r.ts||0);const i=B.findIndex(b=>age<=b[1]);(bk[i]=bk[i]||[]).push(r)});
  let html='';
  B.forEach((b,i)=>{const rows=bk[i];if(!rows||!rows.length)return;
   const mk=new Map();rows.forEach(r=>{const k=r.cid||r.url;if(!mk.has(k))mk.set(k,[]);mk.get(k).push(r)});
-  const groups=[...mk.values()].map(g=>{const buy=g.filter(r=>r.side!=='SELL').reduce((a,r)=>a+(+r.usd||0),0),sell=g.filter(r=>r.side==='SELL').reduce((a,r)=>a+(+r.usd||0),0);return {g,buy,sell,net:buy-sell,last:Math.max(...g.map(r=>+r.ts||0))}}).sort((a,b)=>b.last-a.last);
-  const net=groups.reduce((a,x)=>a+x.net,0);
+  const groups=[...mk.values()].map(g=>{const buy=g.filter(r=>r.side!=='SELL').reduce((a,r)=>a+(+r.usd||0),0),sell=g.filter(r=>r.side==='SELL').reduce((a,r)=>a+(+r.usd||0),0);
+   const sides={};g.forEach(r=>{const k=(r.side==='SELL'?'s':'b')+'|'+String(r.out).toUpperCase(),o=sides[k]||(sides[k]={sell:r.side==='SELL',out:String(r.out).toUpperCase(),ws:new Set(),nw:new Set(),usd:0});o.ws.add(who(r));o.usd+=+r.usd||0;if(isNewIn(r))o.nw.add(who(r))});
+   const sl=Object.values(sides).sort((a,b)=>(a.sell-b.sell)||b.ws.size-a.ws.size||b.usd-a.usd),buyers=new Set(g.filter(r=>r.side!=='SELL').map(who)).size,traders=new Set(g.map(who)).size;
+   return {g,buy,sell,net:buy-sell,last:Math.max(...g.map(r=>+r.ts||0)),sl,buyers,traders}}).filter(x=>LTF!=='multi'||x.traders>=2).sort((a,b)=>b.buyers-a.buyers||b.traders-a.traders||Math.abs(b.net)-Math.abs(a.net));
+  if(!groups.length)return;const net=groups.reduce((a,x)=>a+x.net,0);
   html+=`<div class="ltbk"><span><b>${b[0]}</b> · ${groups.length} market${groups.length>1?'s':''} · ${rows.length} trade${rows.length>1?'s':''}</span><span class="${net>=0?'g':'rd'}">${net>=0?'+':'−'}${usd(net)} net</span></div>`;
   html+=groups.map(x=>{const r0=x.g[0],initials=(r0.t||'?').replace(/[^a-z0-9]/gi,'').slice(0,2).toUpperCase();
    const icon=r0.img?`<img class="icon" alt="" src="${esc(r0.img)}" width="40" height="40" loading="lazy" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'icon ph',textContent:'${initials}'}))">`:`<span class="icon ph">${initials}</span>`;
@@ -1617,7 +1622,7 @@ function ltGroups(data){
      const hold=r.held>0?`Now holding ${shn(r.held)} ${r.out} shares (${'$'+Math.round(+r.hval||0).toLocaleString('en-US')})`:'Fully exited';
      return {last:+r.ts||0,tot,html:`<div class="ltt" title="${esc(hold)}">${av}<span class="nm">${esc(r.n)}</span>${waBtn(r.n)}<span class="act ${sell?'sell':''}">${sell?'Sold':'Bought'} ${esc(String(r.out).toUpperCase())}<small>${fills>1?fills+' fills · ':''}@${sh?cents(tot/sh):cents(r.price)}</small></span>${tag?`<span class="consensus ${r.chip==='Against'?'against':''}">${esc(tag)}</span>`:''}<span class="amt ${sell?'s':'b'}">${sell?'−':'+'}${usd(tot)}</span><span class="tm" data-ts="${r.ts}">${ago(r.ts)}</span></div>`}}).sort((a,b)=>b.tot-a.tot);
    const tot=x.buy+x.sell||1;
-   return `<div class="ltg"><div class="ltgh"><div class="market" data-url="${esc(r0.url)}" data-cid="${esc(r0.cid||'')}"><span class="mhit">${icon}</span><div style="min-width:0"><a href="${esc(r0.url)}" target="_blank" rel="noopener noreferrer">${esc(r0.t)}</a><div class="ltgs">${cons}</div></div></div><div class="ltgn"><b class="${x.net>=0?'g':'rd'}">${x.net>=0?'+':'−'}${usd(x.net)} net</b><small>${x.g.length} trade${x.g.length>1?'s':''} · ${ago(x.last)} ago</small></div></div>
+   return `<div class="ltg"><div class="ltgh"><div class="market" data-url="${esc(r0.url)}" data-cid="${esc(r0.cid||'')}"><span class="mhit">${icon}</span><div style="min-width:0"><a href="${esc(r0.url)}" target="_blank" rel="noopener noreferrer">${esc(r0.t)}</a><div class="lthl">${x.sl.map((s,j)=>`${j?' · ':''}<b class="${s.sell?'rd':'g'}">${s.ws.size}${j?'':' smart trader'+(s.ws.size>1?'s':'')}</b> ${s.sell?'sold':'bought'} ${esc(s.out)} <span class="lthu">${usd(s.usd)}</span>${!s.sell&&s.nw.size?`<span class="lthn">${s.nw.size} new entr${s.nw.size>1?'ies':'y'}</span>`:''}`).join('')}</div><div class="ltgs">${cons}</div></div></div><div class="ltgn"><b class="${x.net>=0?'g':'rd'}">${x.net>=0?'+':'−'}${usd(x.net)} net</b><small>${x.traders} trader${x.traders>1?'s':''} · ${x.g.length} trade${x.g.length>1?'s':''} · last ${ago(x.last)} ago</small></div></div>
     <div class="ltgbar" title="Bought ${usd(x.buy)} · Sold ${usd(x.sell)}">${x.buy?`<i class="b" style="width:${x.buy/tot*100}%"></i>`:''}${x.sell?`<i class="s" style="width:${x.sell/tot*100}%"></i>`:''}</div>
     ${lines.map(l=>l.html).join('')}</div>`}).join('');
  });
