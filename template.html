@@ -731,6 +731,7 @@ summary{gap:8px;align-items:center}summary>span:first-child{flex:none}.stags{mar
 #v-wallet .xa,#v-portfolio .xa{margin-left:auto;display:flex;gap:8px;align-items:center;flex:none}
 #v-wallet .xb,#v-portfolio .xb{width:32px;height:32px;border-radius:50%;border:1px solid #2a2a2a;background:none;color:#aaa;display:inline-flex;align-items:center;justify-content:center;padding:0;cursor:pointer;font-size:11px}
 #v-wallet .xb:hover,#v-portfolio .xb:hover{color:#fff;border-color:#555}
+#v-wallet .xsp{display:block;margin-top:4px;font:12px ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:var(--xmu)}
 #v-wallet .xl,#v-portfolio .xl{display:block;font:11px ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:1.2px;text-transform:uppercase;color:var(--xmu)}
 #v-wallet .xbig,#v-portfolio .xbig{font-size:52px;font-weight:400;letter-spacing:-1.5px;line-height:1.1;margin-top:8px;font-variant-numeric:tabular-nums;display:inline-block}
 #v-wallet .xd,#v-portfolio .xd{font:13px ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:#8a8a8a;margin-left:12px;vertical-align:28px}
@@ -1262,6 +1263,10 @@ function reqW(w){
 }
 let TRS=/*__TR_S__*/__TRADERS__/*__TR_E__*/;let TR=TRS;
 // Sizing % = this position's value / the trader's whole portfolio value (all open positions, from the build)
+/* Stablecoin cash a wallet holds on Polygon (pUSD + USDC.e + USDC), read straight from the chain */
+async function walletCash(addr){const T=['0xc011a7e12a19f7b1f670d46f03b03f3342e82dfb','0x2791bca1f2de4661ed88a30c99a7a9449aa84174','0x3c499c542cef5e3811e1192ce70d8cc03d5c3359'],d='0x70a08231'+String(addr).toLowerCase().replace(/^0x/,'').padStart(64,'0');
+ for(const u of ['https://polygon-bor-rpc.publicnode.com','https://polygon.drpc.org']){try{const r=await fetch(u,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(T.map((t,i)=>({jsonrpc:'2.0',id:i,method:'eth_call',params:[{to:t,data:d},'latest']})))}).then(r=>r.json());
+  if(Array.isArray(r)&&r.every(x=>x.result!=null))return r.reduce((a,x)=>a+parseInt(x.result,16)/1e6,0)}catch(e){}}return null}
 const PVOF=n=>{const t=TRS.find(x=>x.n==n);return t&&+t.pv>0?+t.pv:null};
 const sizeCell=(n,v,cls)=>{const pv=PVOF(n);if(!pv||!(+v>0))return `<span class="szp sz${cls}">—</span>`;const p=v/pv*100;return `<span class="szp sz${cls}" title="$${Math.round(v).toLocaleString('en-US')} of a $${Math.round(pv).toLocaleString('en-US')} portfolio (open positions + cash)">${p>=10?Math.round(p):p>=1?p.toFixed(1):p<0.1?'<0.1':p.toFixed(1)}%</span>`};
 
@@ -1943,7 +1948,7 @@ async function load(addr) {
   Object.keys(S).forEach(k => delete S[k]);
   S.addr = addr; S.tab = 'overview'; S.lbPeriod = 'all'; S.calMode = 'daily'; S.calUnit = '$';
   try {
-    const [stats, value, open, wins, losses, recentClosed, trades, pnl, lbAll] = await Promise.all([
+    const [stats, value, open, wins, losses, recentClosed, trades, pnl, lbAll, cash] = await Promise.all([
       safe(api('/v2/user-stats', {user: addr})),
       safe(api('/v2/value', {user: addr})),
       safe(paged('/v2/positions', {user: addr, limit: 500}, 2000)),
@@ -1953,10 +1958,13 @@ async function load(addr) {
       safe(api('/v2/activity', {user: addr, type: 'TRADE', limit: 100})),
       safe(api('/v2/user-pnl', {user: addr, interval: 'all', fidelity: '1d'}).then(j => j?.data?.points?.length ? j : api('/v2/user-pnl', {user: addr, interval: 'max', fidelity: '1d'}))),
       safe(api('/v2/leaderboard', {user: addr, time_period: 'all'})),
+      walletCash(addr).catch(() => null),
     ]);
     if (!stats && !open && !trades) throw new Error('Could not reach the Polymarket Data API (network or CORS). Try again, or open this page from your deployed site.');
     S.stats = stats?.data || {};
-    S.value = num(value?.data?.value);
+    S.posValue = num(value?.data?.value);          // open positions only
+    S.cash = cash;                                   // stablecoins in the wallet (null if the chain could not be read)
+    S.value = S.posValue + (cash || 0);              // portfolio = positions + cash
     S.open = (open || []).filter(p => num(p.current_value) > 0.01 || num(p.current_size) > 0);
     S.wins = wins?.data || [];
     S.losses = losses?.data || [];
@@ -2029,7 +2037,7 @@ function render() {
       <span class="xl">All-time PnL</span>
       <div><span class="xbig ${cls(allPnl)}">${allPnl == null ? '—' : money(allPnl)}</span>${st.biggest_win != null ? `<span class="xd">best win <span class="g">${money(st.biggest_win)}</span></span>` : ''}</div>
       <div class="xrow" style="--n:4">
-        <div><span class="xl">Portfolio</span><b>${moneyFull(S.value)}</b></div>
+        <div><span class="xl">Portfolio</span><b>${moneyFull(S.value)}</b><span class="xsp">${S.cash == null ? 'positions only · cash unavailable' : `${money(S.posValue, false)} positions · ${money(S.cash, false)} cash`}</span></div>
         <div><span class="xl">Volume</span><b>${S.lbUser.volume != null ? moneyFull(S.lbUser.volume) : '—'}</b></div>
         <div><span class="xl">Markets</span><b>${st.trades != null ? num(st.trades).toLocaleString() : '—'}</b></div>
         <div><span class="xl">Open positions</span><b>${S.open.length}</b></div>
